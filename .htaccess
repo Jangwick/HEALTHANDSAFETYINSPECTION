@@ -1,0 +1,26 @@
+# Health & Safety Inspections - Apache Configuration
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    
+    # Redirect to public folder
+    RewriteRule ^$ public/ [L]
+    RewriteRule (.*) public/$1 [L]
+</IfModule>
+
+# Security Headers
+<IfModule mod_headers.c>
+    Header set X-Content-Type-Options "nosniff"
+    Header set X-Frame-Options "SAMEORIGIN"
+    Header set X-XSS-Protection "1; mode=block"
+    Header set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
+
+# Disable directory listing
+Options -Indexes
+
+# Protect sensitive files
+<FilesMatch "^\.env">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
