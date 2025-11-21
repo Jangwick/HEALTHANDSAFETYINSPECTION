@@ -17,6 +17,17 @@ if (!$certificateId) {
 try {
     $db = Database::getConnection();
     
+    // Ensure session has first_name and last_name
+    if (!isset($_SESSION['first_name']) || !isset($_SESSION['last_name'])) {
+        $userStmt = $db->prepare("SELECT first_name, last_name FROM users WHERE user_id = ?");
+        $userStmt->execute([$_SESSION['user_id']]);
+        $userData = $userStmt->fetch(PDO::FETCH_ASSOC);
+        if ($userData) {
+            $_SESSION['first_name'] = $userData['first_name'];
+            $_SESSION['last_name'] = $userData['last_name'];
+        }
+    }
+    
     // Get certificate details
     $stmt = $db->prepare("
         SELECT c.*,
