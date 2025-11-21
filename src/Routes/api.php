@@ -74,6 +74,10 @@ $routes = [
 // Match route
 $routeKey = $requestMethod . ' ' . $route;
 
+// Debug logging
+error_log("API Request: $routeKey");
+error_log("Available routes: " . implode(', ', array_keys($routes)));
+
 // Handle route parameters (e.g., {id})
 $matchedRoute = null;
 $params = [];
@@ -105,7 +109,12 @@ if ($matchedRoute !== null) {
     } elseif (is_array($matchedRoute)) {
         // Controller method
         [$controllerName, $methodName] = $matchedRoute;
+        
+        // Try HealthSafety namespace first, then App namespace
         $controllerClass = "HealthSafety\\Controllers\\$controllerName";
+        if (!class_exists($controllerClass)) {
+            $controllerClass = "App\\Controllers\\$controllerName";
+        }
         
         if (class_exists($controllerClass)) {
             $controller = new $controllerClass();

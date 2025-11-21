@@ -9,9 +9,21 @@ declare(strict_types=1);
 
 // Load environment variables
 if (file_exists(__DIR__ . '/../.env')) {
-    $env = parse_ini_file(__DIR__ . '/../.env');
-    foreach ($env as $key => $value) {
-        $_ENV[$key] = $value;
+    $lines = file(__DIR__ . '/../.env', FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+    foreach ($lines as $line) {
+        // Skip comments
+        if (strpos(trim($line), '#') === 0) {
+            continue;
+        }
+        // Parse KEY=VALUE
+        if (strpos($line, '=') !== false) {
+            list($key, $value) = explode('=', $line, 2);
+            $key = trim($key);
+            $value = trim($value);
+            // Remove quotes if present
+            $value = trim($value, '"\'');
+            $_ENV[$key] = $value;
+        }
     }
 }
 
@@ -32,7 +44,15 @@ if (session_status() === PHP_SESSION_NONE) {
 // Get request information
 $requestMethod = $_SERVER['REQUEST_METHOD'];
 $requestUri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+
+// Clean up the URI - remove common path prefixes
 $requestUri = str_replace('/HEALTHANDSAFETYINSPECTION/public', '', $requestUri);
+$requestUri = str_replace('/public', '', $requestUri);
+
+// Ensure URI starts with /
+if ($requestUri === '' || $requestUri[0] !== '/') {
+    $requestUri = '/' . $requestUri;
+}
 
 // Log API request
 $startTime = microtime(true);

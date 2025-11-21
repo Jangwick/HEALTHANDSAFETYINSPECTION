@@ -48,25 +48,26 @@ if (file_exists(ROOT_PATH . '/vendor/autoload.php')) {
 
 // Custom Autoloader for src/ classes
 spl_autoload_register(function ($class) {
-    // Convert namespace to file path
-    $prefix = 'HealthSafety\\';
+    // Support both HealthSafety and App namespaces
+    $prefixes = ['HealthSafety\\', 'App\\'];
     $base_dir = ROOT_PATH . '/src/';
     
-    // Check if class uses the namespace prefix
-    $len = strlen($prefix);
-    if (strncmp($prefix, $class, $len) !== 0) {
-        return;
-    }
-    
-    // Get relative class name
-    $relative_class = substr($class, $len);
-    
-    // Replace namespace separators with directory separators
-    $file = $base_dir . str_replace('\\', '/', $relative_class) . '.php';
-    
-    // If file exists, require it
-    if (file_exists($file)) {
-        require $file;
+    foreach ($prefixes as $prefix) {
+        // Check if class uses the namespace prefix
+        $len = strlen($prefix);
+        if (strncmp($prefix, $class, $len) === 0) {
+            // Get relative class name
+            $relative_class = substr($class, $len);
+            
+            // Replace namespace separators with directory separators
+            $file = $base_dir . str_replace('\\', '/', $relative_class) . '.php';
+            
+            // If file exists, require it
+            if (file_exists($file)) {
+                require $file;
+                return;
+            }
+        }
     }
 });
 

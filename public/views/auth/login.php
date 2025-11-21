@@ -1,3 +1,50 @@
+<?php
+session_start();
+
+// Handle login form submission
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    require_once __DIR__ . '/../../../config/database.php';
+    
+    $username = $_POST['username'] ?? '';
+    $password = $_POST['password'] ?? '';
+    
+    try {
+        // Get database connection
+        $db = Database::getConnection();
+        
+        // Find user by email or username
+        $stmt = $db->prepare("
+            SELECT u.*, r.role_name, r.permissions 
+            FROM users u
+            LEFT JOIN user_roles ur ON u.user_id = ur.user_id
+            LEFT JOIN roles r ON ur.role_id = r.role_id
+            WHERE u.email = ? OR u.username = ?
+            LIMIT 1
+        ");
+        $stmt->execute([$username, $username]);
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        if ($user && password_verify($password, $user['password_hash'])) {
+            // Login successful
+            $_SESSION['user_id'] = $user['user_id'];
+            $_SESSION['username'] = $user['username'];
+            $_SESSION['email'] = $user['email'];
+            $_SESSION['full_name'] = $user['first_name'] . ' ' . $user['last_name'];
+            $_SESSION['role'] = $user['role_name'];
+            $_SESSION['logged_in'] = true;
+            
+            // Redirect to dashboard
+            header('Location: /dashboard.php');
+            exit;
+        } else {
+            $error = 'Invalid username or password';
+        }
+    } catch (PDOException $e) {
+        $error = 'Database error. Please try again.';
+        error_log('Login error: ' . $e->getMessage());
+    }
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -28,7 +75,18 @@
 
             <!-- Login Form -->
             <div class="bg-white rounded-xl shadow-2xl p-8">
-                <form id="loginForm" class="space-y-6" onsubmit="handleLogin(event)">
+                <?php if (isset($error)): ?>
+                <div class="mb-6 rounded-lg bg-red-50 border border-red-200 p-4">
+                    <div class="flex items-start">
+                        <i class="fas fa-exclamation-circle text-red-500 mt-0.5 mr-3"></i>
+                        <div class="flex-1">
+                            <p class="text-sm font-medium text-red-800"><?= htmlspecialchars($error) ?></p>
+                        </div>
+                    </div>
+                </div>
+                <?php endif; ?>
+
+                <form method="POST" class="space-y-6">
                     <!-- Username Field -->
                     <div>
                         <label for="username" class="block text-sm font-semibold text-gray-700 mb-2">
@@ -40,6 +98,7 @@
                             type="text" 
                             required 
                             autocomplete="username"
+                            value="<?= htmlspecialchars($_POST['username'] ?? '') ?>"
                             class="appearance-none rounded-lg relative block w-full px-4 py-3 border border-gray-300 placeholder-gray-400 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-150"
                             placeholder="Enter your username or email"
                         >
@@ -91,28 +150,14 @@
                         </div>
                     </div>
 
-                    <!-- Error Alert -->
-                    <div id="errorAlert" class="hidden rounded-lg bg-red-50 border border-red-200 p-4">
-                        <div class="flex items-start">
-                            <i class="fas fa-exclamation-circle text-red-500 mt-0.5 mr-3"></i>
-                            <div class="flex-1">
-                                <p id="errorMessage" class="text-sm font-medium text-red-800"></p>
-                            </div>
-                            <button onclick="closeError()" class="text-red-500 hover:text-red-700">
-                                <i class="fas fa-times"></i>
-                            </button>
-                        </div>
-                    </div>
-
                     <!-- Submit Button -->
                     <div>
                         <button 
                             type="submit" 
-                            id="loginBtn"
-                            class="group relative w-full flex justify-center items-center py-3 px-4 border border-transparent text-sm font-semibold rounded-lg text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition duration-150 shadow-md hover:shadow-lg"
+                            class="group relative w-full flex justify-center items-center py-3 px-4 border border-transparent text-sm font-semibold rounded-lg text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-150 shadow-md hover:shadow-lg"
                         >
                             <i class="fas fa-sign-in-alt mr-2"></i>
-                            <span id="loginBtnText">Sign in</span>
+                            <span>Sign in</span>
                         </button>
                     </div>
                 </form>
@@ -159,73 +204,6 @@
                 passwordInput.type = 'password';
                 toggleIcon.classList.remove('fa-eye-slash');
                 toggleIcon.classList.add('fa-eye');
-            }
-        }
-
-        function closeError() {
-            document.getElementById('errorAlert').classList.add('hidden');
-        }
-
-        async function handleLogin(event) {
-            event.preventDefault();
-            
-            const loginBtn = document.getElementById('loginBtn');
-            const loginBtnText = document.getElementById('loginBtnText');
-            const errorAlert = document.getElementById('errorAlert');
-            const errorMessage = document.getElementById('errorMessage');
-            
-            // Disable button and show loading state
-            loginBtn.disabled = true;
-            loginBtnText.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Signing in...';
-            
-            // Hide previous errors
-            errorAlert.classList.add('hidden');
-            
-            // Get form data
-            const formData = {
-                username: document.getElementById('username').value,
-                password: document.getElementById('password').value,
-                remember_me: document.getElementById('remember-me').checked
-            };
-            
-            try {
-                const response = await fetch('/api/v1/auth/login', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(formData)
-                });
-                
-                const data = await response.json();
-                
-                if (data.success) {
-                    // Store token in localStorage
-                    localStorage.setItem('access_token', data.data.token.access_token);
-                    localStorage.setItem('user', JSON.stringify(data.data.user));
-                    
-                    // Show success message
-                    loginBtnText.innerHTML = '<i class="fas fa-check mr-2"></i>Success! Redirecting...';
-                    
-                    // Redirect to dashboard
-                    setTimeout(() => {
-                        window.location.href = '/dashboard.php';
-                    }, 500);
-                } else {
-                    // Show error
-                    errorMessage.textContent = data.error.message;
-                    errorAlert.classList.remove('hidden');
-                    
-                    // Re-enable button
-                    loginBtn.disabled = false;
-                    loginBtnText.innerHTML = 'Sign in';
-                }
-            } catch (error) {
-                console.error('Login error:', error);
-                errorMessage.textContent = 'Network error. Please check your connection and try again.';
-                errorAlert.classList.remove('hidden');
-                loginBtn.disabled = false;
-                loginBtnText.innerHTML = 'Sign in';
             }
         }
 

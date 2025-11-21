@@ -7,6 +7,29 @@ declare(strict_types=1);
  * Health & Safety Inspections System
  */
 
+// Load environment variables if not already loaded
+if (empty($_ENV['DB_HOST'])) {
+    $envFile = __DIR__ . '/../.env';
+    if (file_exists($envFile)) {
+        $lines = file($envFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+        foreach ($lines as $line) {
+            // Skip comments
+            if (strpos(trim($line), '#') === 0) {
+                continue;
+            }
+            // Parse KEY=VALUE
+            if (strpos($line, '=') !== false) {
+                list($key, $value) = explode('=', $line, 2);
+                $key = trim($key);
+                $value = trim($value);
+                // Remove quotes if present
+                $value = trim($value, '"\'');
+                $_ENV[$key] = $value;
+            }
+        }
+    }
+}
+
 class Database
 {
     private static ?PDO $instance = null;
