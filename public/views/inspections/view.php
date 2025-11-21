@@ -1,5 +1,5 @@
 <?php
-session_start();
+// Session already started by index.php
 if (!isset($_SESSION['user_id'])) {
     header('Location: /views/auth/login.php');
     exit;
@@ -22,17 +22,21 @@ try {
         SELECT 
             i.*,
             e.name AS establishment_name,
-            e.business_type,
-            e.address,
-            e.contact_person,
-            e.contact_number,
-            e.email AS establishment_email,
+            e.type AS establishment_type,
+            e.address_street,
+            e.address_barangay,
+            e.address_city,
+            e.owner_name AS contact_person,
+            e.owner_contact AS contact_number,
+            e.owner_email AS establishment_email,
             u.first_name AS inspector_first_name,
             u.last_name AS inspector_last_name,
             u.email AS inspector_email
         FROM inspections i
-        LEFT JOIN establishments e ON i.establishment_id = e.id
-        LEFT JOIN users u ON i.inspector_id = u.id
+        LEFT JOIN establishments e ON i.establishment_id = e.establishment_id
+        LEFT JOIN users u ON i.inspector_id = u.user_id
+        WHERE i.inspection_id = ?
+    ");
         WHERE i.id = ?
     ");
     $stmt->execute([$inspectionId]);
@@ -271,11 +275,11 @@ function getPriorityBadge($priority) {
                         <div class="row">
                             <div class="col-md-6">
                                 <p><strong>Name:</strong> <?= htmlspecialchars($inspection['establishment_name']) ?></p>
-                                <p><strong>Type:</strong> <?= htmlspecialchars($inspection['business_type']) ?></p>
+                                <p><strong>Type:</strong> <?= htmlspecialchars(ucwords(str_replace('_', ' ', $inspection['establishment_type']))) ?></p>
                                 <p><strong>Contact Person:</strong> <?= htmlspecialchars($inspection['contact_person']) ?></p>
                             </div>
                             <div class="col-md-6">
-                                <p><strong>Address:</strong> <?= htmlspecialchars($inspection['address']) ?></p>
+                                <p><strong>Address:</strong> <?= htmlspecialchars($inspection['address_street'] . ', ' . $inspection['address_barangay'] . ', ' . $inspection['address_city']) ?></p>
                                 <p><strong>Phone:</strong> <?= htmlspecialchars($inspection['contact_number']) ?></p>
                                 <p><strong>Email:</strong> <?= htmlspecialchars($inspection['establishment_email']) ?></p>
                             </div>

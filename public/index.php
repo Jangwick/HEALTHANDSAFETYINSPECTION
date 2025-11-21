@@ -101,7 +101,8 @@ try {
         );
     } else {
         http_response_code(500);
-        include __DIR__ . '/../public/views/errors/500.php';
+        $error = $e->getMessage();
+        include __DIR__ . '/views/errors/500.php';
     }
 }
 

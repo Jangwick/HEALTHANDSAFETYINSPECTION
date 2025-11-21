@@ -1,5 +1,5 @@
 <?php
-session_start();
+// Session already started by index.php
 if (!isset($_SESSION['user_id'])) {
     header('Location: /views/auth/login.php');
     exit;
@@ -38,7 +38,7 @@ if ($type) {
 }
 
 if ($search) {
-    $where[] = "(e.establishment_name LIKE ? OR e.business_owner_name LIKE ?)";
+    $where[] = "(e.name LIKE ? OR e.owner_name LIKE ?)";
     $params[] = "%$search%";
     $params[] = "%$search%";
 }
@@ -55,11 +55,15 @@ $totalPages = ceil($totalInspections / $perPage);
 // Get inspections
 $sql = "
     SELECT i.*, 
-           e.establishment_name, e.business_type, e.address,
+           e.name as establishment_name, 
+           e.type as establishment_type, 
+           e.address_street,
+           e.address_barangay,
+           e.address_city,
            CONCAT(u.first_name, ' ', u.last_name) as inspector_name
     FROM inspections i
     LEFT JOIN establishments e ON i.establishment_id = e.establishment_id
-    LEFT JOIN users u ON i.assigned_inspector_id = u.user_id
+    LEFT JOIN users u ON i.inspector_id = u.user_id
     $whereClause
     ORDER BY i.created_at DESC
     LIMIT $perPage OFFSET $offset
@@ -215,7 +219,7 @@ $inspections = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                 <td><strong>#<?php echo $inspection['inspection_id']; ?></strong></td>
                                 <td>
                                     <strong><?php echo htmlspecialchars($inspection['establishment_name']); ?></strong><br>
-                                    <small style="color: #6b7280;"><?php echo htmlspecialchars($inspection['business_type']); ?></small>
+                                    <small style="color: #6b7280;"><?php echo htmlspecialchars(ucwords(str_replace('_', ' ', $inspection['establishment_type']))); ?></small>
                                 </td>
                                 <td><?php echo ucwords(str_replace('_', ' ', $inspection['inspection_type'])); ?></td>
                                 <td><?php echo htmlspecialchars($inspection['inspector_name'] ?? 'Not assigned'); ?></td>

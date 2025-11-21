@@ -1,5 +1,5 @@
 <?php
-session_start();
+// Session already started by index.php
 if (!isset($_SESSION['user_id'])) {
     header('Location: /views/auth/login.php');
     exit;
@@ -22,7 +22,7 @@ try {
         SELECT 
             i.*,
             e.name AS establishment_name,
-            e.business_type,
+            e.type AS establishment_type,
             e.address_street,
             e.address_barangay,
             e.address_city,
@@ -257,7 +257,7 @@ $isPrint = isset($_GET['print']);
                     <div class="info-box">
                         <h5>Establishment Details</h5>
                         <p><strong>Name:</strong> <?= htmlspecialchars($inspection['establishment_name']) ?></p>
-                        <p><strong>Type:</strong> <?= htmlspecialchars($inspection['business_type']) ?></p>
+                        <p><strong>Type:</strong> <?= htmlspecialchars(ucwords(str_replace('_', ' ', $inspection['establishment_type']))) ?></p>
                         <p><strong>Address:</strong> <?= htmlspecialchars($inspection['address_street']) ?>, <?= htmlspecialchars($inspection['address_barangay']) ?>, <?= htmlspecialchars($inspection['address_city']) ?></p>
                         <p><strong>Owner:</strong> <?= htmlspecialchars($inspection['owner_name']) ?></p>
                         <p><strong>Contact:</strong> <?= htmlspecialchars($inspection['owner_contact']) ?></p>

@@ -1,5 +1,5 @@
 <?php
-session_start();
+// Session already started by index.php
 if (!isset($_SESSION['user_id'])) {
     header('Location: /views/auth/login.php');
     exit;
@@ -59,7 +59,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 // Get establishments
-$establishments = $db->query("SELECT establishment_id, establishment_name, business_type, address FROM establishments WHERE compliance_status != 'revoked' ORDER BY establishment_name")->fetchAll(PDO::FETCH_ASSOC);
+$establishments = $db->query("SELECT establishment_id, name, type, address_street, address_barangay, address_city FROM establishments WHERE compliance_status != 'revoked' ORDER BY name")->fetchAll(PDO::FETCH_ASSOC);
 
 // Get inspectors
 $inspectors = $db->query("
@@ -183,9 +183,9 @@ $inspectors = $db->query("
                             <option value="">Select an establishment</option>
                             <?php foreach ($establishments as $est): ?>
                                 <option value="<?php echo $est['establishment_id']; ?>" 
-                                        data-type="<?php echo htmlspecialchars($est['business_type']); ?>"
-                                        data-address="<?php echo htmlspecialchars($est['address']); ?>">
-                                    <?php echo htmlspecialchars($est['establishment_name']); ?>
+                                        data-type="<?php echo htmlspecialchars($est['type']); ?>"
+                                        data-address="<?php echo htmlspecialchars($est['address_street'] . ', ' . $est['address_barangay'] . ', ' . $est['address_city']); ?>">
+                                    <?php echo htmlspecialchars($est['name']); ?>
                                 </option>
                             <?php endforeach; ?>
                         </select>

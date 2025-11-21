@@ -1,5 +1,5 @@
 <?php
-session_start();
+// Session already started by index.php
 if (!isset($_SESSION['user_id'])) {
     header('Location: /views/auth/login.php');
     exit;

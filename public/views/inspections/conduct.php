@@ -1,5 +1,5 @@
 <?php
-session_start();
+// Session already started by index.php
 if (!isset($_SESSION['user_id'])) {
     header('Location: /views/auth/login.php');
     exit;
@@ -19,10 +19,10 @@ try {
     
     // Get inspection details
     $stmt = $db->prepare("
-        SELECT i.*, e.name AS establishment_name, e.business_type
+        SELECT i.*, e.name AS establishment_name, e.type AS establishment_type
         FROM inspections i
-        LEFT JOIN establishments e ON i.establishment_id = e.id
-        WHERE i.id = ?
+        LEFT JOIN establishments e ON i.establishment_id = e.establishment_id
+        WHERE i.inspection_id = ?
     ");
     $stmt->execute([$inspectionId]);
     $inspection = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -254,7 +254,7 @@ try {
                     </h3>
                     <p class="mb-0 text-muted">
                         <strong><?= htmlspecialchars($inspection['establishment_name']) ?></strong>
-                        <span class="ms-2">(<?= htmlspecialchars($inspection['business_type']) ?>)</span>
+                        <span class="ms-2">(<?= htmlspecialchars(ucwords(str_replace('_', ' ', $inspection['establishment_type']))) ?>)</span>
                     </p>
                 </div>
                 <div class="col-md-6 text-end">
