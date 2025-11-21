@@ -1,8 +1,5 @@
 <?php
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-
+// Session already started by index.php
 header('Content-Type: application/json');
 
 if (!isset($_SESSION['user_id'])) {
@@ -22,7 +19,7 @@ try {
         throw new Exception('Invalid certificate ID');
     }
     
-    $db = Database::getInstance()->getConnection();
+    $db = Database::getConnection();
     
     // Update certificate status
     $stmt = $db->prepare("

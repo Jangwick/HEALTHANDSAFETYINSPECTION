@@ -15,7 +15,7 @@ if (!$inspectionId) {
 }
 
 try {
-    $db = Database::getInstance()->getConnection();
+    $db = Database::getConnection();
     
     // Get inspection details with establishment and inspector info
     $stmt = $db->prepare("

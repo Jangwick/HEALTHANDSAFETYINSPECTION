@@ -1,7 +1,5 @@
 <?php
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
+// Session already started by index.php
 if (!isset($_SESSION['user_id'])) {
     header('Location: /views/auth/login.php');
     exit;
@@ -10,7 +8,7 @@ if (!isset($_SESSION['user_id'])) {
 require_once __DIR__ . '/../../../config/database.php';
 
 try {
-    $db = Database::getInstance()->getConnection();
+    $db = Database::getConnection();
     
     // Pagination
     $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;

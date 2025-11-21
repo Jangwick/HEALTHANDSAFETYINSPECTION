@@ -10,7 +10,7 @@ if (!$certificateId) {
 }
 
 try {
-    $db = Database::getInstance()->getConnection();
+    $db = Database::getConnection();
     
     // Get certificate details
     $stmt = $db->prepare("

@@ -13,7 +13,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' || $certificateNumber) {
     
     if ($certificateNumber) {
         try {
-            $db = Database::getInstance()->getConnection();
+            $db = Database::getConnection();
             
             $stmt = $db->prepare("
                 SELECT c.*,
