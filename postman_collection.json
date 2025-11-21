@@ -1,0 +1,582 @@
+{
+	"info": {
+		"name": "Health & Safety Inspection System API",
+		"description": "Comprehensive API documentation and test collection for the Health & Safety Inspection System.\n\nThis collection includes all endpoints for:\n- Authentication & Authorization\n- Inspection Management\n- Establishment Registry\n- Violations Tracking\n- Certificate Issuance\n- Analytics & Reporting\n- Checklist Management\n- Inspector Management\n- Notifications\n- Document Management\n- Integration Hub\n\nBase URL: http://localhost/api/v1",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost/HEALTHANDSAFETYINSPECTION/public/api/v1",
+			"type": "string"
+		},
+		{
+			"key": "jwt_token",
+			"value": "",
+			"type": "string"
+		}
+	],
+	"item": [
+		{
+			"name": "Authentication",
+			"item": [
+				{
+					"name": "Login",
+					"request": {
+						"method": "POST",
+						"header": [{"key": "Content-Type", "value": "application/json"}],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"admin@example.com\",\n  \"password\": \"password123\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/login",
+							"host": ["{{base_url}}"],
+							"path": ["auth", "login"]
+						}
+					}
+				},
+				{
+					"name": "Register",
+					"request": {
+						"method": "POST",
+						"header": [{"key": "Content-Type", "value": "application/json"}],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"newuser@example.com\",\n  \"password\": \"SecurePass123!\",\n  \"full_name\": \"New User\",\n  \"role_id\": 4,\n  \"contact_number\": \"+639171234567\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/register",
+							"host": ["{{base_url}}"],
+							"path": ["auth", "register"]
+						}
+					}
+				},
+				{
+					"name": "Get Current User",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{jwt_token}}"}],
+						"url": {
+							"raw": "{{base_url}}/auth/me",
+							"host": ["{{base_url}}"],
+							"path": ["auth", "me"]
+						}
+					}
+				},
+				{
+					"name": "Logout",
+					"request": {
+						"method": "POST",
+						"header": [{"key": "Authorization", "value": "Bearer {{jwt_token}}"}],
+						"url": {
+							"raw": "{{base_url}}/auth/logout",
+							"host": ["{{base_url}}"],
+							"path": ["auth", "logout"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Inspections",
+			"item": [
+				{
+					"name": "List Inspections",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{jwt_token}}"}],
+						"url": {
+							"raw": "{{base_url}}/inspections?page=1&per_page=20&status=scheduled",
+							"host": ["{{base_url}}"],
+							"path": ["inspections"],
+							"query": [
+								{"key": "page", "value": "1"},
+								{"key": "per_page", "value": "20"},
+								{"key": "status", "value": "scheduled"}
+							]
+						}
+					}
+				},
+				{
+					"name": "Create Inspection",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Authorization", "value": "Bearer {{jwt_token}}"},
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"establishment_id\": 1,\n  \"inspector_id\": 2,\n  \"inspection_type\": \"routine\",\n  \"scheduled_date\": \"2024-02-15 10:00:00\",\n  \"checklist_id\": 1\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/inspections",
+							"host": ["{{base_url}}"],
+							"path": ["inspections"]
+						}
+					}
+				},
+				{
+					"name": "Get Inspection",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{jwt_token}}"}],
+						"url": {
+							"raw": "{{base_url}}/inspections/1",
+							"host": ["{{base_url}}"],
+							"path": ["inspections", "1"]
+						}
+					}
+				},
+				{
+					"name": "Start Inspection",
+					"request": {
+						"method": "PATCH",
+						"header": [{"key": "Authorization", "value": "Bearer {{jwt_token}}"}],
+						"url": {
+							"raw": "{{base_url}}/inspections/1/start",
+							"host": ["{{base_url}}"],
+							"path": ["inspections", "1", "start"]
+						}
+					}
+				},
+				{
+					"name": "Complete Inspection",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{"key": "Authorization", "value": "Bearer {{jwt_token}}"},
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"result\": \"passed\",\n  \"score\": 95,\n  \"notes\": \"All requirements met\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/inspections/1/complete",
+							"host": ["{{base_url}}"],
+							"path": ["inspections", "1", "complete"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Establishments",
+			"item": [
+				{
+					"name": "List Establishments",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{jwt_token}}"}],
+						"url": {
+							"raw": "{{base_url}}/establishments?page=1&per_page=20",
+							"host": ["{{base_url}}"],
+							"path": ["establishments"],
+							"query": [
+								{"key": "page", "value": "1"},
+								{"key": "per_page", "value": "20"}
+							]
+						}
+					}
+				},
+				{
+					"name": "Create Establishment",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Authorization", "value": "Bearer {{jwt_token}}"},
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Sample Restaurant\",\n  \"type\": \"restaurant\",\n  \"address\": \"123 Main Street\",\n  \"city\": \"Manila\",\n  \"barangay\": \"Ermita\",\n  \"owner_name\": \"John Doe\",\n  \"contact_number\": \"+639171234567\",\n  \"email\": \"owner@restaurant.com\",\n  \"latitude\": 14.5995,\n  \"longitude\": 120.9842\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/establishments",
+							"host": ["{{base_url}}"],
+							"path": ["establishments"]
+						}
+					}
+				},
+				{
+					"name": "Get Establishment",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{jwt_token}}"}],
+						"url": {
+							"raw": "{{base_url}}/establishments/1",
+							"host": ["{{base_url}}"],
+							"path": ["establishments", "1"]
+						}
+					}
+				},
+				{
+					"name": "Update Establishment",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{"key": "Authorization", "value": "Bearer {{jwt_token}}"},
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"contact_number\": \"+639179999999\",\n  \"email\": \"newemail@restaurant.com\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/establishments/1",
+							"host": ["{{base_url}}"],
+							"path": ["establishments", "1"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Violations",
+			"item": [
+				{
+					"name": "List Violations",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{jwt_token}}"}],
+						"url": {
+							"raw": "{{base_url}}/violations?status=open",
+							"host": ["{{base_url}}"],
+							"path": ["violations"],
+							"query": [{"key": "status", "value": "open"}]
+						}
+					}
+				},
+				{
+					"name": "Create Violation",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Authorization", "value": "Bearer {{jwt_token}}"},
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"inspection_id\": 1,\n  \"establishment_id\": 1,\n  \"violation_type\": \"sanitation\",\n  \"severity\": \"medium\",\n  \"description\": \"Inadequate food storage\",\n  \"corrective_action\": \"Install proper refrigeration\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/violations",
+							"host": ["{{base_url}}"],
+							"path": ["violations"]
+						}
+					}
+				},
+				{
+					"name": "Resolve Violation",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{"key": "Authorization", "value": "Bearer {{jwt_token}}"},
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"resolution_notes\": \"Refrigeration unit installed and inspected\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/violations/1/resolve",
+							"host": ["{{base_url}}"],
+							"path": ["violations", "1", "resolve"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Certificates",
+			"item": [
+				{
+					"name": "List Certificates",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{jwt_token}}"}],
+						"url": {
+							"raw": "{{base_url}}/certificates",
+							"host": ["{{base_url}}"],
+							"path": ["certificates"]
+						}
+					}
+				},
+				{
+					"name": "Issue Certificate",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Authorization", "value": "Bearer {{jwt_token}}"},
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"inspection_id\": 1,\n  \"establishment_id\": 1,\n  \"certificate_type\": \"health_permit\",\n  \"valid_from\": \"2024-01-01\",\n  \"valid_until\": \"2024-12-31\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/certificates",
+							"host": ["{{base_url}}"],
+							"path": ["certificates"]
+						}
+					}
+				},
+				{
+					"name": "Verify Certificate (Public)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/certificates/verify/CERT-2024-000001",
+							"host": ["{{base_url}}"],
+							"path": ["certificates", "verify", "CERT-2024-000001"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Analytics",
+			"item": [
+				{
+					"name": "Dashboard Metrics",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{jwt_token}}"}],
+						"url": {
+							"raw": "{{base_url}}/analytics/dashboard",
+							"host": ["{{base_url}}"],
+							"path": ["analytics", "dashboard"]
+						}
+					}
+				},
+				{
+					"name": "Inspection Trends",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{jwt_token}}"}],
+						"url": {
+							"raw": "{{base_url}}/analytics/inspection-trends?period=monthly&months=6",
+							"host": ["{{base_url}}"],
+							"path": ["analytics", "inspection-trends"],
+							"query": [
+								{"key": "period", "value": "monthly"},
+								{"key": "months", "value": "6"}
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Checklists",
+			"item": [
+				{
+					"name": "List Checklists",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{jwt_token}}"}],
+						"url": {
+							"raw": "{{base_url}}/checklists",
+							"host": ["{{base_url}}"],
+							"path": ["checklists"]
+						}
+					}
+				},
+				{
+					"name": "Create Checklist",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Authorization", "value": "Bearer {{jwt_token}}"},
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Restaurant Safety Checklist\",\n  \"category\": \"restaurant\",\n  \"description\": \"Comprehensive safety checklist for restaurants\",\n  \"items\": [\n    {\n      \"question\": \"Are fire extinguishers accessible?\",\n      \"category\": \"fire_safety\",\n      \"is_required\": true,\n      \"order_index\": 1\n    }\n  ]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/checklists",
+							"host": ["{{base_url}}"],
+							"path": ["checklists"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Inspectors",
+			"item": [
+				{
+					"name": "List Inspectors",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{jwt_token}}"}],
+						"url": {
+							"raw": "{{base_url}}/inspectors",
+							"host": ["{{base_url}}"],
+							"path": ["inspectors"]
+						}
+					}
+				},
+				{
+					"name": "Get Available Inspectors",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{jwt_token}}"}],
+						"url": {
+							"raw": "{{base_url}}/inspectors/available?date=2024-02-15&specialization=restaurant",
+							"host": ["{{base_url}}"],
+							"path": ["inspectors", "available"],
+							"query": [
+								{"key": "date", "value": "2024-02-15"},
+								{"key": "specialization", "value": "restaurant"}
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Notifications",
+			"item": [
+				{
+					"name": "Get Notifications",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{jwt_token}}"}],
+						"url": {
+							"raw": "{{base_url}}/notifications?is_read=false",
+							"host": ["{{base_url}}"],
+							"path": ["notifications"],
+							"query": [{"key": "is_read", "value": "false"}]
+						}
+					}
+				},
+				{
+					"name": "Mark as Read",
+					"request": {
+						"method": "PATCH",
+						"header": [{"key": "Authorization", "value": "Bearer {{jwt_token}}"}],
+						"url": {
+							"raw": "{{base_url}}/notifications/1/read",
+							"host": ["{{base_url}}"],
+							"path": ["notifications", "1", "read"]
+						}
+					}
+				},
+				{
+					"name": "Get Preferences",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{jwt_token}}"}],
+						"url": {
+							"raw": "{{base_url}}/notifications/preferences",
+							"host": ["{{base_url}}"],
+							"path": ["notifications", "preferences"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Documents",
+			"item": [
+				{
+					"name": "List Documents",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{jwt_token}}"}],
+						"url": {
+							"raw": "{{base_url}}/documents?entity_type=inspection&entity_id=1",
+							"host": ["{{base_url}}"],
+							"path": ["documents"],
+							"query": [
+								{"key": "entity_type", "value": "inspection"},
+								{"key": "entity_id", "value": "1"}
+							]
+						}
+					}
+				},
+				{
+					"name": "Upload Document",
+					"request": {
+						"method": "POST",
+						"header": [{"key": "Authorization", "value": "Bearer {{jwt_token}}"}],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{"key": "file", "type": "file", "src": ""},
+								{"key": "entity_type", "value": "inspection", "type": "text"},
+								{"key": "entity_id", "value": "1", "type": "text"},
+								{"key": "title", "value": "Inspection Report", "type": "text"}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/documents",
+							"host": ["{{base_url}}"],
+							"path": ["documents"]
+						}
+					}
+				},
+				{
+					"name": "Download Document",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{jwt_token}}"}],
+						"url": {
+							"raw": "{{base_url}}/documents/1/download",
+							"host": ["{{base_url}}"],
+							"path": ["documents", "1", "download"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Integrations",
+			"item": [
+				{
+					"name": "Generate API Key",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Authorization", "value": "Bearer {{jwt_token}}"},
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Third Party Integration\",\n  \"permissions\": [\"inspections.read\", \"establishments.read\"],\n  \"expires_at\": \"2025-12-31\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/integrations/api-keys",
+							"host": ["{{base_url}}"],
+							"path": ["integrations", "api-keys"]
+						}
+					}
+				},
+				{
+					"name": "Register Webhook",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Authorization", "value": "Bearer {{jwt_token}}"},
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"url\": \"https://example.com/webhook\",\n  \"events\": [\"inspection.completed\", \"violation.created\"],\n  \"is_active\": true\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/integrations/webhooks",
+							"host": ["{{base_url}}"],
+							"path": ["integrations", "webhooks"]
+						}
+					}
+				}
+			]
+		}
+	]
+}
