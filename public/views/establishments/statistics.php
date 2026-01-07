@@ -19,7 +19,13 @@ try {
             SUM(CASE WHEN compliance_status = 'pending' THEN 1 ELSE 0 END) as pending,
             SUM(CASE WHEN compliance_status = 'suspended' THEN 1 ELSE 0 END) as suspended
         FROM establishments
-    ")->fetch(PDO::FETCH_ASSOC);
+    ")->fetch(PDO::FETCH_ASSOC) ?: [
+        'total_establishments' => 0,
+        'compliant' => 0,
+        'non_compliant' => 0,
+        'pending' => 0,
+        'suspended' => 0
+    ];
     
     // Establishments by type
     $byType = $db->query("
@@ -147,12 +153,12 @@ try {
                     
                     <div class="flex items-center space-x-4">
                         <span class="text-sm font-medium text-slate-600">
-                            <i class="fas fa-calendar-alt mr-2"></i> <?= date('F d, Y') ?>
+                            <i class="fas fa-calendar-alt mr-2"></i> <?php echo  date('F d, Y') ?>
                         </span>
                         <div class="h-8 w-px bg-slate-200 mx-2"></div>
                         <div class="flex items-center">
                              <span class="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-blue-100 text-blue-800">
-                                <?= strtoupper($_SESSION['role'] ?? 'OFFICER') ?>
+                                <?php echo  strtoupper($_SESSION['role'] ?? 'OFFICER') ?>
                              </span>
                         </div>
                     </div>
@@ -183,16 +189,16 @@ try {
             <div class="col-md-3">
                 <div class="stat-card">
                     <div class="stat-label">Total Establishments</div>
-                    <div class="stat-number"><?= number_format($stats['total_establishments']) ?></div>
-                    <small><i class="bi bi-plus-circle"></i> <?= $recentCount ?> added this month</small>
+                    <div class="stat-number"><?php echo  number_format((float)($stats['total_establishments'] ?? 0)) ?></div>
+                    <small><i class="bi bi-plus-circle"></i> <?php echo  $recentCount ?> added this month</small>
                 </div>
             </div>
             <div class="col-md-3">
                 <div class="card" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; border: none;">
                     <div class="card-body">
                         <div class="stat-label">Compliant</div>
-                        <div class="stat-number"><?= number_format($stats['compliant']) ?></div>
-                        <small><?= $stats['total_establishments'] > 0 ? round($stats['compliant']/$stats['total_establishments']*100, 1) : 0 ?>% of total</small>
+                        <div class="stat-number"><?php echo  number_format((float)($stats['compliant'] ?? 0)) ?></div>
+                        <small><?php echo  $stats['total_establishments'] > 0 ? round($stats['compliant']/$stats['total_establishments']*100, 1) : 0 ?>% of total</small>
                     </div>
                 </div>
             </div>
@@ -200,8 +206,8 @@ try {
                 <div class="card" style="background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); color: white; border: none;">
                     <div class="card-body">
                         <div class="stat-label">Non-Compliant</div>
-                        <div class="stat-number"><?= number_format($stats['non_compliant']) ?></div>
-                        <small><?= $stats['total_establishments'] > 0 ? round($stats['non_compliant']/$stats['total_establishments']*100, 1) : 0 ?>% of total</small>
+                        <div class="stat-number"><?php echo  number_format((float)($stats['non_compliant'] ?? 0)) ?></div>
+                        <small><?php echo  $stats['total_establishments'] > 0 ? round($stats['non_compliant']/$stats['total_establishments']*100, 1) : 0 ?>% of total</small>
                     </div>
                 </div>
             </div>
@@ -209,8 +215,8 @@ try {
                 <div class="card" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white; border: none;">
                     <div class="card-body">
                         <div class="stat-label">Pending Review</div>
-                        <div class="stat-number"><?= number_format($stats['pending']) ?></div>
-                        <small><?= $stats['suspended'] ?> suspended</small>
+                        <div class="stat-number"><?php echo  number_format((float)($stats['pending'] ?? 0)) ?></div>
+                        <small><?php echo  $stats['suspended'] ?> suspended</small>
                     </div>
                 </div>
             </div>
@@ -241,48 +247,48 @@ try {
                         <div class="mb-3">
                             <div class="d-flex justify-content-between mb-1">
                                 <span class="text-success">Compliant</span>
-                                <strong><?= $stats['compliant'] ?></strong>
+                                <strong><?php echo  $stats['compliant'] ?></strong>
                             </div>
                             <div class="progress">
                                 <div class="progress-bar bg-success progress-bar-custom" 
-                                     style="width: <?= $stats['total_establishments'] > 0 ? ($stats['compliant']/$stats['total_establishments']*100) : 0 ?>%">
-                                    <?= $stats['total_establishments'] > 0 ? round($stats['compliant']/$stats['total_establishments']*100, 1) : 0 ?>%
+                                     style="width: <?php echo  $stats['total_establishments'] > 0 ? ($stats['compliant']/$stats['total_establishments']*100) : 0 ?>%">
+                                    <?php echo  $stats['total_establishments'] > 0 ? round($stats['compliant']/$stats['total_establishments']*100, 1) : 0 ?>%
                                 </div>
                             </div>
                         </div>
                         <div class="mb-3">
                             <div class="d-flex justify-content-between mb-1">
                                 <span class="text-danger">Non-Compliant</span>
-                                <strong><?= $stats['non_compliant'] ?></strong>
+                                <strong><?php echo  $stats['non_compliant'] ?></strong>
                             </div>
                             <div class="progress">
                                 <div class="progress-bar bg-danger progress-bar-custom" 
-                                     style="width: <?= $stats['total_establishments'] > 0 ? ($stats['non_compliant']/$stats['total_establishments']*100) : 0 ?>%">
-                                    <?= $stats['total_establishments'] > 0 ? round($stats['non_compliant']/$stats['total_establishments']*100, 1) : 0 ?>%
+                                     style="width: <?php echo  $stats['total_establishments'] > 0 ? ($stats['non_compliant']/$stats['total_establishments']*100) : 0 ?>%">
+                                    <?php echo  $stats['total_establishments'] > 0 ? round($stats['non_compliant']/$stats['total_establishments']*100, 1) : 0 ?>%
                                 </div>
                             </div>
                         </div>
                         <div class="mb-3">
                             <div class="d-flex justify-content-between mb-1">
                                 <span class="text-warning">Pending</span>
-                                <strong><?= $stats['pending'] ?></strong>
+                                <strong><?php echo  $stats['pending'] ?></strong>
                             </div>
                             <div class="progress">
                                 <div class="progress-bar bg-warning progress-bar-custom" 
-                                     style="width: <?= $stats['total_establishments'] > 0 ? ($stats['pending']/$stats['total_establishments']*100) : 0 %>%">
-                                    <?= $stats['total_establishments'] > 0 ? round($stats['pending']/$stats['total_establishments']*100, 1) : 0 ?>%
+                                     style="width: <?php echo  $stats['total_establishments'] > 0 ? ($stats['pending']/$stats['total_establishments']*100) : 0 ?>%">
+                                    <?php echo  $stats['total_establishments'] > 0 ? round($stats['pending']/$stats['total_establishments']*100, 1) : 0 ?>%
                                 </div>
                             </div>
                         </div>
                         <div class="mb-0">
                             <div class="d-flex justify-content-between mb-1">
                                 <span class="text-secondary">Suspended</span>
-                                <strong><?= $stats['suspended'] ?></strong>
+                                <strong><?php echo  $stats['suspended'] ?></strong>
                             </div>
                             <div class="progress">
                                 <div class="progress-bar bg-secondary progress-bar-custom" 
-                                     style="width: <?= $stats['total_establishments'] > 0 ? ($stats['suspended']/$stats['total_establishments']*100) : 0 ?>%">
-                                    <?= $stats['total_establishments'] > 0 ? round($stats['suspended']/$stats['total_establishments']*100, 1) : 0 ?>%
+                                     style="width: <?php echo  $stats['total_establishments'] > 0 ? ($stats['suspended']/$stats['total_establishments']*100) : 0 ?>%">
+                                    <?php echo  $stats['total_establishments'] > 0 ? round($stats['suspended']/$stats['total_establishments']*100, 1) : 0 ?>%
                                 </div>
                             </div>
                         </div>
@@ -290,7 +296,7 @@ try {
                         <div class="mt-4 pt-3 border-top">
                             <div class="d-flex justify-content-between">
                                 <span>Active Certificates:</span>
-                                <strong class="text-success"><?= number_format($activeCertificates) ?></strong>
+                                <strong class="text-success"><?php echo  number_format((float)($activeCertificates ?? 0)) ?></strong>
                             </div>
                         </div>
                     </div>
@@ -318,11 +324,11 @@ try {
                                 <tbody>
                                     <?php foreach ($byBarangay as $brgy): ?>
                                     <tr>
-                                        <td><?= htmlspecialchars($brgy['address_barangay']) ?></td>
-                                        <td class="text-end"><strong><?= $brgy['count'] ?></strong></td>
+                                        <td><?php echo  htmlspecialchars($brgy['address_barangay']) ?></td>
+                                        <td class="text-end"><strong><?php echo  $brgy['count'] ?></strong></td>
                                         <td class="text-end">
                                             <span class="badge bg-primary">
-                                                <?= round($brgy['count']/$stats['total_establishments']*100, 1) ?>%
+                                                <?php echo  round($brgy['count']/$stats['total_establishments']*100, 1) ?>%
                                             </span>
                                         </td>
                                     </tr>
@@ -339,7 +345,7 @@ try {
                 <div class="card">
                     <div class="card-header bg-white d-flex justify-content-between align-items-center">
                         <h5 class="mb-0"><i class="bi bi-exclamation-triangle text-warning"></i> Expiring Permits (30 Days)</h5>
-                        <span class="badge bg-warning"><?= count($expiringPermits) ?></span>
+                        <span class="badge bg-warning"><?php echo  count($expiringPermits) ?></span>
                     </div>
                     <div class="card-body">
                         <?php if (empty($expiringPermits)): ?>
@@ -347,18 +353,18 @@ try {
                         <?php else: ?>
                         <div class="list-group list-group-flush">
                             <?php foreach ($expiringPermits as $est): ?>
-                            <a href="/views/establishments/view.php?id=<?= $est['establishment_id'] ?>" 
+                            <a href="/views/establishments/view.php?id=<?php echo  $est['establishment_id'] ?>" 
                                class="list-group-item list-group-item-action alert-warning-custom">
                                 <div class="d-flex justify-content-between align-items-start">
                                     <div>
-                                        <h6 class="mb-1"><?= htmlspecialchars($est['name']) ?></h6>
+                                        <h6 class="mb-1"><?php echo  htmlspecialchars($est['name']) ?></h6>
                                         <small class="text-muted">
-                                            Permit: <?= htmlspecialchars($est['business_permit_number']) ?>
+                                            Permit: <?php echo  htmlspecialchars($est['business_permit_number']) ?>
                                         </small>
                                     </div>
                                     <div class="text-end">
-                                        <span class="badge bg-warning"><?= $est['days_until_expiry'] ?> days</span><br>
-                                        <small class="text-muted"><?= date('M d, Y', strtotime($est['permit_expiry_date'])) ?></small>
+                                        <span class="badge bg-warning"><?php echo  $est['days_until_expiry'] ?> days</span><br>
+                                        <small class="text-muted"><?php echo  date('M d, Y', strtotime($est['permit_expiry_date'])) ?></small>
                                     </div>
                                 </div>
                             </a>
@@ -383,18 +389,18 @@ try {
                         <?php else: ?>
                         <div class="list-group list-group-flush">
                             <?php foreach ($recentlyInspected as $est): ?>
-                            <a href="/views/establishments/view.php?id=<?= $est['establishment_id'] ?>" 
+                            <a href="/views/establishments/view.php?id=<?php echo  $est['establishment_id'] ?>" 
                                class="list-group-item list-group-item-action">
                                 <div class="d-flex justify-content-between align-items-start">
                                     <div>
-                                        <h6 class="mb-1"><?= htmlspecialchars($est['name']) ?></h6>
+                                        <h6 class="mb-1"><?php echo  htmlspecialchars($est['name']) ?></h6>
                                         <small class="text-muted">
-                                            By: <?= htmlspecialchars($est['inspector_name'] ?? 'Unassigned') ?>
+                                            By: <?php echo  htmlspecialchars($est['inspector_name'] ?? 'Unassigned') ?>
                                         </small>
                                     </div>
                                     <div class="text-end">
-                                        <small class="text-muted"><?= date('M d, Y', strtotime($est['scheduled_date'])) ?></small><br>
-                                        <span class="badge bg-info"><?= ucfirst($est['inspection_status']) ?></span>
+                                        <small class="text-muted"><?php echo  date('M d, Y', strtotime($est['scheduled_date'])) ?></small><br>
+                                        <span class="badge bg-info"><?php echo  ucfirst($est['inspection_status']) ?></span>
                                     </div>
                                 </div>
                             </a>
@@ -410,7 +416,7 @@ try {
                 <div class="card">
                     <div class="card-header bg-white d-flex justify-content-between align-items-center">
                         <h5 class="mb-0"><i class="bi bi-exclamation-circle text-danger"></i> Never Inspected</h5>
-                        <span class="badge bg-danger"><?= count($neverInspected) ?>+</span>
+                        <span class="badge bg-danger"><?php echo  count($neverInspected) ?>+</span>
                     </div>
                     <div class="card-body">
                         <?php if (empty($neverInspected)): ?>
@@ -420,13 +426,13 @@ try {
                             <?php foreach ($neverInspected as $est): ?>
                             <div class="list-group-item d-flex justify-content-between align-items-center">
                                 <div>
-                                    <h6 class="mb-1"><?= htmlspecialchars($est['name']) ?></h6>
+                                    <h6 class="mb-1"><?php echo  htmlspecialchars($est['name']) ?></h6>
                                     <small class="text-muted">
-                                        <?= htmlspecialchars(ucwords(str_replace('_', ' ', $est['type']))) ?> - 
-                                        <?= htmlspecialchars($est['address_barangay']) ?>
+                                        <?php echo  htmlspecialchars(ucwords(str_replace('_', ' ', $est['type']))) ?> - 
+                                        <?php echo  htmlspecialchars($est['address_barangay']) ?>
                                     </small>
                                 </div>
-                                <a href="/views/inspections/create.php?establishment_id=<?= $est['establishment_id'] ?>" 
+                                <a href="/views/inspections/create.php?establishment_id=<?php echo  $est['establishment_id'] ?>" 
                                    class="btn btn-sm btn-outline-primary">
                                     <i class="bi bi-plus"></i> Schedule
                                 </a>

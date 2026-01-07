@@ -100,140 +100,186 @@ try {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Add Violation - Inspection #<?= $inspectionId ?></title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
+    <title>INFRACTION_REPORT :: #<?= $inspectionId ?></title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://site-assets.fontawesome.com/releases/v6.7.2/css/all.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        body {
-            background: #f8f9fa;
+        @import "https://cdn.jsdelivr.net/npm/tailwindcss@4.0.0-alpha.25/dist/tailwind.min.css";
+        :root { --glass: rgba(15, 23, 42, 0.8); }
+        body { font-family: 'Inter', sans-serif; background: #020617; color: #f8fafc; overflow-x: hidden; }
+        .mono { font-family: 'JetBrains Mono', monospace; }
+        .glass { background: var(--glass); backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.05); }
+        .scan-line {
+            width: 100%; height: 2px; background: rgba(244, 63, 94, 0.1);
+            position: absolute; top: 0; left: 0; animation: scan 4s linear infinite; pointer-events: none;
         }
-        .violation-form {
-            max-width: 700px;
-            margin: 2rem auto;
-            background: white;
-            padding: 2rem;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }
-        .photo-preview {
-            max-width: 100%;
-            max-height: 300px;
-            margin-top: 1rem;
-            border-radius: 8px;
-        }
+        @keyframes scan { 0% { top: 0; } 100% { top: 100%; } }
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(244, 63, 94, 0.2); border-radius: 10px; }
     </style>
 </head>
-<body>
-    <div class="violation-form">
-        <h4 class="mb-4">
-            <i class="bi bi-exclamation-triangle text-warning"></i> 
-            Add Violation
-        </h4>
+<body class="p-4 md:p-8 flex items-center justify-center min-h-screen">
+    <div class="fixed inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-10 pointer-events-none"></div>
+    
+    <div class="glass w-full max-w-3xl rounded-[2.5rem] overflow-hidden relative border border-rose-500/20 shadow-2xl shadow-rose-900/20">
+        <div class="scan-line"></div>
         
-        <p class="text-muted mb-4">
-            <strong>Inspection:</strong> #<?= $inspectionId ?> - <?= htmlspecialchars($inspection['establishment_name']) ?>
-        </p>
-
-        <?php if (isset($success)): ?>
-        <div class="alert alert-success">
-            <i class="bi bi-check-circle"></i> Violation added successfully!
-            <div class="mt-2">
-                <button onclick="window.close()" class="btn btn-sm btn-success">Close Window</button>
-                <button onclick="location.reload()" class="btn btn-sm btn-primary">Add Another</button>
-            </div>
-        </div>
-        <?php endif; ?>
-
-        <?php if (isset($error)): ?>
-        <div class="alert alert-danger">
-            <i class="bi bi-exclamation-circle"></i> <?= htmlspecialchars($error) ?>
-        </div>
-        <?php endif; ?>
-
-        <form method="POST" enctype="multipart/form-data">
-            <div class="mb-3">
-                <label class="form-label">Description <span class="text-danger">*</span></label>
-                <textarea class="form-control" name="description" rows="3" required 
-                          placeholder="Describe the violation..."></textarea>
-            </div>
-
-            <div class="row">
-                <div class="col-md-6 mb-3">
-                    <label class="form-label">Violation Type</label>
-                    <select class="form-select" name="violation_type">
-                        <option value="">Select type...</option>
-                        <option value="food_safety">Food Safety</option>
-                        <option value="sanitation">Sanitation</option>
-                        <option value="structural">Structural</option>
-                        <option value="fire_safety">Fire Safety</option>
-                        <option value="occupational_health">Occupational Health</option>
-                        <option value="environmental">Environmental</option>
-                        <option value="documentation">Documentation</option>
-                        <option value="other">Other</option>
-                    </select>
+        <!-- Header Terminal -->
+        <div class="bg-rose-600 px-8 py-6 flex items-center justify-between">
+            <div class="flex items-center gap-4">
+                <div class="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-md">
+                    <i class="fas fa-biohazard text-white text-xl"></i>
                 </div>
+                <div>
+                    <h1 class="text-xl font-black text-white italic tracking-tighter uppercase italic">REPORT_INFRACTION</h1>
+                    <div class="mono text-[10px] text-rose-100 font-bold tracking-widest opacity-80 uppercase">
+                        INSPECTION_LINK: #<?= str_pad((string)$inspectionId, 5, '0', STR_PAD_LEFT) ?>
+                    </div>
+                </div>
+            </div>
+            <button onclick="window.close()" class="w-10 h-10 rounded-full hover:bg-black/10 flex items-center justify-center text-white transition-colors">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
 
-                <div class="col-md-6 mb-3">
-                    <label class="form-label">Severity <span class="text-danger">*</span></label>
-                    <select class="form-select" name="severity" required>
-                        <option value="minor">Minor</option>
-                        <option value="major">Major</option>
-                        <option value="critical">Critical</option>
-                    </select>
-                    <small class="text-muted">
-                        Minor: Low risk | Major: Moderate risk | Critical: Immediate action required
-                    </small>
+        <div class="p-8 md:p-12 space-y-8">
+            <!-- Entity Context -->
+            <div class="flex items-center gap-6 p-6 bg-white/[0.02] rounded-3xl border border-white/5">
+                <div class="w-16 h-16 glass rounded-2xl flex items-center justify-center text-rose-500 text-2xl">
+                    <i class="fas fa-building-circle-exclamation"></i>
+                </div>
+                <div>
+                    <div class="mono text-[9px] text-slate-500 uppercase tracking-[0.3em] font-black italic mb-1">TARGET_ENTITY</div>
+                    <div class="text-2xl font-black text-white italic uppercase tracking-tighter italic">
+                        <?= htmlspecialchars($inspection['establishment_name']) ?>
+                    </div>
                 </div>
             </div>
 
-            <div class="mb-3">
-                <label class="form-label">Corrective Action Required</label>
-                <textarea class="form-control" name="corrective_action" rows="2" 
-                          placeholder="What needs to be done to fix this violation?"></textarea>
-            </div>
+            <?php if (isset($success)): ?>
+                <div class="bg-emerald-500/10 border border-emerald-500/30 rounded-[2rem] p-8 text-center space-y-6">
+                    <div class="w-16 h-16 bg-emerald-500/20 rounded-full flex items-center justify-center mx-auto">
+                        <i class="fas fa-check-circle text-emerald-500 text-3xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-black text-white italic uppercase tracking-tighter">INFRACTION_LOGGED</h3>
+                        <p class="text-slate-400 mono text-xs mt-2 italic">Data has been successfully persisted to the registry.</p>
+                    </div>
+                    <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                        <button onclick="window.close()" class="px-8 py-4 bg-emerald-600 hover:bg-emerald-500 text-white rounded-2xl mono text-[10px] font-black uppercase tracking-widest transition-all shadow-lg shadow-emerald-900/40">
+                            TERMINATE_SESSION
+                        </button>
+                        <button onclick="location.reload()" class="px-8 py-4 bg-white/5 hover:bg-white/10 text-white rounded-2xl border border-white/5 mono text-[10px] font-black uppercase tracking-widest transition-all">
+                            NEW_RECORD_ENTRY
+                        </button>
+                    </div>
+                </div>
+            <?php elseif (isset($error)): ?>
+                <div class="bg-rose-500/10 border border-rose-500/30 rounded-3xl p-6 flex items-center gap-4">
+                    <i class="fas fa-triangle-exclamation text-rose-500 text-xl"></i>
+                    <div class="text-rose-200 mono text-xs uppercase font-bold tracking-widest">ERROR: <?= htmlspecialchars($error) ?></div>
+                </div>
+            <?php endif; ?>
 
-            <div class="mb-3">
-                <label class="form-label">Deadline for Correction</label>
-                <input type="date" class="form-control" name="deadline" min="<?= date('Y-m-d') ?>">
-            </div>
+            <?php if (!isset($success)): ?>
+                <form method="POST" enctype="multipart/form-data" class="space-y-8">
+                    <div class="space-y-3">
+                        <label class="block mono text-[9px] text-slate-500 uppercase tracking-[0.3em] font-bold italic ml-2">VIOLATION_DESCRIPTION <span class="text-rose-500">*</span></label>
+                        <textarea name="description" rows="3" required placeholder="NARRATIVE_OF_NON_COMPLIANCE..." 
+                                  class="w-full bg-slate-950/80 border border-slate-800 rounded-3xl py-6 px-8 text-white text-sm mono uppercase tracking-widest focus:outline-none focus:border-rose-500/50 transition-all italic leading-relaxed"></textarea>
+                    </div>
 
-            <div class="mb-3">
-                <label class="form-label">Photo Evidence</label>
-                <input type="file" class="form-control" name="photo" accept="image/*" 
-                       onchange="previewPhoto(event)">
-                <img id="photoPreview" class="photo-preview" style="display: none;">
-            </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div class="space-y-3">
+                            <label class="block mono text-[9px] text-slate-500 uppercase tracking-[0.3em] font-bold italic ml-2">INFRACTION_CATEGORY</label>
+                            <div class="relative group">
+                                <select name="violation_type" class="w-full bg-slate-950/80 border border-slate-800 rounded-2xl py-4 px-6 text-white text-[11px] mono uppercase tracking-widest appearance-none focus:outline-none focus:border-rose-500/50 cursor-pointer transition-all italic">
+                                    <option value="">UNCATEGORIZED</option>
+                                    <option value="food_safety">FOOD_SAFETY</option>
+                                    <option value="sanitation">SANITATION_PROTOCOL</option>
+                                    <option value="structural">STRUCTURAL_INTEGRITY</option>
+                                    <option value="fire_safety">THERMAL_SAFETY</option>
+                                    <option value="occupational_health">OCC_HEALTH</option>
+                                    <option value="environmental">ENV_COMPLIANCE</option>
+                                    <option value="documentation">DATA_INTEGRITY</option>
+                                    <option value="other">OTHER_ANOMALY</option>
+                                </select>
+                                <i class="fas fa-chevron-down absolute right-6 top-1/2 -translate-y-1/2 text-slate-700 pointer-events-none"></i>
+                            </div>
+                        </div>
 
-            <div class="d-grid gap-2">
-                <button type="submit" class="btn btn-danger">
-                    <i class="bi bi-exclamation-triangle"></i> Add Violation
-                </button>
-                <button type="button" class="btn btn-secondary" onclick="window.close()">
-                    Cancel
-                </button>
-            </div>
-        </form>
+                        <div class="space-y-3">
+                            <label class="block mono text-[9px] text-slate-500 uppercase tracking-[0.3em] font-bold italic ml-2">SEVERITY_PROTOCOL <span class="text-rose-500">*</span></label>
+                            <div class="relative group">
+                                <select name="severity" required class="w-full bg-slate-950/80 border border-slate-800 rounded-2xl py-4 px-6 text-white text-[11px] mono uppercase tracking-widest appearance-none focus:outline-none focus:border-rose-500/50 cursor-pointer transition-all italic">
+                                    <option value="minor">MINOR_NON_COMPLIANCE</option>
+                                    <option value="major">MAJOR_PROTOCOL_BREAK</option>
+                                    <option value="critical">CRITICAL_SYSTEM_RISK</option>
+                                </select>
+                                <i class="fas fa-chevron-down absolute right-6 top-1/2 -translate-y-1/2 text-slate-700 pointer-events-none"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="space-y-3">
+                        <label class="block mono text-[9px] text-slate-500 uppercase tracking-[0.3em] font-bold italic ml-2">CORRECTIVE_PROTOCOL_REQUIRED</label>
+                        <textarea name="corrective_action" rows="2" placeholder="REMEDIATION_REQUIREMENTS..." 
+                                  class="w-full bg-slate-950/80 border border-slate-800 rounded-3xl py-6 px-8 text-white text-sm mono uppercase tracking-widest focus:outline-none focus:border-rose-500/50 transition-all italic leading-relaxed"></textarea>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div class="space-y-3">
+                            <label class="block mono text-[9px] text-slate-500 uppercase tracking-[0.3em] font-bold italic ml-2">RESOLUTION_DEADLINE</label>
+                            <input type="date" name="deadline" min="<?= date('Y-m-d') ?>" 
+                                   class="w-full bg-slate-950/80 border border-slate-800 rounded-2xl py-4 px-6 text-white text-[11px] mono uppercase tracking-widest focus:outline-none focus:border-rose-500/50 transition-all italic">
+                        </div>
+
+                        <div class="space-y-3">
+                            <label class="block mono text-[9px] text-slate-500 uppercase tracking-[0.3em] font-bold italic ml-2">VISUAL_EVIDENCE</label>
+                            <label class="w-full bg-slate-950/80 border border-slate-800 rounded-2xl py-4 px-6 flex items-center justify-between cursor-pointer group hover:border-white/20 transition-all overflow-hidden">
+                                <span class="text-[11px] mono text-slate-500 group-hover:text-slate-300 transition-colors italic truncate">INITIALIZE_CAPTURE...</span>
+                                <i class="fas fa-camera text-slate-700 group-hover:text-rose-500 transition-colors"></i>
+                                <input type="file" name="photo" accept="image/*" onchange="previewPhoto(event)" class="hidden">
+                            </label>
+                        </div>
+                    </div>
+
+                    <div id="previewContainer" class="hidden glass rounded-3xl p-4 border border-rose-500/20">
+                        <div class="mono text-[8px] text-rose-500 uppercase tracking-widest font-black mb-3 italic">EVIDENCE_PREVIEW</div>
+                        <img id="photoPreview" class="w-full h-48 object-cover rounded-2xl border border-white/5 shadow-2xl">
+                    </div>
+
+                    <div class="pt-6">
+                        <button type="submit" class="w-full h-16 bg-rose-600 hover:bg-rose-500 text-white rounded-3xl flex items-center justify-center gap-4 transition-all shadow-xl shadow-rose-900/40 group active:scale-[0.98]">
+                            <i class="fas fa-biohazard text-xl group-hover:scale-125 transition-transform"></i>
+                            <span class="mono text-xs font-black uppercase tracking-[0.3em]">COMMIT_INFRACTION_DATA</span>
+                        </button>
+                    </div>
+                </form>
+            <?php endif; ?>
+        </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         function previewPhoto(event) {
             const file = event.target.files[0];
             const preview = document.getElementById('photoPreview');
+            const container = document.getElementById('previewContainer');
             
             if (file) {
                 const reader = new FileReader();
                 reader.onload = function(e) {
                     preview.src = e.target.result;
-                    preview.style.display = 'block';
+                    container.classList.remove('hidden');
                 };
                 reader.readAsDataURL(file);
             } else {
-                preview.style.display = 'none';
+                container.classList.add('hidden');
             }
         }
 
-        // Notify parent window when violation is added
         <?php if (isset($success)): ?>
         if (window.opener && !window.opener.closed) {
             window.opener.location.reload();

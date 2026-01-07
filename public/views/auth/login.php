@@ -84,7 +84,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <div class="flex items-start">
                         <i class="fas fa-exclamation-circle text-red-500 mt-0.5 mr-3"></i>
                         <div class="flex-1">
-                            <p class="text-sm font-medium text-red-800"><?= htmlspecialchars($error) ?></p>
+                            <p class="text-sm font-medium text-red-800"><?php echo  htmlspecialchars($error) ?></p>
                         </div>
                     </div>
                 </div>
@@ -102,7 +102,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             type="text" 
                             required 
                             autocomplete="username"
-                            value="<?= htmlspecialchars($_POST['username'] ?? '') ?>"
+                            value="<?php echo  htmlspecialchars($_POST['username'] ?? '') ?>"
                             class="appearance-none rounded-lg relative block w-full px-4 py-3 border border-gray-300 placeholder-gray-400 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-150"
                             placeholder="Enter your username or email"
                         >

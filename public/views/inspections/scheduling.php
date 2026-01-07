@@ -97,7 +97,7 @@ $overdueInspections = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                 <i class="fas fa-calendar-day text-xl"></i>
                             </div>
                         </div>
-                        <div class="text-2xl font-bold text-slate-900"><?= $stats['today'] ?></div>
+                        <div class="text-2xl font-bold text-slate-900"><?php echo  $stats['today'] ?></div>
                         <div class="text-sm text-slate-500 font-medium">Scheduled Today</div>
                     </div>
                     
@@ -107,7 +107,7 @@ $overdueInspections = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                 <i class="fas fa-calendar-week text-xl"></i>
                             </div>
                         </div>
-                        <div class="text-2xl font-bold text-slate-900"><?= $stats['this_week'] ?></div>
+                        <div class="text-2xl font-bold text-slate-900"><?php echo  $stats['this_week'] ?></div>
                         <div class="text-sm text-slate-500 font-medium">Coming Up (7 Days)</div>
                     </div>
 
@@ -117,7 +117,7 @@ $overdueInspections = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                 <i class="fas fa-clock text-xl"></i>
                             </div>
                         </div>
-                        <div class="text-2xl font-bold text-slate-900"><?= $stats['overdue'] ?></div>
+                        <div class="text-2xl font-bold text-slate-900"><?php echo  $stats['overdue'] ?></div>
                         <div class="text-sm text-slate-500 font-medium text-rose-600">Overdue Inspections</div>
                     </div>
 
@@ -127,7 +127,7 @@ $overdueInspections = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                 <i class="fas fa-hourglass-half text-xl"></i>
                             </div>
                         </div>
-                        <div class="text-2xl font-bold text-slate-900"><?= $stats['total_pending'] ?></div>
+                        <div class="text-2xl font-bold text-slate-900"><?php echo  $stats['total_pending'] ?></div>
                         <div class="text-sm text-slate-500 font-medium">Total Pending</div>
                     </div>
                 </div>
@@ -169,23 +169,23 @@ $overdueInspections = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                                     ][$insp['priority']] ?? 'text-slate-600 bg-slate-50';
                                                 ?>
                                                 <tr class="hover:bg-slate-50 transition-colors">
-                                                    <td class="px-6 py-4 <?= $dateColor ?>">
-                                                        <?= date('M d, Y', strtotime($insp['scheduled_date'])) ?>
+                                                    <td class="px-6 py-4 <?php echo  $dateColor ?>">
+                                                        <?php echo  date('M d, Y', strtotime($insp['scheduled_date'])) ?>
                                                     </td>
                                                     <td class="px-6 py-4">
-                                                        <div class="font-semibold text-slate-900"><?= htmlspecialchars($insp['establishment_name']) ?></div>
-                                                        <div class="text-xs text-slate-400"><?= ucwords(str_replace('_', ' ', $insp['inspection_type'])) ?></div>
+                                                        <div class="font-semibold text-slate-900"><?php echo  htmlspecialchars($insp['establishment_name']) ?></div>
+                                                        <div class="text-xs text-slate-400"><?php echo  ucwords(str_replace('_', ' ', $insp['inspection_type'])) ?></div>
                                                     </td>
                                                     <td class="px-6 py-4 text-slate-600">
-                                                        <?= htmlspecialchars($insp['inspector_name'] ?: 'Unassigned') ?>
+                                                        <?php echo  htmlspecialchars($insp['inspector_name'] ?: 'Unassigned') ?>
                                                     </td>
                                                     <td class="px-6 py-4">
-                                                        <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase <?= $priorityClass ?>">
-                                                            <?= $insp['priority'] ?>
+                                                        <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase <?php echo  $priorityClass ?>">
+                                                            <?php echo  $insp['priority'] ?>
                                                         </span>
                                                     </td>
                                                     <td class="px-6 py-4 text-right">
-                                                        <a href="/views/inspections/view.php?id=<?= $insp['inspection_id'] ?>" class="text-blue-600 hover:text-blue-800 font-medium">View</a>
+                                                        <a href="/views/inspections/view.php?id=<?php echo  $insp['inspection_id'] ?>" class="text-blue-600 hover:text-blue-800 font-medium">View</a>
                                                     </td>
                                                 </tr>
                                             <?php endforeach; ?>
@@ -213,20 +213,20 @@ $overdueInspections = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                         <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm relative overflow-hidden group">
                                             <div class="absolute left-0 top-0 bottom-0 w-1 bg-rose-500"></div>
                                             <div class="flex justify-between items-start mb-2">
-                                                <span class="text-xs font-bold text-rose-500 uppercase"><?= date('M d', strtotime($insp['scheduled_date'])) ?></span>
+                                                <span class="text-xs font-bold text-rose-500 uppercase"><?php echo  date('M d', strtotime($insp['scheduled_date'])) ?></span>
                                                 <span class="px-1.5 py-0.5 rounded text-[10px] font-bold uppercase bg-rose-50 text-rose-600 border border-rose-100">LATE</span>
                                             </div>
-                                            <h3 class="font-bold text-slate-900 truncate"><?= htmlspecialchars($insp['establishment_name']) ?></h3>
-                                            <p class="text-xs text-slate-500 mb-3 line-clamp-1"><?= ucwords(str_replace('_', ' ', $insp['inspection_type'])) ?></p>
+                                            <h3 class="font-bold text-slate-900 truncate"><?php echo  htmlspecialchars($insp['establishment_name']) ?></h3>
+                                            <p class="text-xs text-slate-500 mb-3 line-clamp-1"><?php echo  ucwords(str_replace('_', ' ', $insp['inspection_type'])) ?></p>
                                             <div class="flex items-center justify-between">
-                                                <span class="text-xs text-slate-400 italic">Assignee: <?= htmlspecialchars($insp['inspector_name'] ?: 'None') ?></span>
-                                                <a href="/views/inspections/view.php?id=<?= $insp['inspection_id'] ?>" class="text-xs font-bold text-blue-600 hover:underline">Re-schedule</a>
+                                                <span class="text-xs text-slate-400 italic">Assignee: <?php echo  htmlspecialchars($insp['inspector_name'] ?: 'None') ?></span>
+                                                <a href="/views/inspections/view.php?id=<?php echo  $insp['inspection_id'] ?>" class="text-xs font-bold text-blue-600 hover:underline">Re-schedule</a>
                                             </div>
                                         </div>
                                     <?php endforeach; ?>
                                     <?php if (count($overdueInspections) > 5): ?>
                                         <button class="w-full py-2 text-xs font-bold text-slate-400 hover:text-slate-600 transition-colors uppercase tracking-widest">
-                                            View all <?= count($overdueInspections) ?> overdue
+                                            View all <?php echo  count($overdueInspections) ?> overdue
                                         </button>
                                     <?php endif; ?>
                                 <?php endif; ?>

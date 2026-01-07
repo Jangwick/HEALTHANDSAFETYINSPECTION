@@ -81,400 +81,308 @@ try {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= htmlspecialchars($establishment['name']) ?> - Health & Safety Inspection System</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css" rel="stylesheet">
-    <style>
-        body { background-color: #f8f9fa; }
-        .navbar { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
-        .card { box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-bottom: 1.5rem; }
-        .status-badge { padding: 0.5rem 1rem; border-radius: 25px; font-weight: 600; font-size: 0.95rem; }
-        .status-compliant { background-color: #d1fae5; color: #065f46; }
-        .status-non_compliant { background-color: #fee2e2; color: #991b1b; }
-        .status-pending { background-color: #fef3c7; color: #92400e; }
-        .status-suspended { background-color: #dbeafe; color: #1e40af; }
-        .info-row { padding: 0.75rem 0; border-bottom: 1px solid #e5e7eb; }
-        .info-row:last-child { border-bottom: none; }
-        .info-label { font-weight: 600; color: #6b7280; }
-        .establishment-header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 2rem; border-radius: 8px 8px 0 0; }
-    </style>
+    <title><?php echo  htmlspecialchars($establishment['name']) ?> - Health & Safety System</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body>
-    <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-dark mb-4">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="/dashboard.php">
-                <i class="bi bi-shield-check"></i> Health & Safety Inspection
-            </a>
-            <div class="navbar-nav ms-auto">
-                <span class="nav-link text-white">
-                    <i class="bi bi-person-circle"></i> <?= htmlspecialchars($_SESSION['first_name'] ?? '') ?> <?= htmlspecialchars($_SESSION['last_name'] ?? '') ?>
-                </span>
-                <a class="nav-link text-white" href="/views/auth/logout.php">
-                    <i class="bi bi-box-arrow-right"></i> Logout
-                </a>
-            </div>
-        </div>
-    </nav>
+<body class="bg-[#0b0c10] font-sans antialiased text-slate-200 overflow-hidden">
+    <div class="flex h-screen">
+        <!-- Sidebar Navigation -->
+        <?php 
+            $activePage = 'establishments';
+            include __DIR__ . '/../partials/sidebar.php'; 
+        ?>
 
-    <div class="container-fluid">
-        <?php if ($success): ?>
-        <div class="alert alert-success alert-dismissible fade show">
-            <i class="bi bi-check-circle"></i> Establishment created successfully!
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-        <?php endif; ?>
-
-        <!-- Establishment Header -->
-        <div class="card">
-            <div class="establishment-header">
-                <div class="d-flex justify-content-between align-items-start">
-                    <div>
-                        <h2 class="mb-2"><i class="bi bi-building"></i> <?= htmlspecialchars($establishment['name']) ?></h2>
-                        <p class="mb-3">
-                            <span class="badge bg-light text-dark me-2">
-                                <i class="bi bi-tag"></i> <?= htmlspecialchars(ucwords(str_replace('_', ' ', $establishment['type']))) ?>
-                            </span>
-                            <span class="status-badge status-<?= htmlspecialchars($establishment['compliance_status']) ?>">
-                                <?= htmlspecialchars(ucwords(str_replace('_', ' ', $establishment['compliance_status']))) ?>
-                            </span>
-                        </p>
-                        <p class="mb-0">
-                            <i class="bi bi-geo-alt-fill"></i> 
-                            <?= htmlspecialchars($establishment['address_street']) ?>, 
-                            <?= htmlspecialchars($establishment['address_barangay']) ?>, 
-                            <?= htmlspecialchars($establishment['address_city']) ?>
-                        </p>
-                    </div>
-                    <div>
-                        <a href="/views/establishments/list.php" class="btn btn-light me-2">
-                            <i class="bi bi-arrow-left"></i> Back
-                        </a>
-                        <a href="/views/establishments/edit.php?id=<?= $establishment['establishment_id'] ?>" class="btn btn-light me-2">
-                            <i class="bi bi-pencil"></i> Edit
-                        </a>
-                        <a href="/views/inspections/create.php?establishment_id=<?= $establishment['establishment_id'] ?>" class="btn btn-success">
-                            <i class="bi bi-clipboard-check"></i> New Inspection
-                        </a>
-                    </div>
+        <!-- Main Content -->
+        <div class="flex-1 flex flex-col min-w-0">
+            <!-- Top Navbar -->
+            <header class="bg-[#0f1115] border-b border-white/5 h-20 flex items-center justify-between px-8 shrink-0">
+                <div class="flex items-center space-x-4">
+                    <a href="/establishments" class="text-slate-500 hover:text-white transition-colors">
+                        <i class="fas fa-arrow-left"></i>
+                    </a>
+                    <h1 class="text-2xl font-bold text-white tracking-tight"><?php echo  htmlspecialchars($establishment['name']) ?></h1>
                 </div>
-            </div>
-
-            <div class="card-body">
-                <div class="row">
-                    <!-- Establishment Details -->
-                    <div class="col-md-6">
-                        <h5 class="mb-3"><i class="bi bi-info-circle"></i> Establishment Details</h5>
-                        
-                        <div class="info-row">
-                            <div class="row">
-                                <div class="col-4 info-label">Business Permit:</div>
-                                <div class="col-8"><?= htmlspecialchars($establishment['business_permit_number'] ?? 'N/A') ?></div>
-                            </div>
-                        </div>
-                        
-                        <?php if ($establishment['permit_issue_date']): ?>
-                        <div class="info-row">
-                            <div class="row">
-                                <div class="col-4 info-label">Permit Issued:</div>
-                                <div class="col-8"><?= date('F d, Y', strtotime($establishment['permit_issue_date'])) ?></div>
-                            </div>
-                        </div>
-                        <?php endif; ?>
-                        
-                        <?php if ($establishment['permit_expiry_date']): ?>
-                        <div class="info-row">
-                            <div class="row">
-                                <div class="col-4 info-label">Permit Expires:</div>
-                                <div class="col-8">
-                                    <?= date('F d, Y', strtotime($establishment['permit_expiry_date'])) ?>
-                                    <?php 
-                                    $expiry = new DateTime($establishment['permit_expiry_date']);
-                                    $now = new DateTime();
-                                    $daysUntilExpiry = $now->diff($expiry)->days;
-                                    if ($expiry < $now): ?>
-                                    <span class="badge bg-danger">Expired</span>
-                                    <?php elseif ($daysUntilExpiry <= 30): ?>
-                                    <span class="badge bg-warning">Expires in <?= $daysUntilExpiry ?> days</span>
-                                    <?php endif; ?>
-                                </div>
-                            </div>
-                        </div>
-                        <?php endif; ?>
-                        
-                        <?php if ($establishment['capacity']): ?>
-                        <div class="info-row">
-                            <div class="row">
-                                <div class="col-4 info-label">Capacity:</div>
-                                <div class="col-8"><?= number_format($establishment['capacity']) ?> persons</div>
-                            </div>
-                        </div>
-                        <?php endif; ?>
-                        
-                        <?php if ($establishment['operating_hours']): ?>
-                        <div class="info-row">
-                            <div class="row">
-                                <div class="col-4 info-label">Operating Hours:</div>
-                                <div class="col-8"><?= htmlspecialchars($establishment['operating_hours']) ?></div>
-                            </div>
-                        </div>
-                        <?php endif; ?>
-                        
-                        <?php if ($establishment['description']): ?>
-                        <div class="info-row">
-                            <div class="row">
-                                <div class="col-4 info-label">Description:</div>
-                                <div class="col-8"><?= htmlspecialchars($establishment['description']) ?></div>
-                            </div>
-                        </div>
-                        <?php endif; ?>
-                        
-                        <div class="info-row">
-                            <div class="row">
-                                <div class="col-4 info-label">Registered By:</div>
-                                <div class="col-8"><?= htmlspecialchars($establishment['created_by_name']) ?></div>
-                            </div>
-                        </div>
-                        
-                        <div class="info-row">
-                            <div class="row">
-                                <div class="col-4 info-label">Registered On:</div>
-                                <div class="col-8"><?= date('F d, Y g:i A', strtotime($establishment['created_at'])) ?></div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Owner Details -->
-                    <div class="col-md-6">
-                        <h5 class="mb-3"><i class="bi bi-person"></i> Owner Information</h5>
-                        
-                        <div class="info-row">
-                            <div class="row">
-                                <div class="col-4 info-label">Name:</div>
-                                <div class="col-8"><?= htmlspecialchars($establishment['owner_name']) ?></div>
-                            </div>
-                        </div>
-                        
-                        <div class="info-row">
-                            <div class="row">
-                                <div class="col-4 info-label">Phone:</div>
-                                <div class="col-8">
-                                    <a href="tel:<?= htmlspecialchars($establishment['owner_phone']) ?>">
-                                        <i class="bi bi-telephone"></i> <?= htmlspecialchars($establishment['owner_phone']) ?>
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <?php if ($establishment['owner_email']): ?>
-                        <div class="info-row">
-                            <div class="row">
-                                <div class="col-4 info-label">Email:</div>
-                                <div class="col-8">
-                                    <a href="mailto:<?= htmlspecialchars($establishment['owner_email']) ?>">
-                                        <i class="bi bi-envelope"></i> <?= htmlspecialchars($establishment['owner_email']) ?>
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                        <?php endif; ?>
-                        
-                        <h5 class="mb-3 mt-4"><i class="bi bi-geo-alt"></i> Complete Address</h5>
-                        
-                        <div class="info-row">
-                            <div class="row">
-                                <div class="col-4 info-label">Street:</div>
-                                <div class="col-8"><?= htmlspecialchars($establishment['address_street']) ?></div>
-                            </div>
-                        </div>
-                        
-                        <div class="info-row">
-                            <div class="row">
-                                <div class="col-4 info-label">Barangay:</div>
-                                <div class="col-8"><?= htmlspecialchars($establishment['address_barangay']) ?></div>
-                            </div>
-                        </div>
-                        
-                        <div class="info-row">
-                            <div class="row">
-                                <div class="col-4 info-label">City/Municipality:</div>
-                                <div class="col-8"><?= htmlspecialchars($establishment['address_city']) ?></div>
-                            </div>
-                        </div>
-                        
-                        <?php if ($establishment['address_province']): ?>
-                        <div class="info-row">
-                            <div class="row">
-                                <div class="col-4 info-label">Province:</div>
-                                <div class="col-8"><?= htmlspecialchars($establishment['address_province']) ?></div>
-                            </div>
-                        </div>
-                        <?php endif; ?>
-                    </div>
+                <div class="flex items-center space-x-4">
+                    <a href="/inspections/create?establishment_id=<?php echo  $establishment['establishment_id'] ?>" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl text-sm font-bold flex items-center shadow-lg shadow-blue-900/20 transition-all active:scale-95 group">
+                        <i class="fas fa-plus mr-2 group-hover:rotate-90 transition-transform"></i> Schedule Inspection
+                    </a>
                 </div>
-            </div>
-        </div>
+            </header>
 
-        <div class="row">
-            <!-- Inspection History -->
-            <div class="col-md-8">
-                <div class="card">
-                    <div class="card-header bg-white">
-                        <h5 class="mb-0"><i class="bi bi-clipboard-data"></i> Inspection History</h5>
-                    </div>
-                    <div class="card-body">
-                        <?php if (empty($inspectionHistory)): ?>
-                        <div class="alert alert-info">
-                            <i class="bi bi-info-circle"></i> No inspections recorded yet.
-                            <a href="/views/inspections/create.php?establishment_id=<?= $establishment['establishment_id'] ?>">Schedule an inspection</a>
-                        </div>
-                        <?php else: ?>
-                        <div class="table-responsive">
-                            <table class="table table-hover">
-                                <thead class="table-light">
-                                    <tr>
-                                        <th>Reference</th>
-                                        <th>Type</th>
-                                        <th>Scheduled Date</th>
-                                        <th>Inspector</th>
-                                        <th>Status</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <?php foreach ($inspectionHistory as $insp): ?>
-                                    <tr>
-                                        <td><strong><?= htmlspecialchars($insp['reference_number']) ?></strong></td>
-                                        <td><?= htmlspecialchars(ucwords(str_replace('_', ' ', $insp['inspection_type']))) ?></td>
-                                        <td><?= date('M d, Y', strtotime($insp['scheduled_date'])) ?></td>
-                                        <td><?= htmlspecialchars($insp['inspector_name'] ?? 'Unassigned') ?></td>
-                                        <td>
-                                            <?php
-                                            $statusColors = [
-                                                'scheduled' => 'primary',
-                                                'in_progress' => 'info',
-                                                'completed' => 'success',
-                                                'cancelled' => 'secondary'
-                                            ];
-                                            $color = $statusColors[$insp['status']] ?? 'secondary';
-                                            ?>
-                                            <span class="badge bg-<?= $color ?>">
-                                                <?= htmlspecialchars(ucwords(str_replace('_', ' ', $insp['status']))) ?>
-                                            </span>
-                                        </td>
-                                        <td>
-                                            <a href="/views/inspections/view.php?id=<?= $insp['inspection_id'] ?>" 
-                                               class="btn btn-sm btn-outline-primary">
-                                                <i class="bi bi-eye"></i>
-                                            </a>
-                                        </td>
-                                    </tr>
-                                    <?php endforeach; ?>
-                                </tbody>
-                            </table>
-                        </div>
-                        <?php endif; ?>
-                    </div>
-                </div>
-
-                <!-- Violations -->
-                <?php if (!empty($violationList)): ?>
-                <div class="card">
-                    <div class="card-header bg-white">
-                        <h5 class="mb-0"><i class="bi bi-exclamation-triangle"></i> Recent Violations</h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="list-group">
-                            <?php foreach ($violationList as $violation): ?>
-                            <div class="list-group-item">
-                                <div class="d-flex justify-content-between align-items-start">
-                                    <div>
-                                        <h6 class="mb-1"><?= htmlspecialchars($violation['violation_type']) ?></h6>
-                                        <p class="mb-1 text-muted small"><?= htmlspecialchars($violation['description']) ?></p>
-                                        <small class="text-muted">
-                                            <i class="bi bi-calendar"></i> <?= date('M d, Y', strtotime($violation['identified_date'])) ?>
-                                            | Inspection: <?= htmlspecialchars($violation['inspection_reference']) ?>
-                                        </small>
-                                    </div>
-                                    <span class="badge bg-<?= $violation['severity'] === 'critical' ? 'danger' : ($violation['severity'] === 'major' ? 'warning' : 'info') ?>">
-                                        <?= htmlspecialchars(ucfirst($violation['severity'])) ?>
-                                    </span>
-                                </div>
-                            </div>
-                            <?php endforeach; ?>
-                        </div>
-                    </div>
+            <!-- Scrollable Content Area -->
+            <main class="flex-1 overflow-y-auto p-8 bg-[#0b0c10]">
+                <?php if ($success): ?>
+                <div class="max-w-7xl mx-auto mb-8 p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-xl flex items-center text-emerald-500">
+                    <i class="fas fa-check-circle mr-3"></i>
+                    <span class="text-xs font-black uppercase tracking-widest italic">Establishment successfully updated/registered.</span>
                 </div>
                 <?php endif; ?>
-            </div>
 
-            <!-- Sidebar -->
-            <div class="col-md-4">
-                <!-- Certificates -->
-                <div class="card">
-                    <div class="card-header bg-white">
-                        <h5 class="mb-0"><i class="bi bi-award"></i> Certificates</h5>
-                    </div>
-                    <div class="card-body">
-                        <?php if (empty($certificateList)): ?>
-                        <p class="text-muted mb-0"><i class="bi bi-info-circle"></i> No certificates issued yet.</p>
-                        <?php else: ?>
-                        <div class="list-group">
-                            <?php foreach ($certificateList as $cert): ?>
-                            <a href="/views/certificates/view.php?id=<?= $cert['certificate_id'] ?>" 
-                               class="list-group-item list-group-item-action">
-                                <div class="d-flex justify-content-between align-items-center">
+                <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <!-- Left Column: Details & History -->
+                    <div class="lg:col-span-2 space-y-8">
+                        <!-- Header Banner -->
+                        <div class="bg-[#15181e] rounded-3xl border border-white/5 overflow-hidden shadow-2xl relative">
+                            <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-600 via-indigo-600 to-emerald-600"></div>
+                            <div class="p-8">
+                                <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
                                     <div>
-                                        <h6 class="mb-1"><?= htmlspecialchars($cert['certificate_number']) ?></h6>
-                                        <small class="text-muted">
-                                            <?= htmlspecialchars(ucwords(str_replace('_', ' ', $cert['certificate_type']))) ?>
-                                        </small>
+                                        <div class="flex items-center space-x-3 mb-4">
+                                            <span class="px-3 py-1.5 bg-blue-500/10 text-blue-400 border border-blue-500/20 rounded-lg text-[10px] font-black uppercase tracking-widest">
+                                                <i class="fas fa-tag mr-1.5"></i> <?php echo  htmlspecialchars(ucwords($establishment['type'])) ?>
+                                            </span>
+                                            <?php
+                                                $statusStyles = [
+                                                    'compliant' => 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20',
+                                                    'non_compliant' => 'bg-rose-500/10 text-rose-500 border-rose-500/20',
+                                                    'pending' => 'bg-amber-500/10 text-amber-500 border-amber-500/20',
+                                                    'suspended' => 'bg-blue-500/10 text-blue-500 border-blue-500/20'
+                                                ];
+                                                $style = $statusStyles[$establishment['compliance_status']] ?? 'bg-slate-500/10 text-slate-500 border-white/10';
+                                            ?>
+                                            <span class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest border <?php echo  $style ?>">
+                                                <i class="fas fa-shield-alt mr-1.5"></i> <?php echo  str_replace('_', ' ', $establishment['compliance_status']) ?>
+                                            </span>
+                                        </div>
+                                        <div class="flex items-start text-slate-400 text-sm italic font-medium leading-relaxed">
+                                            <i class="fas fa-map-marker-alt mt-1 mr-3 text-blue-500"></i>
+                                            <span>
+                                                <?php echo  htmlspecialchars($establishment['address_street']) ?>, 
+                                                <?php echo  htmlspecialchars($establishment['address_barangay']) ?>, 
+                                                <?php echo  htmlspecialchars($establishment['address_city']) ?>
+                                            </span>
+                                        </div>
                                     </div>
-                                    <?php
-                                    $certStatusColors = [
-                                        'active' => 'success',
-                                        'expired' => 'danger',
-                                        'revoked' => 'dark',
-                                        'suspended' => 'warning'
-                                    ];
-                                    $certColor = $certStatusColors[$cert['status']] ?? 'secondary';
-                                    ?>
-                                    <span class="badge bg-<?= $certColor ?>"><?= ucfirst($cert['status']) ?></span>
+                                    <div class="flex space-x-3">
+                                        <button class="px-6 py-3 bg-[#1e232b] hover:bg-[#252b35] text-white rounded-xl text-sm font-bold border border-white/5 transition-all active:scale-95 shadow-lg">
+                                            <i class="fas fa-edit mr-2 text-slate-400"></i> Edit
+                                        </button>
+                                        <button class="px-6 py-3 bg-white/[0.03] hover:bg-white/[0.08] text-white rounded-xl text-sm font-bold border border-white/10 transition-all active:scale-95">
+                                            <i class="fas fa-download mr-2 text-slate-400"></i> Export
+                                        </button>
+                                    </div>
                                 </div>
-                                <small class="text-muted d-block mt-1">
-                                    Valid until: <?= date('M d, Y', strtotime($cert['expiry_date'])) ?>
-                                </small>
-                            </a>
-                            <?php endforeach; ?>
+                            </div>
                         </div>
-                        <?php endif; ?>
-                    </div>
-                </div>
 
-                <!-- Quick Stats -->
-                <div class="card">
-                    <div class="card-header bg-white">
-                        <h5 class="mb-0"><i class="bi bi-graph-up"></i> Quick Stats</h5>
+                        <!-- Grid Info Blocks -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <!-- Business Info -->
+                            <div class="bg-[#15181e] rounded-3xl border border-white/5 shadow-xl overflow-hidden">
+                                <div class="px-8 py-6 bg-white/[0.02] border-b border-white/5">
+                                    <h2 class="text-[10px] font-black text-blue-500 uppercase tracking-[0.2em] flex items-center">
+                                        <i class="fas fa-building mr-2"></i> Business Details
+                                    </h2>
+                                </div>
+                                <div class="p-8 space-y-6">
+                                    <div>
+                                        <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1.5">Permit Number</label>
+                                        <div class="text-white font-mono text-sm"><?php echo  htmlspecialchars($establishment['business_permit_number'] ?? 'N/A') ?></div>
+                                    </div>
+                                    <div class="grid grid-cols-2 gap-4">
+                                        <div>
+                                            <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1.5">Capacity</label>
+                                            <div class="text-white font-bold text-sm"><?php echo  number_format((float)($establishment['capacity'] ?? 0)) ?> <span class="text-slate-500 font-normal">Persons</span></div>
+                                        </div>
+                                        <div>
+                                            <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1.5">Operating Hours</label>
+                                            <div class="text-white font-bold text-sm"><?php echo  htmlspecialchars($establishment['operating_hours'] ?? 'N/A') ?></div>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1.5">Description</label>
+                                        <p class="text-slate-400 text-xs leading-relaxed italic"><?php echo  htmlspecialchars($establishment['description'] ?? 'No description provided.') ?></p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Ownership Info -->
+                            <div class="bg-[#15181e] rounded-3xl border border-white/5 shadow-xl overflow-hidden">
+                                <div class="px-8 py-6 bg-white/[0.02] border-b border-white/5">
+                                    <h2 class="text-[10px] font-black text-emerald-500 uppercase tracking-[0.2em] flex items-center">
+                                        <i class="fas fa-user-tie mr-2"></i> Contact & Ownership
+                                    </h2>
+                                </div>
+                                <div class="p-8 space-y-6">
+                                    <div>
+                                        <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1.5">Owner Name</label>
+                                        <div class="text-white font-bold text-sm"><?php echo  htmlspecialchars($establishment['owner_name']) ?></div>
+                                    </div>
+                                    <div>
+                                        <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1.5">Phone Contact</label>
+                                        <a href="tel:<?php echo  htmlspecialchars($establishment['owner_phone']) ?>" class="text-blue-400 hover:text-blue-300 transition-colors font-mono text-sm flex items-center group">
+                                            <i class="fas fa-phone-alt mr-2 text-[10px] group-hover:scale-110"></i> <?php echo  htmlspecialchars($establishment['owner_phone']) ?>
+                                        </a>
+                                    </div>
+                                    <div>
+                                        <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1.5">Email Address</label>
+                                        <a href="mailto:<?php echo  htmlspecialchars($establishment['owner_email']) ?>" class="text-slate-300 hover:text-white transition-colors text-sm flex items-center group italic underline decoration-white/10">
+                                            <i class="fas fa-envelope mr-2 text-[10px] group-hover:scale-110"></i> <?php echo  htmlspecialchars($establishment['owner_email'] ?? 'N/A') ?>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Inspection History Table -->
+                        <div class="bg-[#15181e] rounded-3xl border border-white/5 shadow-2xl overflow-hidden">
+                            <div class="px-8 py-6 bg-white/[0.02] border-b border-white/5 flex items-center justify-between">
+                                <h2 class="text-[10px] font-black text-amber-500 uppercase tracking-[0.2em] flex items-center">
+                                    <i class="fas fa-history mr-2"></i> Inspection History
+                                </h2>
+                                <span class="text-[9px] font-black text-slate-600 uppercase tracking-widest italic"><?php echo  count($inspectionHistory) ?> total records</span>
+                            </div>
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-left border-collapse">
+                                    <thead>
+                                        <tr class="bg-white/[0.01] border-b border-white/5 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">
+                                            <th class="px-8 py-5">Reference</th>
+                                            <th class="px-8 py-5">Type / Inspector</th>
+                                            <th class="px-8 py-5 text-center">Date</th>
+                                            <th class="px-8 py-5">Status</th>
+                                            <th class="px-8 py-5 text-right">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-white/5 text-sm">
+                                        <?php if (!empty($inspectionHistory)): ?>
+                                            <?php foreach ($inspectionHistory as $insp): ?>
+                                                <tr class="hover:bg-white/[0.02] transition-colors group cursor-pointer" onclick="window.location='/inspections/view?id=<?php echo  $insp['inspection_id'] ?>'">
+                                                    <td class="px-8 py-6">
+                                                        <div class="font-mono font-bold text-white group-hover:text-amber-400 transition-colors">#<?php echo  htmlspecialchars($insp['reference_number']) ?></div>
+                                                    </td>
+                                                    <td class="px-8 py-6">
+                                                        <div class="text-white font-medium"><?php echo  ucwords(str_replace('_', ' ', $insp['inspection_type'])) ?></div>
+                                                        <div class="text-[10px] font-black text-slate-500 uppercase tracking-widest mt-1"><?php echo  htmlspecialchars($insp['inspector_name'] ?? 'Unassigned') ?></div>
+                                                    </td>
+                                                    <td class="px-8 py-6 text-center">
+                                                        <div class="text-white"><?php echo  date('M d, Y', strtotime($insp['scheduled_date'])) ?></div>
+                                                    </td>
+                                                    <td class="px-8 py-6">
+                                                        <?php
+                                                        $statusColors = [
+                                                            'scheduled' => 'bg-blue-500/10 text-blue-500 border-blue-500/20',
+                                                            'in_progress' => 'bg-amber-500/10 text-amber-500 border-amber-500/20',
+                                                            'completed' => 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20',
+                                                            'cancelled' => 'bg-rose-500/10 text-rose-500 border-rose-500/20'
+                                                        ];
+                                                        $color = $statusColors[$insp['status']] ?? 'bg-slate-500/10 text-slate-500 border-white/10';
+                                                        ?>
+                                                        <span class="px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-[0.1em] border <?php echo  $color ?>">
+                                                            <?php echo  $insp['status'] ?>
+                                                        </span>
+                                                    </td>
+                                                    <td class="px-8 py-6 text-right">
+                                                        <a href="/inspections/view?id=<?php echo  $insp['inspection_id'] ?>" class="p-2 text-slate-500 hover:text-white transition-colors">
+                                                            <i class="fas fa-external-link-alt text-xs"></i>
+                                                        </a>
+                                                    </td>
+                                                </tr>
+                                            <?php endforeach; ?>
+                                        <?php else: ?>
+                                            <tr>
+                                                <td colspan="5" class="px-8 py-12 text-center text-slate-500 italic">No inspection history found.</td>
+                                            </tr>
+                                        <?php endif; ?>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
                     </div>
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between mb-3">
-                            <span class="text-muted">Total Inspections:</span>
-                            <strong><?= count($inspectionHistory) ?></strong>
+
+                    <!-- Right Column: Sidebar Stats & Certificates -->
+                    <div class="space-y-8">
+                        <!-- Quick Stats -->
+                        <div class="bg-gradient-to-br from-[#1e232b] to-[#15181e] p-8 rounded-3xl border border-white/10 shadow-2xl relative overflow-hidden group">
+                           <div class="absolute -right-8 -bottom-8 opacity-[0.03] text-9xl group-hover:scale-110 transition-transform duration-700">
+                               <i class="fas fa-chart-line"></i>
+                           </div>
+                           <h3 class="text-[10px] font-black text-slate-500 uppercase tracking-[0.3em] mb-8 italic">Operational Overview</h3>
+                           <div class="space-y-8">
+                               <div class="flex items-center justify-between">
+                                   <div class="flex items-center">
+                                       <div class="w-10 h-10 bg-blue-500/10 rounded-xl flex items-center justify-center mr-4 group-hover:bg-blue-500/20 transition-colors">
+                                           <i class="fas fa-clipboard-check text-blue-500 text-sm"></i>
+                                       </div>
+                                       <span class="text-sm font-bold text-slate-300">Total Inspections</span>
+                                   </div>
+                                   <div class="text-2xl font-black text-white"><?php echo  count($inspectionHistory) ?></div>
+                               </div>
+                               <div class="flex items-center justify-between">
+                                   <div class="flex items-center">
+                                       <div class="w-10 h-10 bg-emerald-500/10 rounded-xl flex items-center justify-center mr-4 group-hover:bg-emerald-500/20 transition-colors">
+                                           <i class="fas fa-certificate text-emerald-500 text-sm"></i>
+                                       </div>
+                                       <span class="text-sm font-bold text-slate-300">Active Certificates</span>
+                                   </div>
+                                   <div class="text-2xl font-black text-white"><?php echo  count(array_filter($certificateList, fn($c) => $c['status'] === 'active')) ?></div>
+                               </div>
+                               <div class="flex items-center justify-between">
+                                   <div class="flex items-center">
+                                       <div class="w-10 h-10 bg-rose-500/10 rounded-xl flex items-center justify-center mr-4 group-hover:bg-rose-500/20 transition-colors">
+                                           <i class="fas fa-exclamation-triangle text-rose-500 text-sm"></i>
+                                       </div>
+                                       <span class="text-sm font-bold text-slate-300">Active Violations</span>
+                                   </div>
+                                   <div class="text-2xl font-black text-rose-500"><?php echo  count($violationList) ?></div>
+                               </div>
+                           </div>
                         </div>
-                        <div class="d-flex justify-content-between mb-3">
-                            <span class="text-muted">Active Certificates:</span>
-                            <strong><?= count(array_filter($certificateList, fn($c) => $c['status'] === 'active')) ?></strong>
+
+                        <!-- Active Certificates List -->
+                        <div class="bg-[#15181e] rounded-3xl border border-white/5 shadow-xl overflow-hidden">
+                            <div class="px-8 py-6 bg-white/[0.02] border-b border-white/5 flex items-center justify-between">
+                                <h2 class="text-[10px] font-black text-purple-500 uppercase tracking-[0.2em] flex items-center">
+                                    <i class="fas fa-award mr-2"></i> Certificates
+                                </h2>
+                                <button class="text-[9px] font-black text-blue-400 hover:text-blue-300 uppercase tracking-widest transition-colors mb-0.5">Issue New</button>
+                            </div>
+                            <div class="p-4 space-y-3">
+                                <?php if (!empty($certificateList)): ?>
+                                    <?php foreach ($certificateList as $cert): ?>
+                                        <a href="/certificates/view?id=<?php echo  $cert['certificate_id'] ?>" class="block p-5 bg-[#0b0c10] hover:bg-white/[0.04] border border-white/5 rounded-2xl transition-all group overflow-hidden relative">
+                                            <div class="flex justify-between items-start relative z-10">
+                                                <div>
+                                                    <div class="text-xs font-black text-white group-hover:text-purple-400 transition-colors mb-1"><?php echo  htmlspecialchars($cert['certificate_number']) ?></div>
+                                                    <div class="text-[9px] font-black text-slate-500 uppercase tracking-widest"><?php echo  str_replace('_', ' ', $cert['certificate_type']) ?></div>
+                                                </div>
+                                                <?php
+                                                    $certColors = [
+                                                        'active' => 'bg-emerald-500 text-white',
+                                                        'expired' => 'bg-rose-500 text-white',
+                                                        'revoked' => 'bg-slate-700 text-slate-400'
+                                                    ];
+                                                ?>
+                                                <span class="px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-tighter <?php echo  $certColors[$cert['status']] ?? 'bg-slate-500 text-white' ?>">
+                                                    <?php echo  $cert['status'] ?>
+                                                </span>
+                                            </div>
+                                            <div class="mt-4 flex items-center text-[9px] font-black text-slate-600 uppercase tracking-widest group-hover:text-slate-400 transition-colors">
+                                                <i class="fas fa-calendar-alt mr-2"></i> Expires: <?php echo  date('M d, Y', strtotime($cert['expiry_date'])) ?>
+                                            </div>
+                                        </a>
+                                    <?php endforeach; ?>
+                                <?php else: ?>
+                                    <div class="p-8 text-center text-slate-500 italic text-xs">No certificates issued yet.</div>
+                                <?php endif; ?>
+                            </div>
                         </div>
-                        <div class="d-flex justify-content-between mb-0">
-                            <span class="text-muted">Violations:</span>
-                            <strong class="text-danger"><?= count($violationList) ?></strong>
+
+                        <!-- System Info -->
+                        <div class="bg-blue-600/5 rounded-3xl border border-blue-500/10 p-6 flex items-start">
+                            <i class="fas fa-info-circle text-blue-500 mt-0.5 mr-3"></i>
+                            <div>
+                                <div class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5">Record Metadata</div>
+                                <div class="text-[10px] text-slate-500 leading-relaxed italic">
+                                    Last modified by <span class="text-slate-300 font-bold"><?php echo  htmlspecialchars($establishment['created_by_name']) ?></span> 
+                                    on <?php echo  date('F d, Y', strtotime($establishment['created_at'])) ?>.
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
+            </main>
         </div>
     </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

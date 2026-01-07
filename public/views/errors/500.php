@@ -136,7 +136,7 @@
         <?php if (isset($error) && $_ENV['APP_ENV'] !== 'production'): ?>
         <div class="error-details">
             <h3>Error Details (Development Mode)</h3>
-            <p><?= htmlspecialchars($error) ?></p>
+            <p><?php echo  htmlspecialchars($error) ?></p>
         </div>
         <?php endif; ?>
         

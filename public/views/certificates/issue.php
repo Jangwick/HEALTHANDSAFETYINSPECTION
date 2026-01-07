@@ -130,7 +130,7 @@ try {
                     <div class="card-body">
                         <?php if (isset($error)): ?>
                         <div class="alert alert-danger">
-                            <i class="bi bi-exclamation-circle"></i> <?= htmlspecialchars($error) ?>
+                            <i class="bi bi-exclamation-circle"></i> <?php echo  htmlspecialchars($error) ?>
                         </div>
                         <?php endif; ?>
 
@@ -150,14 +150,14 @@ try {
                                 <select name="inspection_id" id="inspection_id" class="form-select" required onchange="updateInspectionInfo()">
                                     <option value="">Choose an inspection...</option>
                                     <?php foreach ($inspections as $insp): ?>
-                                    <option value="<?= $insp['inspection_id'] ?>" 
-                                            data-type="<?= $insp['inspection_type'] ?>"
-                                            data-establishment="<?= htmlspecialchars($insp['establishment_name']) ?>"
-                                            data-date="<?= date('M d, Y', strtotime($insp['actual_end_datetime'])) ?>"
-                                            data-reference="<?= htmlspecialchars($insp['reference_number']) ?>">
-                                        <?= htmlspecialchars($insp['reference_number']) ?> - 
-                                        <?= htmlspecialchars($insp['establishment_name']) ?> 
-                                        (<?= date('M d, Y', strtotime($insp['actual_end_datetime'])) ?>)
+                                    <option value="<?php echo  $insp['inspection_id'] ?>" 
+                                            data-type="<?php echo  $insp['inspection_type'] ?>"
+                                            data-establishment="<?php echo  htmlspecialchars($insp['establishment_name']) ?>"
+                                            data-date="<?php echo  date('M d, Y', strtotime($insp['actual_end_datetime'])) ?>"
+                                            data-reference="<?php echo  htmlspecialchars($insp['reference_number']) ?>">
+                                        <?php echo  htmlspecialchars($insp['reference_number']) ?> - 
+                                        <?php echo  htmlspecialchars($insp['establishment_name']) ?> 
+                                        (<?php echo  date('M d, Y', strtotime($insp['actual_end_datetime'])) ?>)
                                     </option>
                                     <?php endforeach; ?>
                                 </select>
@@ -207,9 +207,9 @@ try {
                             <!-- Preview Box -->
                             <div class="alert alert-info">
                                 <h6><i class="bi bi-info-circle"></i> Certificate Preview</h6>
-                                <p class="mb-1"><strong>Issue Date:</strong> <?= date('F d, Y') ?></p>
-                                <p class="mb-1"><strong>Expiry Date:</strong> <span id="expiry-preview"><?= date('F d, Y', strtotime('+12 months')) ?></span></p>
-                                <p class="mb-0"><strong>Issued By:</strong> <?= htmlspecialchars($_SESSION['first_name'] . ' ' . $_SESSION['last_name']) ?></p>
+                                <p class="mb-1"><strong>Issue Date:</strong> <?php echo  date('F d, Y') ?></p>
+                                <p class="mb-1"><strong>Expiry Date:</strong> <span id="expiry-preview"><?php echo  date('F d, Y', strtotime('+12 months')) ?></span></p>
+                                <p class="mb-0"><strong>Issued By:</strong> <?php echo  htmlspecialchars($_SESSION['first_name'] . ' ' . $_SESSION['last_name']) ?></p>
                             </div>
 
                             <!-- Submit Buttons -->

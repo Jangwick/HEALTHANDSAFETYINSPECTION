@@ -21,11 +21,17 @@ $webRoutes = [
     '/inspections' => ['type' => 'view', 'file' => 'inspections/list.php'],
     '/inspections/scheduling' => ['type' => 'view', 'file' => 'inspections/scheduling.php'],
     '/inspections/create' => ['type' => 'view', 'file' => 'inspections/create.php'],
+    '/inspections/view' => ['type' => 'view', 'file' => 'inspections/view.php'],
+    '/inspections/view.php' => ['type' => 'view', 'file' => 'inspections/view.php'],
+    '/inspections/conduct' => ['type' => 'view', 'file' => 'inspections/conduct.php'],
+    '/inspections/conduct.php' => ['type' => 'view', 'file' => 'inspections/conduct.php'],
+    '/inspections/report' => ['type' => 'view', 'file' => 'inspections/report.php'],
     '/inspections/list.php' => ['type' => 'view', 'file' => 'inspections/list.php'],
     '/establishments' => ['type' => 'view', 'file' => 'establishments/list.php'],
     '/establishments/list' => ['type' => 'view', 'file' => 'establishments/list.php'],
     '/establishments/list.php' => ['type' => 'view', 'file' => 'establishments/list.php'],
     '/establishments/create' => ['type' => 'view', 'file' => 'establishments/create.php'],
+    '/establishments/view' => ['type' => 'view', 'file' => 'establishments/view.php'],
     '/establishments/view.php' => ['type' => 'view', 'file' => 'establishments/view.php'],
     '/establishments/edit.php' => ['type' => 'view', 'file' => 'establishments/edit.php'],
     '/establishments/statistics.php' => ['type' => 'view', 'file' => 'establishments/statistics.php'],
@@ -37,6 +43,7 @@ $webRoutes = [
     '/certificates/view.php' => ['type' => 'view', 'file' => 'certificates/view.php'],
     '/violations' => ['type' => 'view', 'file' => 'violations/list.php'],
     '/violations/list.php' => ['type' => 'view', 'file' => 'violations/list.php'],
+    '/violations/add' => ['type' => 'view', 'file' => 'violations/add.php'],
 ];
 
 // Match route - strip query parameters for route matching

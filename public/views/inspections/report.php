@@ -134,276 +134,270 @@ $isPrint = isset($_GET['print']);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inspection Report #<?= $inspection['reference_number'] ?></title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title>VALIDATION_DOSSIER_#<?= $inspection['reference_number'] ?> | Health & Safety</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
     <style>
+        :root { --glass: rgba(15, 23, 42, 0.85); }
+        body { font-family: 'Inter', sans-serif; background: #020617; }
+        .mono { font-family: 'JetBrains Mono', monospace; }
+        .glass { background: var(--glass); backdrop-filter: blur(16px); }
+        
         @media print {
             .no-print { display: none !important; }
-            body { background: white; }
-            .container { max-width: 100%; }
+            body { background: white !important; color: black !important; }
+            .glass { background: white !important; backdrop-filter: none !important; border: 1px solid #ddd !important; }
+            .text-white { color: black !important; }
+            .text-slate-200, .text-slate-300, .text-slate-400, .text-slate-500 { color: #333 !important; }
+            .bg-slate-900, .bg-slate-950, .bg-black { background: white !important; border: 1px solid #eee !important; }
+            .border-white\/5, .border-white\/10 { border-color: #eee !important; }
+            .mono { font-family: 'Courier New', monospace !important; }
+            .print-shadow { box-shadow: none !important; }
+            .print-no-blur { backdrop-filter: none !important; }
         }
-        
-        .report-header {
-            background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
-            color: white;
-            padding: 2rem;
-            margin: -1rem -1rem 2rem -1rem;
-            border-radius: 8px 8px 0 0;
+
+        .scan-line {
+            width: 100%; height: 2px;
+            background: linear-gradient(90deg, transparent, rgba(56, 189, 248, 0.2), transparent);
+            position: absolute; animation: scan 4s linear infinite; pointer-events: none;
         }
-        
-        .letterhead {
-            text-align: center;
-            border-bottom: 3px solid #0d6efd;
-            padding-bottom: 1rem;
-            margin-bottom: 2rem;
-        }
-        
-        .letterhead h1 {
-            font-size: 1.8rem;
-            font-weight: bold;
-            color: #0d6efd;
-            margin: 0;
-        }
-        
-        .letterhead p {
-            margin: 0;
-            color: #6c757d;
-        }
-        
-        .info-box {
-            background: #f8f9fa;
-            padding: 1rem;
-            border-left: 4px solid #0d6efd;
-            margin-bottom: 1rem;
-        }
-        
-        .score-badge {
-            font-size: 3rem;
-            font-weight: bold;
-            text-align: center;
-            padding: 2rem;
-            border-radius: 8px;
-            background: #f8f9fa;
-            margin: 2rem 0;
-        }
-        
-        .checklist-table th {
-            background: #0d6efd;
-            color: white;
-        }
-        
-        .violation-box {
-            border: 2px solid #dc3545;
-            border-radius: 8px;
-            padding: 1rem;
-            margin-bottom: 1rem;
-            background: #fff5f5;
-        }
-        
-        .signature-section {
-            margin-top: 3rem;
-            border-top: 2px solid #dee2e6;
-            padding-top: 2rem;
-        }
-        
-        .signature-box {
-            border-top: 2px solid #000;
-            margin-top: 3rem;
-            padding-top: 0.5rem;
-            text-align: center;
-        }
+        @keyframes scan { 0% { top: -100%; } 100% { top: 100%; } }
     </style>
     <?php if ($isPrint): ?>
-    <script>
-        window.onload = function() { window.print(); };
-    </script>
+    <script>window.onload = function() { window.print(); };</script>
     <?php endif; ?>
 </head>
-<body>
-    <div class="container my-4">
-        <div class="bg-white p-4 shadow-sm rounded">
-            <!-- Letterhead -->
-            <div class="letterhead">
-                <h1>HEALTH & SAFETY INSPECTION SYSTEM</h1>
-                <p>Local Government Unit - Health & Sanitation Office</p>
-                <p>Republic of the Philippines</p>
-            </div>
-            
-            <h2 class="text-center mb-4">INSPECTION REPORT</h2>
-            
-            <!-- Report Actions -->
-            <div class="no-print mb-3">
-                <a href="/views/inspections/view.php?id=<?= $inspectionId ?>" class="btn btn-secondary">
-                    <i class="bi bi-arrow-left"></i> Back to Inspection
-                </a>
-                <button onclick="window.print()" class="btn btn-primary">
-                    <i class="bi bi-printer"></i> Print Report
+<body class="text-slate-300 min-h-screen">
+    <!-- Background Decor (Digital View Only) -->
+    <div class="fixed inset-0 z-0 no-print">
+        <div class="absolute top-0 right-0 w-[50%] h-[50%] bg-sky-950/10 blur-[120px]"></div>
+        <div class="absolute bottom-0 left-0 w-[50%] h-[50%] bg-blue-950/5 blur-[120px]"></div>
+    </div>
+
+    <!-- Interface Content -->
+    <div class="relative z-10 p-8 lg:p-16 max-w-[1200px] mx-auto">
+        
+        <!-- Dashboard Actions -->
+        <div class="no-print flex items-center justify-between mb-16">
+            <a href="/views/inspections/view.php?id=<?= $inspectionId ?>" class="h-12 px-6 glass rounded-2xl flex items-center gap-4 text-slate-400 hover:text-white border border-white/5 transition-all mono text-[10px] font-black uppercase tracking-widest italic translate-y-[-1px] active:translate-y-0">
+                <i class="fas fa-arrow-left"></i> RETURN_TO_VIEW
+            </a>
+            <div class="flex items-center gap-4">
+                <button onclick="window.print()" class="h-12 px-8 bg-sky-600 hover:bg-sky-500 text-white rounded-2xl flex items-center gap-4 shadow-2xl shadow-sky-900/40 transition-all mono text-[10px] font-black uppercase tracking-widest italic active:scale-95">
+                    <i class="fas fa-print"></i> INITIALIZE_PRINT_SEQUENCE
                 </button>
             </div>
-            
-            <!-- Inspection Details -->
-            <div class="row mb-4">
-                <div class="col-md-6">
-                    <div class="info-box">
-                        <h5>Inspection Information</h5>
-                        <p><strong>Reference Number:</strong> <?= htmlspecialchars($inspection['reference_number']) ?></p>
-                        <p><strong>Inspection Type:</strong> <?= htmlspecialchars(str_replace('_', ' ', ucwords($inspection['inspection_type'], '_'))) ?></p>
-                        <p><strong>Date Conducted:</strong> <?= $inspection['started_at'] ? date('F d, Y', strtotime($inspection['started_at'])) : 'N/A' ?></p>
-                        <p><strong>Date Completed:</strong> <?= $inspection['completed_at'] ? date('F d, Y', strtotime($inspection['completed_at'])) : 'N/A' ?></p>
-                        <p><strong>Status:</strong> <span class="badge bg-success"><?= strtoupper($inspection['status']) ?></span></p>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="info-box">
-                        <h5>Establishment Details</h5>
-                        <p><strong>Name:</strong> <?= htmlspecialchars($inspection['establishment_name']) ?></p>
-                        <p><strong>Type:</strong> <?= htmlspecialchars(ucwords(str_replace('_', ' ', $inspection['establishment_type']))) ?></p>
-                        <p><strong>Address:</strong> <?= htmlspecialchars($inspection['address_street']) ?>, <?= htmlspecialchars($inspection['address_barangay']) ?>, <?= htmlspecialchars($inspection['address_city']) ?></p>
-                        <p><strong>Owner:</strong> <?= htmlspecialchars($inspection['owner_name']) ?></p>
-                        <p><strong>Contact:</strong> <?= htmlspecialchars($inspection['owner_contact']) ?></p>
-                    </div>
-                </div>
+        </div>
+
+        <!-- Official Header -->
+        <header class="text-center mb-20 space-y-6">
+            <div class="inline-flex flex-col items-center">
+                <div class="mono text-[10px] text-sky-500 font-black tracking-[0.5em] uppercase italic mb-4">REPUBLIC_OF_THE_PHILIPPINES</div>
+                <h1 class="text-4xl font-black text-white italic tracking-tighter uppercase mb-2">HEALTH_&_SAFETY<span class="text-sky-500">_INSPECTION_SYSTEM</span></h1>
+                <div class="h-px w-64 bg-gradient-to-r from-transparent via-sky-500/50 to-transparent"></div>
+                <p class="mono text-[9px] text-slate-500 uppercase tracking-widest mt-4">OFFICIAL_VALIDATION_REPORT_v2.0_SIGMA</p>
             </div>
-            
-            <!-- Inspector Information -->
-            <div class="info-box mb-4">
-                <h5>Inspector Information</h5>
-                <p><strong>Inspector:</strong> <?= htmlspecialchars($inspection['inspector_first_name'] . ' ' . $inspection['inspector_last_name']) ?></p>
-                <p><strong>Email:</strong> <?= htmlspecialchars($inspection['inspector_email']) ?></p>
+        </header>
+
+        <!-- Mission Meta Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
+            <div class="glass p-8 rounded-[2rem] border border-white/5 space-y-4">
+                <div class="mono text-[8px] text-slate-600 uppercase tracking-widest font-black italic">REPORT_IDENTIFIER</div>
+                <div class="text-lg font-black text-white italic"><?= htmlspecialchars($inspection['reference_number']) ?></div>
+                <div class="h-px bg-white/5"></div>
+                <div class="mono text-[9px] text-slate-500 italic uppercase"><?= htmlspecialchars(str_replace('_', ' ', $inspection['inspection_type'])) ?></div>
             </div>
-            
-            <!-- Overall Score -->
-            <div class="score-badge" style="color: <?= $ratingColor ?>">
-                <div style="font-size: 4rem;"><?= $score ?>%</div>
-                <div style="font-size: 1.5rem;"><?= $rating ?></div>
-                <div style="font-size: 1rem; color: #6c757d;">
-                    <?= $earnedPoints ?> / <?= $totalPoints ?> Points | 
-                    <?= $passCount ?> Passed, <?= $failCount ?> Failed
+
+            <div class="glass p-8 rounded-[2rem] border border-white/5 space-y-4 md:col-span-2">
+                <div class="mono text-[8px] text-slate-600 uppercase tracking-widest font-black italic">TARGET_ENTITY</div>
+                <div class="text-xl font-black text-white italic uppercase"><?= htmlspecialchars($inspection['establishment_name']) ?></div>
+                <div class="text-xs text-slate-400 font-bold italic uppercase tracking-wider">
+                    <?= htmlspecialchars($inspection['address_street']) ?>, <?= htmlspecialchars($inspection['address_barangay']) ?>, <?= htmlspecialchars($inspection['address_city']) ?>
                 </div>
             </div>
-            
-            <!-- Checklist Results -->
-            <?php if (!empty($checklistByCategory)): ?>
-            <h4 class="mt-4 mb-3">Checklist Results</h4>
-            <?php foreach ($checklistByCategory as $category => $responses): ?>
-                <h5 class="text-primary mt-3"><?= htmlspecialchars($category) ?></h5>
-                <table class="table table-bordered checklist-table">
-                    <thead>
-                        <tr>
-                            <th style="width: 50%;">Requirement</th>
-                            <th style="width: 15%;">Status</th>
-                            <th style="width: 15%;">Points</th>
-                            <th style="width: 20%;">Notes</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php foreach ($responses as $response): ?>
-                        <tr>
-                            <td><?= htmlspecialchars($response['requirement_text']) ?></td>
-                            <td class="text-center">
-                                <?php if ($response['response'] === 'pass'): ?>
-                                    <span class="badge bg-success">PASS</span>
-                                <?php elseif ($response['response'] === 'fail'): ?>
-                                    <span class="badge bg-danger">FAIL</span>
-                                <?php else: ?>
-                                    <span class="badge bg-secondary">N/A</span>
-                                <?php endif; ?>
-                            </td>
-                            <td class="text-center">
-                                <?= $response['response'] === 'pass' ? $response['points_possible'] : 0 ?> / <?= $response['points_possible'] ?>
-                            </td>
-                            <td><?= htmlspecialchars($response['notes'] ?? '-') ?></td>
-                        </tr>
-                        <?php endforeach; ?>
-                    </tbody>
-                </table>
-            <?php endforeach; ?>
-            <?php endif; ?>
-            
-            <!-- Violations -->
-            <?php if (!empty($violations)): ?>
-            <h4 class="mt-4 mb-3 text-danger">Violations Found (<?= count($violations) ?>)</h4>
-            <?php foreach ($violations as $index => $violation): ?>
-            <div class="violation-box">
-                <h6>
-                    Violation #<?= $index + 1 ?>: 
-                    <span class="badge bg-<?= $violation['severity'] === 'critical' ? 'dark' : ($violation['severity'] === 'major' ? 'danger' : 'warning') ?>">
-                        <?= strtoupper($violation['severity']) ?>
-                    </span>
-                </h6>
-                <p><strong>Description:</strong> <?= htmlspecialchars($violation['description']) ?></p>
-                <p><strong>Category:</strong> <?= htmlspecialchars($violation['category']) ?></p>
-                <?php if ($violation['corrective_action_required']): ?>
-                <p><strong>Corrective Action Required:</strong> <?= htmlspecialchars($violation['corrective_action_required']) ?></p>
-                <?php endif; ?>
-                <?php if ($violation['corrective_action_deadline']): ?>
-                <p><strong>Deadline:</strong> <?= date('F d, Y', strtotime($violation['corrective_action_deadline'])) ?></p>
-                <?php endif; ?>
-                <p><strong>Status:</strong> 
-                    <span class="badge bg-<?= $violation['status'] === 'resolved' ? 'success' : 'warning' ?>">
-                        <?= strtoupper($violation['status']) ?>
-                    </span>
-                </p>
-            </div>
-            <?php endforeach; ?>
-            <?php else: ?>
-            <div class="alert alert-success mt-4">
-                <h5><i class="bi bi-check-circle"></i> No Violations Found</h5>
-                <p>This establishment has passed all inspection requirements with no violations recorded.</p>
-            </div>
-            <?php endif; ?>
-            
-            <!-- Recommendations -->
-            <h4 class="mt-4 mb-3">Recommendations</h4>
-            <div class="info-box">
-                <?php if ($score >= 90): ?>
-                    <p>The establishment demonstrates excellent compliance with health and safety standards. Continue maintaining current practices and standards.</p>
-                <?php elseif ($score >= 75): ?>
-                    <p>The establishment shows good compliance with health and safety standards. Address the identified violations and implement recommended corrective actions to achieve excellent compliance.</p>
-                <?php elseif ($score >= 60): ?>
-                    <p>The establishment shows fair compliance with health and safety standards. Immediate attention is required to address the identified violations. Follow-up inspection is recommended within 30 days.</p>
-                <?php else: ?>
-                    <p>The establishment shows poor compliance with health and safety standards. Immediate corrective actions are required. A re-inspection will be conducted within 14 days to verify compliance. Failure to comply may result in suspension of operations.</p>
-                <?php endif; ?>
+        </div>
+
+        <!-- Metric Pulse -->
+        <div class="glass p-12 rounded-[3.5rem] border border-white/5 relative bg-white/[0.01] mb-16 overflow-hidden text-center">
+            <div class="scan-line opacity-10"></div>
+            <div class="relative z-10 flex flex-col items-center">
+                <div class="mono text-[10px] text-slate-600 uppercase tracking-[0.4em] font-black italic mb-8">COMPLIANCE_ALGORITHM_RESULT</div>
                 
-                <?php if (!empty($violations)): ?>
-                <p class="mt-2"><strong>Required Actions:</strong></p>
-                <ul>
-                    <?php foreach ($violations as $violation): ?>
-                    <li><?= htmlspecialchars($violation['corrective_action_required'] ?: 'Address the violation: ' . $violation['description']) ?></li>
-                    <?php endforeach; ?>
-                </ul>
-                <?php endif; ?>
-            </div>
-            
-            <!-- Signature Section -->
-            <div class="signature-section">
-                <div class="row">
-                    <div class="col-md-6">
-                        <p><strong>Prepared by:</strong></p>
-                        <div class="signature-box">
-                            <?= htmlspecialchars($inspection['inspector_first_name'] . ' ' . $inspection['inspector_last_name']) ?><br>
-                            <small>Health Inspector</small><br>
-                            <small>Date: <?= date('F d, Y') ?></small>
-                        </div>
+                <div class="flex items-center justify-center gap-12 mb-8">
+                    <div class="text-center">
+                        <div class="text-6xl font-black italic" style="color: <?= $ratingColor ?>"><?= $score ?>%</div>
+                        <div class="mono text-[10px] font-bold mt-2 tracking-widest" style="color: <?= $ratingColor ?>"><?= $rating ?></div>
                     </div>
-                    <div class="col-md-6">
-                        <p><strong>Received by:</strong></p>
-                        <div class="signature-box">
-                            <?= htmlspecialchars($inspection['owner_name']) ?><br>
-                            <small>Establishment Owner/Representative</small><br>
-                            <small>Date: ___________________</small>
+                    <div class="h-20 w-px bg-white/10"></div>
+                    <div class="text-left space-y-3">
+                        <div class="flex items-center gap-4">
+                            <i class="fas fa-check-circle text-emerald-500 text-xs"></i>
+                            <span class="mono text-[9px] text-slate-400 uppercase tracking-widest">PASSED: <?= $passCount ?></span>
+                        </div>
+                        <div class="flex items-center gap-4">
+                            <i class="fas fa-times-circle text-rose-500 text-xs"></i>
+                            <span class="mono text-[9px] text-slate-400 uppercase tracking-widest">FAILED: <?= $failCount ?></span>
+                        </div>
+                        <div class="flex items-center gap-4">
+                            <i class="fas fa-database text-slate-500 text-xs"></i>
+                            <span class="mono text-[9px] text-slate-400 uppercase tracking-widest">TOTAL_POINTS: <?= $earnedPoints ?> / <?= $totalPoints ?></span>
                         </div>
                     </div>
                 </div>
             </div>
-            
-            <!-- Footer -->
-            <div class="text-center mt-4 pt-3 border-top">
-                <small class="text-muted">
+        </div>
+
+        <!-- Results Clusters -->
+        <div class="space-y-16 mb-20">
+            <h2 class="text-2xl font-black text-white italic tracking-tighter uppercase flex items-center gap-4 mb-8">
+                <span class="w-10 h-px bg-sky-500"></span>
+                VALIDATION_CLUSTERS
+            </h2>
+
+            <?php foreach ($checklistByCategory as $category => $responses): ?>
+                <div class="space-y-6">
+                    <h3 class="mono text-[10px] font-black text-sky-500/80 tracking-[0.3em] uppercase italic ml-4"><?= htmlspecialchars($category) ?></h3>
+                    
+                    <div class="glass rounded-3xl overflow-hidden border border-white/5">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-slate-950/50 border-b border-white/5">
+                                    <th class="px-8 py-5 mono text-[8px] text-slate-500 uppercase tracking-widest italic">REQUIREMENT_DESCRIPTOR</th>
+                                    <th class="px-8 py-5 mono text-[8px] text-slate-500 uppercase tracking-widest italic text-center">STATUS</th>
+                                    <th class="px-8 py-5 mono text-[8px] text-slate-500 uppercase tracking-widest italic text-center">YIELD</th>
+                                    <th class="px-8 py-5 mono text-[8px] text-slate-500 uppercase tracking-widest italic">NOTE_LOG</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-white/5">
+                                <?php foreach ($responses as $response): ?>
+                                    <tr class="hover:bg-white/[0.01] transition-colors">
+                                        <td class="px-8 py-6 text-xs font-bold text-slate-200 italic uppercase tracking-tight"><?= htmlspecialchars($response['requirement_text']) ?></td>
+                                        <td class="px-8 py-6 text-center">
+                                            <span class="px-3 py-1 rounded-full mono text-[7px] font-black uppercase tracking-widest italic border <?= $response['response'] === 'pass' ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20' : ($response['response'] === 'fail' ? 'bg-rose-500/10 text-rose-500 border-rose-500/20' : 'bg-slate-500/10 text-slate-500 border-slate-500/20') ?>">
+                                                <?= strtoupper($response['response']) ?>
+                                            </span>
+                                        </td>
+                                        <td class="px-8 py-6 text-center mono text-[9px] font-bold text-slate-400 italic">
+                                            <?= $response['response'] === 'pass' ? $response['points_possible'] : 0 ?> / <?= $response['points_possible'] ?>
+                                        </td>
+                                        <td class="px-8 py-6 text-[10px] text-slate-500 italic">
+                                            <?= htmlspecialchars($response['notes'] ?? '-') ?>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            <?php endforeach; ?>
+        </div>
+
+        <!-- Anomaly Inventory -->
+        <?php if (!empty($violations)): ?>
+            <div class="mb-20">
+                <h2 class="text-2xl font-black text-rose-500 italic tracking-tighter uppercase flex items-center gap-4 mb-8">
+                    <span class="w-10 h-px bg-rose-500"></span>
+                    ANOMALY_INVENTORY (<?= count($violations) ?>)
+                </h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <?php foreach ($violations as $v): ?>
+                        <div class="glass p-8 rounded-[2rem] border border-rose-500/20 bg-rose-500/[0.01]">
+                            <div class="flex items-center justify-between mb-4">
+                                <span class="px-3 py-1 bg-rose-500/10 text-rose-500 rounded-full mono text-[7px] font-black uppercase tracking-widest italic border border-rose-500/20">
+                                    <?= strtoupper($v['severity']) ?>_RISK
+                                </span>
+                                <span class="mono text-[8px] text-slate-600 uppercase italic">STATUS: <?= strtoupper($v['status']) ?></span>
+                            </div>
+                            <h4 class="text-lg font-black text-white italic uppercase mb-2"><?= htmlspecialchars($v['violation_type'] ?? 'GENERAL_ANOMALY') ?></h4>
+                            <p class="text-xs text-slate-400 italic leading-relaxed mb-6 uppercase tracking-tighter"><?= htmlspecialchars($v['description']) ?></p>
+                            
+                            <div class="p-4 bg-slate-950/50 rounded-2xl border border-white/5">
+                                <div class="mono text-[8px] text-slate-600 uppercase mb-1 font-black italic italic">REMEDIATION_PROTOCOL</div>
+                                <div class="text-[10px] text-rose-400 font-bold italic uppercase"><?= htmlspecialchars($v['corrective_action_required'] ?: 'IMMEDIATE_RESOLUTION_REQUIRED') ?></div>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+        <?php endif; ?>
+
+        <!-- Operational Summary -->
+        <section class="mb-20">
+            <h2 class="text-2xl font-black text-white italic tracking-tighter uppercase flex items-center gap-4 mb-8">
+                <span class="w-10 h-px bg-sky-500"></span>
+                FINAL_PROTOCOL_SUMMARY
+            </h2>
+            <div class="glass p-10 rounded-[3rem] border border-white/5 bg-slate-900/20">
+                 <p class="text-sm text-slate-300 italic leading-relaxed uppercase tracking-tight mb-8">
+                    <?php if ($score >= 90): ?>
+                        TARGET_ENTITY_EXHIBITS_SUPERIOR_COMPLIANCE_PARAMETERS. CONTINUED_OPERATIONS_AUTHORIZED_WITH_MINIMAL_OVERSIGHT.
+                    <?php elseif ($score >= 75): ?>
+                        TARGET_ENTITY_MEETS_OPERATIONAL_THRESHOLD. IDENTIFIED_ANOMALIES_REQUIRING_MINOR_RECALIBRATION_PER_PROTOCOL.
+                    <?php elseif ($score >= 60): ?>
+                        TARGET_ENTITY_FAILURE_POINTS_DETECTED. IMMEDIATE_INTERVENTION_REQUIRED. FOLLOW-UP_SCAN_SCHEDULED_T-30_DAYS.
+                    <?php else: ?>
+                        CRITICAL_PROTOCOL_FAILURES. OPERATIONAL_SAFETY_COMPROMISED. RE-VALIDATION_REQUIRED_T-14_DAYS. SUSPENSION_PENDING_REVIEW.
+                    <?php endif; ?>
+                 </p>
+                 
+                 <?php if (!empty($violations)): ?>
+                    <div class="space-y-4">
+                        <div class="mono text-[8px] text-slate-600 uppercase tracking-widest font-black italic italic">MANDATORY_FIELD_ACTIONS</div>
+                        <ul class="space-y-2">
+                            <?php foreach ($violations as $v): ?>
+                                <li class="flex items-center gap-4 text-[10px] text-slate-400 italic">
+                                    <div class="w-1 h-1 rounded-full bg-rose-500"></div>
+                                    <?= strtoupper(htmlspecialchars($v['corrective_action_required'] ?: $v['description'])) ?>
+                                </li>
+                            <?php endforeach; ?>
+                        </ul>
+                    </div>
+                 <?php endif; ?>
+            </div>
+        </section>
+
+        <!-- Validation Signatures -->
+        <footer class="mt-32">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-20">
+                <div class="text-center">
+                    <div class="h-24 flex items-end justify-center mb-4">
+                         <!-- Empty space for signature -->
+                    </div>
+                    <div class="mono text-[10px] font-black text-white italic mb-1 uppercase underline decoration-sky-500 underline-offset-8"><?= htmlspecialchars($inspection['inspector_first_name'] . ' ' . $inspection['inspector_last_name']) ?></div>
+                    <div class="mono text-[8px] text-slate-600 uppercase tracking-[0.3em] font-black italic italic">AUTHORIZING_FIELD_AGENT</div>
+                    <div class="text-[9px] text-slate-500 mt-2 italic"><?= date('F d, Y') ?></div>
+                </div>
+
+                <div class="text-center">
+                    <div class="h-24 flex items-end justify-center mb-4">
+                        <!-- Empty space for signature -->
+                    </div>
+                    <div class="mono text-[10px] font-black text-white italic mb-1 uppercase underline decoration-slate-700 underline-offset-8"><?= htmlspecialchars($inspection['owner_name']) ?></div>
+                    <div class="mono text-[8px] text-slate-600 uppercase tracking-[0.3em] font-black italic italic">ENTITY_REPRESENTATIVE_ACKNOWLEDGMENT</div>
+                    <div class="text-[9px] text-slate-500 mt-2 italic">TIMESTAMP_PENDING</div>
+                </div>
+            </div>
+
+            <!-- Report Footer -->
+            <div class="mt-32 pt-8 border-t border-white/5 text-center">
+                <div class="mono text-[8px] text-slate-700 uppercase tracking-widest italic italic">
+                    DIGITALLY_ENCRYPTED_DOCUMENT | REFID: <?= $inspection['reference_number'] ?> | GENERATED: <?= date('Y-m-d H:i:s') ?>
+                </div>
+                <div class="mt-4 flex justify-center gap-8 text-slate-800 text-xs">
+                    <i class="fas fa-microchip"></i>
+                    <i class="fas fa-fingerprint"></i>
+                    <i class="fas fa-barcode"></i>
+                </div>
+            </div>
+        </footer>
+    </div>
+</body>
+</html>
                     This is an official document generated by the Health & Safety Inspection System<br>
-                    Report Generated: <?= date('F d, Y h:i A') ?><br>
-                    Reference: <?= htmlspecialchars($inspection['reference_number']) ?>
+                    Report Generated: <?php echo  date('F d, Y h:i A') ?><br>
+                    Reference: <?php echo  htmlspecialchars($inspection['reference_number']) ?>
                 </small>
             </div>
         </div>

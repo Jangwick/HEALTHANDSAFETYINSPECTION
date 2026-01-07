@@ -1,0 +1,276 @@
+<?php
+/**
+ * Health & Safety Inspection System
+ * Establishments List View - Modern Tailwind Layout
+ */
+
+declare(strict_types=1);
+
+if (!isset($_SESSION['user_id'])) {
+    header('Location: /views/auth/login.php');
+    exit;
+}
+
+require_once __DIR__ . '/../../../config/database.php';
+
+try {
+    $db = Database::getConnection();
+    
+    // Pagination
+    $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+    $perPage = 15;
+    $offset = ($page - 1) * $perPage;
+    
+    // Filters
+    $type = $_GET['type'] ?? '';
+    $status = $_GET['status'] ?? '';
+    $barangay = $_GET['barangay'] ?? '';
+    $search = trim($_GET['search'] ?? '');
+    
+    // Build query
+    $where = [];
+    $params = [];
+    
+    if ($type) {
+        $where[] = "e.type = ?";
+        $params[] = $type;
+    }
+    
+    if ($status) {
+        $where[] = "e.compliance_status = ?";
+        $params[] = $status;
+    }
+    
+    if ($barangay) {
+        $where[] = "e.address_barangay = ?";
+        $params[] = $barangay;
+    }
+    
+    if ($search) {
+        $where[] = "(e.name LIKE ? OR e.owner_name LIKE ? OR e.business_permit_number LIKE ?)";
+        $params[] = "%$search%";
+        $params[] = "%$search%";
+        $params[] = "%$search%";
+    }
+    
+    $whereClause = $where ? "WHERE " . implode(" AND ", $where) : "";
+    
+    // Get total count
+    $countStmt = $db->prepare("SELECT COUNT(*) FROM establishments e $whereClause");
+    $countStmt->execute($params);
+    $totalRecords = (int)$countStmt->fetchColumn();
+    $totalPages = ceil($totalRecords / $perPage);
+    
+    // Get establishments
+    $sql = "
+        SELECT e.*,
+               (SELECT COUNT(*) FROM inspections i WHERE i.establishment_id = e.establishment_id) as inspection_count,
+               (SELECT MAX(i.scheduled_date) FROM inspections i WHERE i.establishment_id = e.establishment_id) as last_inspection_date,
+               (SELECT COUNT(*) FROM certificates c WHERE c.establishment_id = e.establishment_id AND c.status = 'active') as active_certificates
+        FROM establishments e
+        $whereClause
+        ORDER BY e.created_at DESC
+        LIMIT $perPage OFFSET $offset
+    ";
+    $stmt = $db->prepare($sql);
+    $stmt->execute($params);
+    $establishments = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    
+    // Get unique barangays for filter
+    $barangays = $db->query("SELECT DISTINCT address_barangay FROM establishments WHERE address_barangay IS NOT NULL ORDER BY address_barangay")->fetchAll(PDO::FETCH_COLUMN);
+    
+    // Get stats
+    $stats = $db->query("
+        SELECT 
+            COUNT(*) as total,
+            SUM(CASE WHEN compliance_status = 'compliant' THEN 1 ELSE 0 END) as compliant,
+            SUM(CASE WHEN compliance_status = 'non_compliant' THEN 1 ELSE 0 END) as non_compliant,
+            SUM(CASE WHEN compliance_status = 'pending' THEN 1 ELSE 0 END) as pending
+        FROM establishments
+    ")->fetch(PDO::FETCH_ASSOC);
+    
+} catch (PDOException $e) {
+    error_log("Database error: " . $e->getMessage());
+    die("An error occurred while fetching establishments.");
+}
+?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Establishments - Health & Safety System</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-slate-50 font-sans antialiased text-slate-900 overflow-hidden">
+    <div class="flex h-screen">
+        <!-- Sidebar Navigation -->
+        <?php 
+            $activePage = 'establishments';
+            include __DIR__ . '/../partials/sidebar.php'; 
+        ?>
+
+        <!-- Main Content -->
+        <div class="flex-1 flex flex-col min-w-0">
+            <!-- Top Navbar -->
+            <header class="bg-white border-b border-slate-200 h-16 flex items-center justify-between px-8 shrink-0">
+                <h1 class="text-xl font-bold text-slate-800">Establishments</h1>
+                <div class="flex items-center space-x-4">
+                    <a href="/views/establishments/create.php" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-semibold flex items-center shadow-sm transition-all active:scale-95">
+                        <i class="fas fa-plus mr-2"></i> Add Establishment
+                    </a>
+                </div>
+            </header>
+
+            <!-- Scrollable Content Area -->
+            <main class="flex-1 overflow-y-auto p-8">
+                <!-- Stats Overview -->
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                    <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                        <div class="text-sm font-medium text-slate-500 mb-1">Total Registered</div>
+                        <div class="text-2xl font-bold text-slate-900"><?php echo  number_format($stats['total']) ?></div>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                        <div class="text-sm font-medium text-emerald-600 mb-1 font-bold italic">Compliant</div>
+                        <div class="text-2xl font-bold text-slate-900"><?php echo  number_format($stats['compliant']) ?></div>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                        <div class="text-sm font-medium text-rose-600 mb-1 font-bold italic">Non-Compliant</div>
+                        <div class="text-2xl font-bold text-slate-900"><?php echo  number_format($stats['non_compliant']) ?></div>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                        <div class="text-sm font-medium text-amber-600 mb-1 font-bold italic">Pending Review</div>
+                        <div class="text-2xl font-bold text-slate-900"><?php echo  number_format($stats['pending']) ?></div>
+                    </div>
+                </div>
+
+                <!-- Filters Section -->
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 mb-8">
+                    <form method="GET" class="grid grid-cols-1 md:grid-cols-5 gap-4">
+                        <div class="md:col-span-2">
+                            <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Search</label>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400">
+                                    <i class="fas fa-search"></i>
+                                </span>
+                                <input type="text" name="search" value="<?php echo  htmlspecialchars($search) ?>" placeholder="Name, owner, or permit..." 
+                                    class="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none transition-all">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Type</label>
+                            <select name="type" class="w-full bg-slate-50 border border-slate-200 rounded-lg py-2 px-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none transition-all">
+                                <option value="">All Types</option>
+                                <option value="restaurant" <?php echo  $type === 'restaurant' ? 'selected' : '' ?>>Restaurant</option>
+                                <option value="school" <?php echo  $type === 'school' ? 'selected' : '' ?>>School</option>
+                                <option value="hospital" <?php echo  $type === 'hospital' ? 'selected' : '' ?>>Hospital</option>
+                                <option value="hotel" <?php echo  $type === 'hotel' ? 'selected' : '' ?>>Hotel</option>
+                                <option value="market" <?php echo  $type === 'market' ? 'selected' : '' ?>>Market</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Status</label>
+                            <select name="status" class="w-full bg-slate-50 border border-slate-200 rounded-lg py-2 px-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none transition-all">
+                                <option value="">All Statuses</option>
+                                <option value="compliant" <?php echo  $status === 'compliant' ? 'selected' : '' ?>>Compliant</option>
+                                <option value="non_compliant" <?php echo  $status === 'non_compliant' ? 'selected' : '' ?>>Non-Compliant</option>
+                                <option value="pending" <?php echo  $status === 'pending' ? 'selected' : '' ?>>Pending</option>
+                            </select>
+                        </div>
+                        <div class="flex items-end">
+                            <button type="submit" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-semibold py-2 px-4 rounded-lg text-sm transition-colors flex items-center justify-center">
+                                <i class="fas fa-filter mr-2"></i> Apply
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Results Table -->
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                    <?php if (!empty($establishments)): ?>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse">
+                                <thead>
+                                    <tr class="bg-slate-50 border-b border-slate-200 text-xs font-bold text-slate-500 uppercase tracking-wider">
+                                        <th class="px-6 py-4">Establishment</th>
+                                        <th class="px-6 py-4">Type</th>
+                                        <th class="px-6 py-4">Owner / Contact</th>
+                                        <th class="px-6 py-4">Status</th>
+                                        <th class="px-6 py-4">Last Inspection</th>
+                                        <th class="px-6 py-4 text-right">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-100 italic">
+                                    <?php foreach ($establishments as $est): ?>
+                                        <tr class="hover:bg-slate-50 transition-colors cursor-pointer" onclick="window.location='/views/establishments/view.php?id=<?php echo  $est['establishment_id'] ?>'">
+                                            <td class="px-6 py-4">
+                                                <div class="font-bold text-slate-900"><?php echo  htmlspecialchars($est['name']) ?></div>
+                                                <div class="text-xs text-slate-400 uppercase tracking-tight"><?php echo  htmlspecialchars($est['business_permit_number'] ?? 'No Permit') ?></div>
+                                            </td>
+                                            <td class="px-6 py-4">
+                                                <span class="text-sm text-slate-600"><?php echo  ucwords($est['type']) ?></span>
+                                            </td>
+                                            <td class="px-6 py-4">
+                                                <div class="text-sm text-slate-900 font-medium"><?php echo  htmlspecialchars($est['owner_name']) ?></div>
+                                                <div class="text-xs text-slate-500"><?php echo  htmlspecialchars($est['owner_phone'] ?? '') ?></div>
+                                            </td>
+                                            <td class="px-6 py-4">
+                                                <?php
+                                                    $statusClasses = [
+                                                        'compliant' => 'bg-emerald-100 text-emerald-700',
+                                                        'non_compliant' => 'bg-rose-100 text-rose-700',
+                                                        'pending' => 'bg-amber-100 text-amber-700'
+                                                    ];
+                                                    $class = $statusClasses[$est['compliance_status']] ?? 'bg-slate-100 text-slate-700';
+                                                ?>
+                                                <span class="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider <?php echo  $class ?>">
+                                                    <?php echo  str_replace('_', ' ', $est['compliance_status']) ?>
+                                                </span>
+                                            </td>
+                                            <td class="px-6 py-4">
+                                                <div class="text-sm text-slate-600">
+                                                    <?php echo  $est['last_inspection_date'] ? date('M d, Y', strtotime($est['last_inspection_date'])) : 'Never' ?>
+                                                </div>
+                                                <div class="text-xs text-slate-400"><?php echo  $est['inspection_count'] ?> total</div>
+                                            </td>
+                                            <td class="px-6 py-4 text-right" onclick="event.stopPropagation()">
+                                                <div class="flex justify-end space-x-2">
+                                                    <a href="/views/establishments/view.php?id=<?php echo  $est['establishment_id'] ?>" class="p-2 text-slate-400 hover:text-blue-600 transition-colors"><i class="fas fa-eye"></i></a>
+                                                    <a href="/views/inspections/create.php?establishment_id=<?php echo  $est['establishment_id'] ?>" class="p-2 text-slate-400 hover:text-emerald-600 transition-colors" title="Schedule Inspection"><i class="fas fa-calendar-plus"></i></a>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Pagination -->
+                        <?php if ($totalPages > 1): ?>
+                            <div class="px-6 py-4 bg-slate-50 border-t border-slate-200 flex items-center justify-between">
+                                <div class="text-sm text-slate-500 italic">Page <?php echo  $page ?> of <?php echo  $totalPages ?></div>
+                                <div class="flex space-x-1">
+                                    <?php for ($i = 1; $i <= $totalPages; $i++): ?>
+                                        <a href="?page=<?php echo  $i ?>&search=<?php echo  urlencode($search) ?>&type=<?php echo  $type ?>&status=<?php echo  $status ?>" 
+                                            class="px-3 py-1 rounded border <?php echo  $i == $page ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50' ?> text-xs font-bold transition-all">
+                                            <?php echo  $i ?>
+                                        </a>
+                                    <?php endfor; ?>
+                                </div>
+                            </div>
+                        <?php endif; ?>
+
+                    <?php else: ?>
+                        <div class="p-12 text-center">
+                            <i class="fas fa-building text-4xl text-slate-200 mb-4"></i>
+                            <h3 class="text-lg font-bold text-slate-800">No establishments found</h3>
+                            <p class="text-slate-500">Try adjusting your search or filters.</p>
+                        </div>
+                    <?php endif; ?>
+                </div>
+            </main>
+        </div>
+    </div>
+</body>
+</html>

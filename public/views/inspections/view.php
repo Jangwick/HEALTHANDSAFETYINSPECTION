@@ -48,8 +48,6 @@ try {
         LEFT JOIN users u ON i.inspector_id = u.user_id
         WHERE i.inspection_id = ?
     ");
-        WHERE i.id = ?
-    ");
     $stmt->execute([$inspectionId]);
     $inspection = $stmt->fetch(PDO::FETCH_ASSOC);
     
@@ -152,7 +150,7 @@ function getPriorityBadge($priority) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inspection #<?= $inspection['id'] ?> - Health & Safety Inspection</title>
+    <title>Inspection #<?php echo  $inspection['id'] ?> - Health & Safety Inspection</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
     <style>
@@ -219,7 +217,7 @@ function getPriorityBadge($priority) {
                         <a class="nav-link active" href="/views/inspections/list.php">Inspections</a>
                     </li>
                     <li class="nav-item">
-                        <span class="nav-link"><?= htmlspecialchars($_SESSION['first_name']) ?> <?= htmlspecialchars($_SESSION['last_name']) ?></span>
+                        <span class="nav-link"><?php echo  htmlspecialchars($_SESSION['first_name']) ?> <?php echo  htmlspecialchars($_SESSION['last_name']) ?></span>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="/views/auth/logout.php">Logout</a>
@@ -235,9 +233,9 @@ function getPriorityBadge($priority) {
             <div class="row">
                 <div class="col-md-6">
                     <h2>
-                        <i class="bi bi-clipboard-check"></i> Inspection #<?= $inspection['id'] ?>
-                        <?= getStatusBadge($inspection['status']) ?>
-                        <?= getPriorityBadge($inspection['priority']) ?>
+                        <i class="bi bi-clipboard-check"></i> Inspection #<?php echo  $inspection['id'] ?>
+                        <?php echo  getStatusBadge($inspection['status']) ?>
+                        <?php echo  getPriorityBadge($inspection['priority']) ?>
                     </h2>
                 </div>
                 <div class="col-md-6 text-end">
@@ -246,18 +244,18 @@ function getPriorityBadge($priority) {
                     </a>
                     
                     <?php if ($inspection['status'] === 'pending' || $inspection['status'] === 'scheduled'): ?>
-                        <a href="/views/inspections/conduct.php?id=<?= $inspection['id'] ?>" class="btn btn-success">
+                        <a href="/views/inspections/conduct.php?id=<?php echo  $inspection['id'] ?>" class="btn btn-success">
                             <i class="bi bi-play-circle"></i> Start Inspection
                         </a>
                     <?php elseif ($inspection['status'] === 'in_progress'): ?>
-                        <a href="/views/inspections/conduct.php?id=<?= $inspection['id'] ?>" class="btn btn-primary">
+                        <a href="/views/inspections/conduct.php?id=<?php echo  $inspection['id'] ?>" class="btn btn-primary">
                             <i class="bi bi-arrow-right-circle"></i> Continue Inspection
                         </a>
                     <?php elseif ($inspection['status'] === 'completed'): ?>
-                        <a href="/views/inspections/report.php?id=<?= $inspection['id'] ?>" class="btn btn-info" target="_blank">
+                        <a href="/views/inspections/report.php?id=<?php echo  $inspection['id'] ?>" class="btn btn-info" target="_blank">
                             <i class="bi bi-file-earmark-pdf"></i> View Report
                         </a>
-                        <a href="/views/inspections/report.php?id=<?= $inspection['id'] ?>&download=1" class="btn btn-success">
+                        <a href="/views/inspections/report.php?id=<?php echo  $inspection['id'] ?>&download=1" class="btn btn-success">
                             <i class="bi bi-download"></i> Download PDF
                         </a>
                     <?php endif; ?>
@@ -285,14 +283,14 @@ function getPriorityBadge($priority) {
                     <div class="card-body">
                         <div class="row">
                             <div class="col-md-6">
-                                <p><strong>Name:</strong> <?= htmlspecialchars($inspection['establishment_name']) ?></p>
-                                <p><strong>Type:</strong> <?= htmlspecialchars(ucwords(str_replace('_', ' ', $inspection['establishment_type']))) ?></p>
-                                <p><strong>Contact Person:</strong> <?= htmlspecialchars($inspection['contact_person']) ?></p>
+                                <p><strong>Name:</strong> <?php echo  htmlspecialchars($inspection['establishment_name']) ?></p>
+                                <p><strong>Type:</strong> <?php echo  htmlspecialchars(ucwords(str_replace('_', ' ', $inspection['establishment_type']))) ?></p>
+                                <p><strong>Contact Person:</strong> <?php echo  htmlspecialchars($inspection['contact_person']) ?></p>
                             </div>
                             <div class="col-md-6">
-                                <p><strong>Address:</strong> <?= htmlspecialchars($inspection['address_street'] . ', ' . $inspection['address_barangay'] . ', ' . $inspection['address_city']) ?></p>
-                                <p><strong>Phone:</strong> <?= htmlspecialchars($inspection['contact_number']) ?></p>
-                                <p><strong>Email:</strong> <?= htmlspecialchars($inspection['establishment_email']) ?></p>
+                                <p><strong>Address:</strong> <?php echo  htmlspecialchars($inspection['address_street'] . ', ' . $inspection['address_barangay'] . ', ' . $inspection['address_city']) ?></p>
+                                <p><strong>Phone:</strong> <?php echo  htmlspecialchars($inspection['contact_number']) ?></p>
+                                <p><strong>Email:</strong> <?php echo  htmlspecialchars($inspection['establishment_email']) ?></p>
                             </div>
                         </div>
                     </div>
@@ -306,20 +304,20 @@ function getPriorityBadge($priority) {
                     <div class="card-body">
                         <div class="row">
                             <div class="col-md-6">
-                                <p><strong>Type:</strong> <?= htmlspecialchars(str_replace('_', ' ', ucwords($inspection['inspection_type'], '_'))) ?></p>
-                                <p><strong>Inspector:</strong> <?= htmlspecialchars($inspection['inspector_first_name'] . ' ' . $inspection['inspector_last_name']) ?></p>
-                                <p><strong>Scheduled Date:</strong> <?= date('F d, Y', strtotime($inspection['scheduled_date'])) ?></p>
+                                <p><strong>Type:</strong> <?php echo  htmlspecialchars(str_replace('_', ' ', ucwords($inspection['inspection_type'], '_'))) ?></p>
+                                <p><strong>Inspector:</strong> <?php echo  htmlspecialchars($inspection['inspector_first_name'] . ' ' . $inspection['inspector_last_name']) ?></p>
+                                <p><strong>Scheduled Date:</strong> <?php echo  date('F d, Y', strtotime($inspection['scheduled_date'])) ?></p>
                             </div>
                             <div class="col-md-6">
-                                <p><strong>Started:</strong> <?= $inspection['started_at'] ? date('F d, Y h:i A', strtotime($inspection['started_at'])) : 'Not started' ?></p>
-                                <p><strong>Completed:</strong> <?= $inspection['completed_at'] ? date('F d, Y h:i A', strtotime($inspection['completed_at'])) : 'Not completed' ?></p>
-                                <p><strong>Created:</strong> <?= date('F d, Y h:i A', strtotime($inspection['created_at'])) ?></p>
+                                <p><strong>Started:</strong> <?php echo  $inspection['started_at'] ? date('F d, Y h:i A', strtotime($inspection['started_at'])) : 'Not started' ?></p>
+                                <p><strong>Completed:</strong> <?php echo  $inspection['completed_at'] ? date('F d, Y h:i A', strtotime($inspection['completed_at'])) : 'Not completed' ?></p>
+                                <p><strong>Created:</strong> <?php echo  date('F d, Y h:i A', strtotime($inspection['created_at'])) ?></p>
                             </div>
                         </div>
                         <?php if ($inspection['notes']): ?>
                             <hr>
                             <p><strong>Notes:</strong></p>
-                            <p><?= nl2br(htmlspecialchars($inspection['notes'])) ?></p>
+                            <p><?php echo  nl2br(htmlspecialchars($inspection['notes'])) ?></p>
                         <?php endif; ?>
                     </div>
                 </div>
@@ -332,7 +330,7 @@ function getPriorityBadge($priority) {
                     </div>
                     <div class="card-body">
                         <?php foreach ($checklistByCategory as $category => $responses): ?>
-                            <h6 class="text-primary mt-3"><?= htmlspecialchars($category) ?></h6>
+                            <h6 class="text-primary mt-3"><?php echo  htmlspecialchars($category) ?></h6>
                             <div class="table-responsive">
                                 <table class="table table-sm">
                                     <thead>
@@ -346,7 +344,7 @@ function getPriorityBadge($priority) {
                                     <tbody>
                                         <?php foreach ($responses as $response): ?>
                                         <tr>
-                                            <td><?= htmlspecialchars($response['requirement_text']) ?></td>
+                                            <td><?php echo  htmlspecialchars($response['requirement_text']) ?></td>
                                             <td>
                                                 <?php if ($response['response'] === 'pass'): ?>
                                                     <span class="badge bg-success">Pass</span>
@@ -356,8 +354,8 @@ function getPriorityBadge($priority) {
                                                     <span class="badge bg-warning">N/A</span>
                                                 <?php endif; ?>
                                             </td>
-                                            <td><?= $response['response'] === 'pass' ? $response['points_possible'] : 0 ?> / <?= $response['points_possible'] ?></td>
-                                            <td><?= htmlspecialchars($response['notes'] ?? '') ?></td>
+                                            <td><?php echo  $response['response'] === 'pass' ? $response['points_possible'] : 0 ?> / <?php echo  $response['points_possible'] ?></td>
+                                            <td><?php echo  htmlspecialchars($response['notes'] ?? '') ?></td>
                                         </tr>
                                         <?php endforeach; ?>
                                     </tbody>
@@ -372,23 +370,23 @@ function getPriorityBadge($priority) {
                 <?php if (!empty($violations)): ?>
                 <div class="card mb-3">
                     <div class="card-header bg-light">
-                        <h5 class="mb-0"><i class="bi bi-exclamation-triangle"></i> Violations Found (<?= count($violations) ?>)</h5>
+                        <h5 class="mb-0"><i class="bi bi-exclamation-triangle"></i> Violations Found (<?php echo  count($violations) ?>)</h5>
                     </div>
                     <div class="card-body">
                         <?php foreach ($violations as $violation): ?>
-                        <div class="alert alert-<?= $violation['severity'] === 'critical' ? 'danger' : ($violation['severity'] === 'major' ? 'warning' : 'info') ?> mb-3">
+                        <div class="alert alert-<?php echo  $violation['severity'] === 'critical' ? 'danger' : ($violation['severity'] === 'major' ? 'warning' : 'info') ?> mb-3">
                             <div class="d-flex justify-content-between align-items-start">
                                 <div class="flex-grow-1">
                                     <h6>
-                                        <?= getSeverityBadge($violation['severity']) ?>
-                                        <?= htmlspecialchars($violation['description']) ?>
+                                        <?php echo  getSeverityBadge($violation['severity']) ?>
+                                        <?php echo  htmlspecialchars($violation['description']) ?>
                                     </h6>
-                                    <p class="mb-1"><strong>Category:</strong> <?= htmlspecialchars($violation['violation_type']) ?></p>
+                                    <p class="mb-1"><strong>Category:</strong> <?php echo  htmlspecialchars($violation['violation_type']) ?></p>
                                     <?php if ($violation['corrective_action']): ?>
-                                        <p class="mb-1"><strong>Corrective Action:</strong> <?= htmlspecialchars($violation['corrective_action']) ?></p>
+                                        <p class="mb-1"><strong>Corrective Action:</strong> <?php echo  htmlspecialchars($violation['corrective_action']) ?></p>
                                     <?php endif; ?>
                                     <?php if ($violation['deadline']): ?>
-                                        <p class="mb-0"><strong>Deadline:</strong> <?= date('F d, Y', strtotime($violation['deadline'])) ?></p>
+                                        <p class="mb-0"><strong>Deadline:</strong> <?php echo  date('F d, Y', strtotime($violation['deadline'])) ?></p>
                                     <?php endif; ?>
                                 </div>
                                 <div>
@@ -399,8 +397,8 @@ function getPriorityBadge($priority) {
                                         'resolved' => 'success'
                                     ];
                                     ?>
-                                    <span class="badge bg-<?= $statusClass[$violation['status']] ?? 'secondary' ?>">
-                                        <?= ucfirst($violation['status']) ?>
+                                    <span class="badge bg-<?php echo  $statusClass[$violation['status']] ?? 'secondary' ?>">
+                                        <?php echo  ucfirst($violation['status']) ?>
                                     </span>
                                 </div>
                             </div>
@@ -414,20 +412,20 @@ function getPriorityBadge($priority) {
                 <?php if (!empty($documents)): ?>
                 <div class="card mb-3">
                     <div class="card-header bg-light">
-                        <h5 class="mb-0"><i class="bi bi-images"></i> Photos & Documents (<?= count($documents) ?>)</h5>
+                        <h5 class="mb-0"><i class="bi bi-images"></i> Photos & Documents (<?php echo  count($documents) ?>)</h5>
                     </div>
                     <div class="card-body">
                         <div class="photo-grid">
                             <?php foreach ($documents as $doc): ?>
                             <div class="photo-item">
                                 <?php if (in_array(strtolower(pathinfo($doc['file_path'], PATHINFO_EXTENSION)), ['jpg', 'jpeg', 'png', 'gif'])): ?>
-                                    <img src="/<?= htmlspecialchars($doc['file_path']) ?>" 
-                                         alt="<?= htmlspecialchars($doc['title']) ?>"
-                                         onclick="viewImage('<?= htmlspecialchars($doc['file_path']) ?>')">
-                                    <small class="d-block mt-1"><?= htmlspecialchars($doc['title']) ?></small>
+                                    <img src="/<?php echo  htmlspecialchars($doc['file_path']) ?>" 
+                                         alt="<?php echo  htmlspecialchars($doc['title']) ?>"
+                                         onclick="viewImage('<?php echo  htmlspecialchars($doc['file_path']) ?>')">
+                                    <small class="d-block mt-1"><?php echo  htmlspecialchars($doc['title']) ?></small>
                                 <?php else: ?>
-                                    <a href="/<?= htmlspecialchars($doc['file_path']) ?>" target="_blank" class="btn btn-sm btn-outline-primary">
-                                        <i class="bi bi-file-earmark"></i> <?= htmlspecialchars($doc['title']) ?>
+                                    <a href="/<?php echo  htmlspecialchars($doc['file_path']) ?>" target="_blank" class="btn btn-sm btn-outline-primary">
+                                        <i class="bi bi-file-earmark"></i> <?php echo  htmlspecialchars($doc['title']) ?>
                                     </a>
                                 <?php endif; ?>
                             </div>
@@ -447,11 +445,11 @@ function getPriorityBadge($priority) {
                         <h5 class="mb-0"><i class="bi bi-graph-up"></i> Overall Score</h5>
                     </div>
                     <div class="card-body text-center">
-                        <div class="score-circle <?= $score >= 90 ? 'score-excellent' : ($score >= 75 ? 'score-good' : ($score >= 60 ? 'score-fair' : 'score-poor')) ?>">
-                            <?= $score ?>%
+                        <div class="score-circle <?php echo  $score >= 90 ? 'score-excellent' : ($score >= 75 ? 'score-good' : ($score >= 60 ? 'score-fair' : 'score-poor')) ?>">
+                            <?php echo  $score ?>%
                         </div>
                         <p class="mt-3 mb-0">
-                            <?= $earnedPoints ?> / <?= $totalPoints ?> points
+                            <?php echo  $earnedPoints ?> / <?php echo  $totalPoints ?> points
                         </p>
                         <p class="text-muted small">
                             <?php
@@ -473,15 +471,15 @@ function getPriorityBadge($priority) {
                     <div class="card-body">
                         <div class="d-flex justify-content-between mb-2">
                             <span>Checklist Items:</span>
-                            <strong><?= count($checklistResponses) ?></strong>
+                            <strong><?php echo  count($checklistResponses) ?></strong>
                         </div>
                         <div class="d-flex justify-content-between mb-2">
                             <span>Violations:</span>
-                            <strong class="text-danger"><?= count($violations) ?></strong>
+                            <strong class="text-danger"><?php echo  count($violations) ?></strong>
                         </div>
                         <div class="d-flex justify-content-between mb-2">
                             <span>Photos/Documents:</span>
-                            <strong><?= count($documents) ?></strong>
+                            <strong><?php echo  count($documents) ?></strong>
                         </div>
                         <hr>
                         <?php
@@ -490,11 +488,11 @@ function getPriorityBadge($priority) {
                         ?>
                         <div class="d-flex justify-content-between mb-2">
                             <span><i class="bi bi-check-circle text-success"></i> Passed:</span>
-                            <strong class="text-success"><?= $passCount ?></strong>
+                            <strong class="text-success"><?php echo  $passCount ?></strong>
                         </div>
                         <div class="d-flex justify-content-between">
                             <span><i class="bi bi-x-circle text-danger"></i> Failed:</span>
-                            <strong class="text-danger"><?= $failCount ?></strong>
+                            <strong class="text-danger"><?php echo  $failCount ?></strong>
                         </div>
                     </div>
                 </div>
@@ -509,20 +507,20 @@ function getPriorityBadge($priority) {
                             <li class="mb-2">
                                 <i class="bi bi-circle-fill text-primary"></i>
                                 <small class="text-muted">Created</small><br>
-                                <small><?= date('M d, Y h:i A', strtotime($inspection['created_at'])) ?></small>
+                                <small><?php echo  date('M d, Y h:i A', strtotime($inspection['created_at'])) ?></small>
                             </li>
                             <?php if ($inspection['started_at']): ?>
                             <li class="mb-2">
                                 <i class="bi bi-circle-fill text-info"></i>
                                 <small class="text-muted">Started</small><br>
-                                <small><?= date('M d, Y h:i A', strtotime($inspection['started_at'])) ?></small>
+                                <small><?php echo  date('M d, Y h:i A', strtotime($inspection['started_at'])) ?></small>
                             </li>
                             <?php endif; ?>
                             <?php if ($inspection['completed_at']): ?>
                             <li class="mb-2">
                                 <i class="bi bi-circle-fill text-success"></i>
                                 <small class="text-muted">Completed</small><br>
-                                <small><?= date('M d, Y h:i A', strtotime($inspection['completed_at'])) ?></small>
+                                <small><?php echo  date('M d, Y h:i A', strtotime($inspection['completed_at'])) ?></small>
                             </li>
                             <?php endif; ?>
                         </ul>
@@ -556,7 +554,7 @@ function getPriorityBadge($priority) {
 
         function editInspection() {
             if (confirm('Edit this inspection?')) {
-                window.location.href = '/views/inspections/edit.php?id=<?= $inspection['id'] ?>';
+                window.location.href = '/views/inspections/edit.php?id=<?php echo  $inspection['id'] ?>';
             }
         }
 
@@ -569,7 +567,7 @@ function getPriorityBadge($priority) {
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
-                        inspection_id: <?= $inspection['id'] ?>,
+                        inspection_id: <?php echo  $inspection['id'] ?>,
                         status: 'cancelled'
                     })
                 })

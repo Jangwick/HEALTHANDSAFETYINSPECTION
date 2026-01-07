@@ -98,7 +98,7 @@ try {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edit <?= htmlspecialchars($establishment['name']) ?> - Health & Safety Inspection System</title>
+    <title>Edit <?php echo  htmlspecialchars($establishment['name']) ?> - Health & Safety Inspection System</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css" rel="stylesheet">
     <style>
@@ -118,7 +118,7 @@ try {
             </a>
             <div class="navbar-nav ms-auto">
                 <span class="nav-link text-white">
-                    <i class="bi bi-person-circle"></i> <?= htmlspecialchars($_SESSION['first_name'] ?? '') ?> <?= htmlspecialchars($_SESSION['last_name'] ?? '') ?>
+                    <i class="bi bi-person-circle"></i> <?php echo  htmlspecialchars($_SESSION['first_name'] ?? '') ?> <?php echo  htmlspecialchars($_SESSION['last_name'] ?? '') ?>
                 </span>
                 <a class="nav-link text-white" href="/views/auth/logout.php">
                     <i class="bi bi-box-arrow-right"></i> Logout
@@ -135,7 +135,7 @@ try {
                 <p class="text-muted mb-0">Update establishment information and compliance status</p>
             </div>
             <div>
-                <a href="/views/establishments/view.php?id=<?= $establishmentId ?>" class="btn btn-outline-secondary me-2">
+                <a href="/views/establishments/view.php?id=<?php echo  $establishmentId ?>" class="btn btn-outline-secondary me-2">
                     <i class="bi bi-eye"></i> View Details
                 </a>
                 <a href="/views/establishments/list.php" class="btn btn-outline-secondary">
@@ -146,14 +146,14 @@ try {
 
         <?php if ($error): ?>
         <div class="alert alert-danger alert-dismissible fade show">
-            <i class="bi bi-exclamation-triangle"></i> <?= htmlspecialchars($error) ?>
+            <i class="bi bi-exclamation-triangle"></i> <?php echo  htmlspecialchars($error) ?>
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
         <?php endif; ?>
 
         <?php if ($success): ?>
         <div class="alert alert-success alert-dismissible fade show">
-            <i class="bi bi-check-circle"></i> <?= htmlspecialchars($success) ?>
+            <i class="bi bi-check-circle"></i> <?php echo  htmlspecialchars($success) ?>
             <small class="d-block">Redirecting to details page...</small>
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
@@ -170,7 +170,7 @@ try {
                                 <div class="mb-3">
                                     <label class="form-label">Establishment Name <span class="text-danger">*</span></label>
                                     <input type="text" class="form-control" name="name" required 
-                                           value="<?= htmlspecialchars($establishment['name']) ?>">
+                                           value="<?php echo  htmlspecialchars($establishment['name']) ?>">
                                 </div>
                             </div>
                             <div class="col-md-4">
@@ -182,8 +182,8 @@ try {
                                         $types = ['restaurant', 'school', 'hospital', 'hotel', 'market', 'factory', 'office', 'salon', 'gym', 'other'];
                                         foreach ($types as $type):
                                         ?>
-                                        <option value="<?= $type ?>" <?= $establishment['type'] === $type ? 'selected' : '' ?>>
-                                            <?= ucfirst($type) ?>
+                                        <option value="<?php echo  $type ?>" <?php echo  $establishment['type'] === $type ? 'selected' : '' ?>>
+                                            <?php echo  ucfirst($type) ?>
                                         </option>
                                         <?php endforeach; ?>
                                     </select>
@@ -195,10 +195,10 @@ try {
                                 <div class="mb-3">
                                     <label class="form-label">Compliance Status <span class="text-danger">*</span></label>
                                     <select class="form-select" name="compliance_status" required>
-                                        <option value="compliant" <?= $establishment['compliance_status'] === 'compliant' ? 'selected' : '' ?>>Compliant</option>
-                                        <option value="non_compliant" <?= $establishment['compliance_status'] === 'non_compliant' ? 'selected' : '' ?>>Non-Compliant</option>
-                                        <option value="pending" <?= $establishment['compliance_status'] === 'pending' ? 'selected' : '' ?>>Pending</option>
-                                        <option value="suspended" <?= $establishment['compliance_status'] === 'suspended' ? 'selected' : '' ?>>Suspended</option>
+                                        <option value="compliant" <?php echo  $establishment['compliance_status'] === 'compliant' ? 'selected' : '' ?>>Compliant</option>
+                                        <option value="non_compliant" <?php echo  $establishment['compliance_status'] === 'non_compliant' ? 'selected' : '' ?>>Non-Compliant</option>
+                                        <option value="pending" <?php echo  $establishment['compliance_status'] === 'pending' ? 'selected' : '' ?>>Pending</option>
+                                        <option value="suspended" <?php echo  $establishment['compliance_status'] === 'suspended' ? 'selected' : '' ?>>Suspended</option>
                                     </select>
                                 </div>
                             </div>
@@ -206,20 +206,20 @@ try {
                                 <div class="mb-3">
                                     <label class="form-label">Capacity (persons)</label>
                                     <input type="number" class="form-control" name="capacity" min="0"
-                                           value="<?= htmlspecialchars($establishment['capacity'] ?? '') ?>">
+                                           value="<?php echo  htmlspecialchars($establishment['capacity'] ?? '') ?>">
                                 </div>
                             </div>
                             <div class="col-md-4">
                                 <div class="mb-3">
                                     <label class="form-label">Operating Hours</label>
                                     <input type="text" class="form-control" name="operating_hours"
-                                           value="<?= htmlspecialchars($establishment['operating_hours'] ?? '') ?>">
+                                           value="<?php echo  htmlspecialchars($establishment['operating_hours'] ?? '') ?>">
                                 </div>
                             </div>
                         </div>
                         <div class="mb-0">
                             <label class="form-label">Description/Notes</label>
-                            <textarea class="form-control" name="description" rows="3"><?= htmlspecialchars($establishment['description'] ?? '') ?></textarea>
+                            <textarea class="form-control" name="description" rows="3"><?php echo  htmlspecialchars($establishment['description'] ?? '') ?></textarea>
                         </div>
                     </div>
 
@@ -231,21 +231,21 @@ try {
                                 <div class="mb-3">
                                     <label class="form-label">Owner Name <span class="text-danger">*</span></label>
                                     <input type="text" class="form-control" name="owner_name" required
-                                           value="<?= htmlspecialchars($establishment['owner_name']) ?>">
+                                           value="<?php echo  htmlspecialchars($establishment['owner_name']) ?>">
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label class="form-label">Owner Phone <span class="text-danger">*</span></label>
                                     <input type="tel" class="form-control" name="owner_phone" required
-                                           value="<?= htmlspecialchars($establishment['owner_phone']) ?>">
+                                           value="<?php echo  htmlspecialchars($establishment['owner_phone']) ?>">
                                 </div>
                             </div>
                         </div>
                         <div class="mb-0">
                             <label class="form-label">Owner Email</label>
                             <input type="email" class="form-control" name="owner_email"
-                                   value="<?= htmlspecialchars($establishment['owner_email'] ?? '') ?>">
+                                   value="<?php echo  htmlspecialchars($establishment['owner_email'] ?? '') ?>">
                         </div>
                     </div>
 
@@ -255,28 +255,28 @@ try {
                         <div class="mb-3">
                             <label class="form-label">Street Address <span class="text-danger">*</span></label>
                             <input type="text" class="form-control" name="address_street" required
-                                   value="<?= htmlspecialchars($establishment['address_street']) ?>">
+                                   value="<?php echo  htmlspecialchars($establishment['address_street']) ?>">
                         </div>
                         <div class="row">
                             <div class="col-md-4">
                                 <div class="mb-3">
                                     <label class="form-label">Barangay <span class="text-danger">*</span></label>
                                     <input type="text" class="form-control" name="address_barangay" required
-                                           value="<?= htmlspecialchars($establishment['address_barangay']) ?>">
+                                           value="<?php echo  htmlspecialchars($establishment['address_barangay']) ?>">
                                 </div>
                             </div>
                             <div class="col-md-4">
                                 <div class="mb-3">
                                     <label class="form-label">City/Municipality <span class="text-danger">*</span></label>
                                     <input type="text" class="form-control" name="address_city" required
-                                           value="<?= htmlspecialchars($establishment['address_city']) ?>">
+                                           value="<?php echo  htmlspecialchars($establishment['address_city']) ?>">
                                 </div>
                             </div>
                             <div class="col-md-4">
                                 <div class="mb-3">
                                     <label class="form-label">Province</label>
                                     <input type="text" class="form-control" name="address_province"
-                                           value="<?= htmlspecialchars($establishment['address_province'] ?? '') ?>">
+                                           value="<?php echo  htmlspecialchars($establishment['address_province'] ?? '') ?>">
                                 </div>
                             </div>
                         </div>
@@ -290,21 +290,21 @@ try {
                                 <div class="mb-3">
                                     <label class="form-label">Business Permit Number</label>
                                     <input type="text" class="form-control" name="business_permit_number"
-                                           value="<?= htmlspecialchars($establishment['business_permit_number'] ?? '') ?>">
+                                           value="<?php echo  htmlspecialchars($establishment['business_permit_number'] ?? '') ?>">
                                 </div>
                             </div>
                             <div class="col-md-4">
                                 <div class="mb-3">
                                     <label class="form-label">Permit Issue Date</label>
                                     <input type="date" class="form-control" name="permit_issue_date"
-                                           value="<?= htmlspecialchars($establishment['permit_issue_date'] ?? '') ?>">
+                                           value="<?php echo  htmlspecialchars($establishment['permit_issue_date'] ?? '') ?>">
                                 </div>
                             </div>
                             <div class="col-md-4">
                                 <div class="mb-0">
                                     <label class="form-label">Permit Expiry Date</label>
                                     <input type="date" class="form-control" name="permit_expiry_date"
-                                           value="<?= htmlspecialchars($establishment['permit_expiry_date'] ?? '') ?>">
+                                           value="<?php echo  htmlspecialchars($establishment['permit_expiry_date'] ?? '') ?>">
                                 </div>
                             </div>
                         </div>
@@ -315,11 +315,11 @@ try {
                         <div class="text-muted">
                             <small>
                                 <span class="text-danger">*</span> Required fields<br>
-                                Last updated: <?= date('F d, Y g:i A', strtotime($establishment['updated_at'] ?? $establishment['created_at'])) ?>
+                                Last updated: <?php echo  date('F d, Y g:i A', strtotime($establishment['updated_at'] ?? $establishment['created_at'])) ?>
                             </small>
                         </div>
                         <div>
-                            <a href="/views/establishments/view.php?id=<?= $establishmentId ?>" class="btn btn-outline-secondary me-2">
+                            <a href="/views/establishments/view.php?id=<?php echo  $establishmentId ?>" class="btn btn-outline-secondary me-2">
                                 <i class="bi bi-x-circle"></i> Cancel
                             </a>
                             <button type="submit" class="btn btn-primary">

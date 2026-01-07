@@ -36,7 +36,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' || $certificateNumber) {
                 $error = 'Certificate not found. Please check the certificate number.';
             }
             
-        } catch (PDOException $e) 
+        } catch (PDOException $e) {
             error_log("Database error: " . $e->getMessage());
             $error = 'An error occurred while verifying the certificate.';
         }
@@ -213,7 +213,7 @@ if ($certificate) {
                                class="form-control" 
                                name="certificate_number" 
                                placeholder="Enter Certificate Number (e.g., CERT-2025-00001)" 
-                               value="<?= htmlspecialchars($certificateNumber) ?>"
+                               value="<?php echo  htmlspecialchars($certificateNumber) ?>"
                                required>
                         <button class="btn btn-primary" type="submit">
                             <i class="bi bi-search"></i> Verify
@@ -228,7 +228,7 @@ if ($certificate) {
             <?php if ($error): ?>
             <!-- Error Message -->
             <div class="alert alert-danger" role="alert">
-                <i class="bi bi-exclamation-triangle-fill"></i> <?= htmlspecialchars($error) ?>
+                <i class="bi bi-exclamation-triangle-fill"></i> <?php echo  htmlspecialchars($error) ?>
             </div>
             <?php endif; ?>
             
@@ -249,12 +249,12 @@ if ($certificate) {
                 </div>
                 <?php endif; ?>
                 
-                <span class="status-badge bg-<?= $statusClass ?> text-white">
-                    <?= strtoupper($status) ?>
+                <span class="status-badge bg-<?php echo  $statusClass ?> text-white">
+                    <?php echo  strtoupper($status) ?>
                 </span>
                 
                 <p class="lead mt-3">
-                    <?= htmlspecialchars($statusMessage) ?>
+                    <?php echo  htmlspecialchars($statusMessage) ?>
                 </p>
             </div>
             
@@ -264,23 +264,23 @@ if ($certificate) {
                 
                 <div class="info-row">
                     <span class="info-label">Certificate Number:</span>
-                    <span class="info-value"><strong><?= htmlspecialchars($certificate['certificate_number']) ?></strong></span>
+                    <span class="info-value"><strong><?php echo  htmlspecialchars($certificate['certificate_number']) ?></strong></span>
                 </div>
                 
                 <div class="info-row">
                     <span class="info-label">Certificate Type:</span>
-                    <span class="info-value"><?= htmlspecialchars(ucwords(str_replace('_', ' ', $certificate['certificate_type']))) ?></span>
+                    <span class="info-value"><?php echo  htmlspecialchars(ucwords(str_replace('_', ' ', $certificate['certificate_type']))) ?></span>
                 </div>
                 
                 <div class="info-row">
                     <span class="info-label">Date Issued:</span>
-                    <span class="info-value"><?= date('F d, Y', strtotime($certificate['issue_date'])) ?></span>
+                    <span class="info-value"><?php echo  date('F d, Y', strtotime($certificate['issue_date'])) ?></span>
                 </div>
                 
                 <div class="info-row">
                     <span class="info-label">Expiry Date:</span>
                     <span class="info-value">
-                        <?= date('F d, Y', strtotime($certificate['expiry_date'])) ?>
+                        <?php echo  date('F d, Y', strtotime($certificate['expiry_date'])) ?>
                         <?php 
                         $now = new DateTime();
                         $expiry = new DateTime($certificate['expiry_date']);
@@ -295,20 +295,20 @@ if ($certificate) {
                 <?php if ($certificate['status'] === 'revoked'): ?>
                 <div class="info-row">
                     <span class="info-label">Revoked On:</span>
-                    <span class="info-value text-danger"><?= date('F d, Y', strtotime($certificate['revoked_at'])) ?></span>
+                    <span class="info-value text-danger"><?php echo  date('F d, Y', strtotime($certificate['revoked_at'])) ?></span>
                 </div>
                 
                 <?php if ($certificate['revocation_reason']): ?>
                 <div class="info-row">
                     <span class="info-label">Revocation Reason:</span>
-                    <span class="info-value text-danger"><?= htmlspecialchars($certificate['revocation_reason']) ?></span>
+                    <span class="info-value text-danger"><?php echo  htmlspecialchars($certificate['revocation_reason']) ?></span>
                 </div>
                 <?php endif; ?>
                 <?php endif; ?>
                 
                 <div class="info-row">
                     <span class="info-label">Issued By:</span>
-                    <span class="info-value"><?= htmlspecialchars($certificate['issued_by_name']) ?></span>
+                    <span class="info-value"><?php echo  htmlspecialchars($certificate['issued_by_name']) ?></span>
                 </div>
             </div>
             
@@ -318,25 +318,25 @@ if ($certificate) {
                 
                 <div class="info-row">
                     <span class="info-label">Establishment Name:</span>
-                    <span class="info-value"><strong><?= htmlspecialchars($certificate['establishment_name']) ?></strong></span>
+                    <span class="info-value"><strong><?php echo  htmlspecialchars($certificate['establishment_name']) ?></strong></span>
                 </div>
                 
                 <div class="info-row">
                     <span class="info-label">Type:</span>
-                    <span class="info-value"><?= htmlspecialchars(ucwords(str_replace('_', ' ', $certificate['establishment_type']))) ?></span>
+                    <span class="info-value"><?php echo  htmlspecialchars(ucwords(str_replace('_', ' ', $certificate['establishment_type']))) ?></span>
                 </div>
                 
                 <div class="info-row">
                     <span class="info-label">Owner:</span>
-                    <span class="info-value"><?= htmlspecialchars($certificate['owner_name']) ?></span>
+                    <span class="info-value"><?php echo  htmlspecialchars($certificate['owner_name']) ?></span>
                 </div>
                 
                 <div class="info-row">
                     <span class="info-label">Address:</span>
                     <span class="info-value">
-                        <?= htmlspecialchars($certificate['address_street']) ?>,
-                        <?= htmlspecialchars($certificate['address_barangay']) ?>,
-                        <?= htmlspecialchars($certificate['address_city']) ?>
+                        <?php echo  htmlspecialchars($certificate['address_street']) ?>,
+                        <?php echo  htmlspecialchars($certificate['address_barangay']) ?>,
+                        <?php echo  htmlspecialchars($certificate['address_city']) ?>
                     </span>
                 </div>
             </div>
@@ -360,7 +360,7 @@ if ($certificate) {
                     <i class="bi bi-info-circle"></i> 
                     This verification is provided for informational purposes only. 
                     For official matters, please contact the Local Government Unit Health & Sanitation Office.
-                    Last verified: <?= date('F d, Y g:i A') ?>
+                    Last verified: <?php echo  date('F d, Y g:i A') ?>
                 </small>
             </div>
             <?php endif; ?>

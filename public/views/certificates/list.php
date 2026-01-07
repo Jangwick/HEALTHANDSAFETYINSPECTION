@@ -115,26 +115,26 @@ try {
                     <form method="GET" class="grid grid-cols-1 md:grid-cols-4 gap-4">
                         <div class="md:col-span-1">
                             <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Search</label>
-                            <input type="text" name="search" value="<?= htmlspecialchars($search) ?>" placeholder="Number or Establishment..." 
+                            <input type="text" name="search" value="<?php echo  htmlspecialchars($search) ?>" placeholder="Number or Establishment..." 
                                 class="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none transition-all">
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Type</label>
                             <select name="certificate_type" class="w-full bg-slate-50 border border-slate-200 rounded-lg py-2 px-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
                                 <option value="">All Types</option>
-                                <option value="food_safety" <?= $certificateType === 'food_safety' ? 'selected' : '' ?>>Food Safety</option>
-                                <option value="building_safety" <?= $certificateType === 'building_safety' ? 'selected' : '' ?>>Building Safety</option>
-                                <option value="fire_safety" <?= $certificateType === 'fire_safety' ? 'selected' : '' ?>>Fire Safety</option>
-                                <option value="sanitation" <?= $certificateType === 'sanitation' ? 'selected' : '' ?>>Sanitation</option>
+                                <option value="food_safety" <?php echo  $certificateType === 'food_safety' ? 'selected' : '' ?>>Food Safety</option>
+                                <option value="building_safety" <?php echo  $certificateType === 'building_safety' ? 'selected' : '' ?>>Building Safety</option>
+                                <option value="fire_safety" <?php echo  $certificateType === 'fire_safety' ? 'selected' : '' ?>>Fire Safety</option>
+                                <option value="sanitation" <?php echo  $certificateType === 'sanitation' ? 'selected' : '' ?>>Sanitation</option>
                             </select>
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Status</label>
                             <select name="status" class="w-full bg-slate-50 border border-slate-200 rounded-lg py-2 px-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
                                 <option value="">All Statuses</option>
-                                <option value="active" <?= $status === 'active' ? 'selected' : '' ?>>Active</option>
-                                <option value="expired" <?= $status === 'expired' ? 'selected' : '' ?>>Expired</option>
-                                <option value="revoked" <?= $status === 'revoked' ? 'selected' : '' ?>>Revoked</option>
+                                <option value="active" <?php echo  $status === 'active' ? 'selected' : '' ?>>Active</option>
+                                <option value="expired" <?php echo  $status === 'expired' ? 'selected' : '' ?>>Expired</option>
+                                <option value="revoked" <?php echo  $status === 'revoked' ? 'selected' : '' ?>>Revoked</option>
                             </select>
                         </div>
                         <div class="flex items-end">
@@ -163,15 +163,15 @@ try {
                                     <?php foreach ($certificates as $cert): ?>
                                         <tr class="hover:bg-slate-50 transition-colors">
                                             <td class="px-6 py-4 italic">
-                                                <div class="font-bold text-slate-900 font-mono text-xs"><?= htmlspecialchars($cert['certificate_number']) ?></div>
-                                                <div class="text-sm text-slate-600 font-medium"><?= htmlspecialchars($cert['establishment_name']) ?></div>
+                                                <div class="font-bold text-slate-900 font-mono text-xs"><?php echo  htmlspecialchars($cert['certificate_number']) ?></div>
+                                                <div class="text-sm text-slate-600 font-medium"><?php echo  htmlspecialchars($cert['establishment_name']) ?></div>
                                             </td>
                                             <td class="px-6 py-4">
-                                                <span class="text-sm text-slate-600 font-medium italic"><?= ucwords(str_replace('_', ' ', $cert['certificate_type'])) ?></span>
+                                                <span class="text-sm text-slate-600 font-medium italic"><?php echo  ucwords(str_replace('_', ' ', $cert['certificate_type'])) ?></span>
                                             </td>
                                             <td class="px-6 py-4">
-                                                <div class="text-xs text-slate-500">Issued: <?= date('M d, Y', strtotime($cert['issue_date'])) ?></div>
-                                                <div class="text-xs font-bold text-slate-800 italic">Expires: <?= date('M d, Y', strtotime($cert['expiry_date'])) ?></div>
+                                                <div class="text-xs text-slate-500">Issued: <?php echo  date('M d, Y', strtotime($cert['issue_date'])) ?></div>
+                                                <div class="text-xs font-bold text-slate-800 italic">Expires: <?php echo  date('M d, Y', strtotime($cert['expiry_date'])) ?></div>
                                             </td>
                                             <td class="px-6 py-4">
                                                 <?php
@@ -183,16 +183,16 @@ try {
                                                     ];
                                                     $class = $statusClasses[$cert['status']] ?? 'bg-slate-100 text-slate-700';
                                                 ?>
-                                                <span class="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider <?= $class ?>">
-                                                    <?= $cert['status'] ?>
+                                                <span class="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider <?php echo  $class ?>">
+                                                    <?php echo  $cert['status'] ?>
                                                 </span>
                                             </td>
                                             <td class="px-6 py-4 text-right">
                                                 <div class="flex justify-end space-x-2">
-                                                    <a href="/views/certificates/view.php?id=<?= $cert['certificate_id'] ?>" class="p-2 text-slate-400 hover:text-blue-600 transition-colors" title="View"><i class="fas fa-eye"></i></a>
-                                                    <a href="/views/certificates/certificate.php?id=<?= $cert['certificate_id'] ?>" target="_blank" class="p-2 text-slate-400 hover:text-emerald-600 transition-colors" title="Download"><i class="fas fa-file-pdf"></i></a>
+                                                    <a href="/views/certificates/view.php?id=<?php echo  $cert['certificate_id'] ?>" class="p-2 text-slate-400 hover:text-blue-600 transition-colors" title="View"><i class="fas fa-eye"></i></a>
+                                                    <a href="/views/certificates/certificate.php?id=<?php echo  $cert['certificate_id'] ?>" target="_blank" class="p-2 text-slate-400 hover:text-emerald-600 transition-colors" title="Download"><i class="fas fa-file-pdf"></i></a>
                                                     <?php if ($cert['status'] === 'active'): ?>
-                                                        <button onclick="confirmRevoke(<?= $cert['certificate_id'] ?>)" class="p-2 text-slate-400 hover:text-rose-600 transition-colors" title="Revoke"><i class="fas fa-ban"></i></button>
+                                                        <button onclick="confirmRevoke(<?php echo  $cert['certificate_id'] ?>)" class="p-2 text-slate-400 hover:text-rose-600 transition-colors" title="Revoke"><i class="fas fa-ban"></i></button>
                                                     <?php endif; ?>
                                                 </div>
                                             </td>
@@ -205,12 +205,12 @@ try {
                         <!-- Pagination -->
                         <?php if ($totalPages > 1): ?>
                             <div class="px-6 py-4 bg-slate-50 border-t border-slate-200 flex items-center justify-between">
-                                <span class="text-xs text-slate-500 italic">Page <?= $page ?> of <?= $totalPages ?></span>
+                                <span class="text-xs text-slate-500 italic">Page <?php echo  $page ?> of <?php echo  $totalPages ?></span>
                                 <div class="flex space-x-1">
                                     <?php for ($i = 1; $i <= $totalPages; $i++): ?>
-                                        <a href="?page=<?= $i ?>&status=<?= $status ?>&type=<?= $certificateType ?>&search=<?= urlencode($search) ?>" 
-                                            class="px-3 py-1 rounded border <?= $i == $page ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50' ?> text-xs font-bold transition-all">
-                                            <?= $i ?>
+                                        <a href="?page=<?php echo  $i ?>&status=<?php echo  $status ?>&type=<?php echo  $certificateType ?>&search=<?php echo  urlencode($search) ?>" 
+                                            class="px-3 py-1 rounded border <?php echo  $i == $page ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50' ?> text-xs font-bold transition-all">
+                                            <?php echo  $i ?>
                                         </a>
                                     <?php endfor; ?>
                                 </div>

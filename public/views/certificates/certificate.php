@@ -50,12 +50,15 @@ $isPrint = isset($_GET['print']) || $download;
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Certificate - <?= htmlspecialchars($cert['certificate_number']) ?></title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title>CERTIFICATE | <?= htmlspecialchars($cert['certificate_number']) ?></title>
+    <script src="https://cdn.tailwindcss.com/@4"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;700&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
     <style>
         @media print {
             .no-print { display: none !important; }
-            body { background: white; }
+            body { background: white !important; margin: 0; padding: 0; }
+            .certificate-page { margin: 0 !important; box-shadow: none !important; border: none !important; }
         }
         
         @page {
@@ -64,138 +67,65 @@ $isPrint = isset($_GET['print']) || $download;
         }
         
         body {
-            background: #e9ecef;
-            font-family: 'Times New Roman', Times, serif;
+            background-color: #f1f5f9;
+            font-family: 'Inter', sans-serif;
+            color: #1e293b;
         }
+
+        .mono { font-family: 'JetBrains Mono', monospace; }
+        .serif { font-family: 'Playfair Display', serif; }
         
-        .certificate-container {
-            width: 21cm;
-            min-height: 29.7cm;
+        .certificate-page {
+            width: 210mm;
+            min-height: 297mm;
             background: white;
             margin: 2rem auto;
-            padding: 0;
-            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            position: relative;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            padding: 15mm;
+            box-sizing: border-box;
+            background-image: 
+                radial-gradient(circle at 50% 50%, rgba(203, 213, 225, 0.1) 0%, transparent 80%),
+                url('https://www.transparenttextures.com/patterns/clean-paper.png');
+        }
+
+        .outer-border {
+            border: 8px solid #1e293b;
+            height: 100%;
+            padding: 5mm;
             position: relative;
         }
-        
-        .certificate-border {
-            border: 15px solid #1e40af;
-            border-image: linear-gradient(135deg, #1e40af, #7c3aed, #1e40af) 1;
-            padding: 3rem;
-            min-height: 29.7cm;
+
+        .inner-border {
+            border: 2px solid #94a3b8;
+            height: 100%;
+            padding: 10mm;
             position: relative;
         }
-        
-        .certificate-inner-border {
-            border: 2px solid #d97706;
-            padding: 2rem;
-            min-height: calc(29.7cm - 8rem);
-        }
-        
-        .seal {
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
-            border: 5px solid #d97706;
-            background: linear-gradient(135deg, #fbbf24, #f59e0b);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-direction: column;
-            margin: 0 auto;
-            font-weight: bold;
-            color: #78350f;
-        }
-        
-        .header {
-            text-align: center;
-            margin-bottom: 2rem;
-            border-bottom: 3px double #1e40af;
-            padding-bottom: 1rem;
-        }
-        
-        .header h1 {
-            font-size: 2rem;
-            color: #1e40af;
-            font-weight: bold;
-            margin: 0;
-            text-transform: uppercase;
-        }
-        
-        .header h2 {
-            font-size: 1.5rem;
-            color: #d97706;
-            margin: 0.5rem 0;
-            font-weight: bold;
-        }
-        
-        .certificate-title {
-            text-align: center;
-            font-size: 2.5rem;
-            color: #1e40af;
-            font-weight: bold;
-            margin: 2rem 0;
-            text-transform: uppercase;
-            letter-spacing: 3px;
-        }
-        
-        .certificate-body {
-            text-align: center;
-            font-size: 1.1rem;
-            line-height: 2;
-            margin: 2rem 0;
-        }
-        
-        .establishment-name {
-            font-size: 1.8rem;
-            font-weight: bold;
-            color: #1e40af;
-            text-decoration: underline;
-            margin: 1rem 0;
-        }
-        
-        .certificate-details {
-            margin: 2rem 0;
-            padding: 1rem;
-            background: #f3f4f6;
-            border-radius: 8px;
-        }
-        
-        .signature-section {
-            margin-top: 4rem;
-            display: flex;
-            justify-content: space-around;
-        }
-        
-        .signature-box {
-            text-align: center;
-            width: 200px;
-        }
-        
-        .signature-line {
-            border-top: 2px solid #000;
-            margin-top: 3rem;
-            padding-top: 0.5rem;
-            font-weight: bold;
-        }
-        
-        .qr-code-corner {
+
+        .corner-accent {
             position: absolute;
-            bottom: 2rem;
-            right: 2rem;
-            text-align: center;
+            width: 40px;
+            height: 40px;
+            border-color: #0f172a;
+            border-style: solid;
         }
-        
+        .top-left { top: -4px; left: -4px; border-width: 4px 0 0 4px; }
+        .top-right { top: -4px; right: -4px; border-width: 4px 4px 0 0; }
+        .bottom-left { bottom: -4px; left: -4px; border-width: 0 0 4px 4px; }
+        .bottom-right { bottom: -4px; right: -4px; border-width: 0 4px 4px 0; }
+
         .watermark {
             position: absolute;
             top: 50%;
             left: 50%;
-            transform: translate(-50%, -50%) rotate(-45deg);
-            font-size: 5rem;
-            color: rgba(0,0,0,0.05);
-            font-weight: bold;
+            transform: translate(-50%, -50%) rotate(-30deg);
+            font-size: 150px;
+            color: rgba(226, 232, 240, 0.4);
+            font-weight: 800;
             pointer-events: none;
             z-index: 0;
+            white-space: nowrap;
         }
     </style>
     <?php if ($isPrint): ?>
@@ -204,130 +134,147 @@ $isPrint = isset($_GET['print']) || $download;
     </script>
     <?php endif; ?>
 </head>
-<body>
-    <div class="no-print text-center mt-3">
-        <button onclick="window.print()" class="btn btn-primary">
-            <i class="bi bi-printer"></i> Print Certificate
+<body class="p-4 md:p-8">
+
+    <div class="no-print flex justify-center gap-4 mb-8">
+        <button onclick="window.print()" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-bold shadow-lg transition-all flex items-center gap-2">
+            <i class="fas fa-print"></i> PRINT AUTHORIZATION
         </button>
-        <a href="/views/certificates/view.php?id=<?= $cert['certificate_id'] ?>" class="btn btn-secondary">
-            <i class="bi bi-arrow-left"></i> Back
+        <a href="/certificates/view?id=<?= $cert['certificate_id'] ?>" class="bg-slate-800 hover:bg-slate-900 text-white px-6 py-2 rounded-lg font-bold shadow-lg transition-all flex items-center gap-2">
+            <i class="fas fa-arrow-left"></i> SYSTEM VIEW
         </a>
     </div>
 
-    <div class="certificate-container">
-        <div class="certificate-border">
-            <div class="certificate-inner-border">
-                <!-- Watermark -->
-                <div class="watermark">OFFICIAL</div>
+    <div class="certificate-page">
+        <div class="outer-border">
+            <div class="inner-border">
+                <div class="watermark uppercase mono">LGU AUTHENTIC</div>
                 
+                <!-- Corner Accents -->
+                <div class="corner-accent top-left"></div>
+                <div class="corner-accent top-right"></div>
+                <div class="corner-accent bottom-left"></div>
+                <div class="corner-accent bottom-right"></div>
+
                 <!-- Header -->
-                <div class="header">
-                    <div class="seal">
-                        <div>LGU</div>
-                        <div style="font-size: 0.7rem;">SEAL</div>
-                    </div>
-                    <h1>Republic of the Philippines</h1>
-                    <h2>Local Government Unit</h2>
-                    <p style="margin: 0; color: #6b7280;">Health & Sanitation Office</p>
-                </div>
-                
-                <!-- Certificate Title -->
-                <div class="certificate-title">
-                    CERTIFICATE OF COMPLIANCE
-                </div>
-                
-                <!-- Certificate Body -->
-                <div class="certificate-body" style="position: relative; z-index: 1;">
-                    <p>This is to certify that</p>
-                    
-                    <div class="establishment-name">
-                        <?= htmlspecialchars($cert['establishment_name']) ?>
-                    </div>
-                    
-                    <p>
-                        a <strong><?= htmlspecialchars(ucwords(str_replace('_', ' ', $cert['establishment_type']))) ?></strong>
-                        located at
-                    </p>
-                    
-                    <p style="font-weight: bold;">
-                        <?= htmlspecialchars($cert['address_street']) ?>,
-                        <?= htmlspecialchars($cert['address_barangay']) ?>,
-                        <?= htmlspecialchars($cert['address_city']) ?>
-                    </p>
-                    
-                    <p>
-                        has been inspected and found to be in compliance with the applicable
-                        health, safety, and sanitation standards and regulations.
-                    </p>
-                    
-                    <!-- Certificate Details -->
-                    <div class="certificate-details text-start">
-                        <div class="row">
-                            <div class="col-6">
-                                <p><strong>Certificate Number:</strong><br><?= htmlspecialchars($cert['certificate_number']) ?></p>
-                                <p><strong>Certificate Type:</strong><br><?= htmlspecialchars(ucwords(str_replace('_', ' ', $cert['certificate_type']))) ?></p>
-                                <p><strong>Owner/Operator:</strong><br><?= htmlspecialchars($cert['owner_name']) ?></p>
-                            </div>
-                            <div class="col-6">
-                                <p><strong>Date Issued:</strong><br><?= date('F d, Y', strtotime($cert['issue_date'])) ?></p>
-                                <p><strong>Valid Until:</strong><br><?= date('F d, Y', strtotime($cert['expiry_date'])) ?></p>
-                                <?php if ($cert['inspection_reference']): ?>
-                                <p><strong>Inspection Reference:</strong><br><?= htmlspecialchars($cert['inspection_reference']) ?></p>
-                                <?php endif; ?>
-                            </div>
+                <div class="text-center mb-10 relative z-10">
+                    <div class="flex items-center justify-center gap-6 mb-6">
+                        <div class="w-24 h-24 border-4 border-slate-900 rounded-full flex items-center justify-center p-2">
+                            <i class="fas fa-shield-halved text-5xl text-slate-900"></i>
                         </div>
-                        
-                        <?php if ($cert['remarks']): ?>
-                        <p class="mt-2"><strong>Remarks:</strong><br><?= htmlspecialchars($cert['remarks']) ?></p>
-                        <?php endif; ?>
                     </div>
+                    <div class="uppercase tracking-[0.2em] font-bold text-slate-600 text-xs mb-1">Republic of the Philippines</div>
+                    <div class="uppercase tracking-[0.3em] font-black text-slate-900 text-lg mb-1">LOCAL GOVERNMENT UNIT</div>
+                    <div class="uppercase tracking-[0.1em] font-bold text-blue-700 text-sm">HEALTH & SANITATION OFFICE</div>
+                    <div class="w-32 h-1 bg-slate-900 mx-auto mt-4 mb-2"></div>
+                    <div class="w-16 h-0.5 bg-slate-900 mx-auto"></div>
+                </div>
+
+                <!-- Title Section -->
+                <div class="text-center mb-12 relative z-10">
+                    <h1 class="serif italic text-5xl text-slate-900 mb-2">Certificate of Compliance</h1>
+                    <div class="mono text-[10px] text-slate-500 tracking-[0.5em] uppercase">STRICT PROTOCOL ADHERENCE GRANTED</div>
+                </div>
+
+                <!-- Main Content -->
+                <div class="text-center px-8 mb-12 space-y-6 relative z-10">
+                    <p class="text-slate-600 text-lg">This official document hereby authorizes and confirms that</p>
                     
-                    <p style="margin-top: 2rem; font-size: 0.95rem; color: #6b7280;">
-                        This certificate is valid for the period specified above and must be
-                        prominently displayed at the establishment. Regular inspections will be
-                        conducted to ensure continued compliance.
+                    <h2 class="text-4xl font-black text-slate-900 uppercase tracking-tight border-b-2 border-slate-200 inline-block pb-2 px-4"><?= htmlspecialchars($cert['establishment_name']) ?></h2>
+                    
+                    <p class="text-slate-600">
+                        Categorized as a <span class="font-bold text-slate-900 italic"><?= htmlspecialchars(ucwords(str_replace('_', ' ', $cert['establishment_type']))) ?></span>
+                        <br>Located at the premises of:
+                    </p>
+                    
+                    <div class="bg-slate-50 border border-slate-200 py-3 px-6 rounded-lg inline-block">
+                        <span class="font-bold text-slate-900 italic text-lg"><?= htmlspecialchars($cert['address_street']) ?>, <?= htmlspecialchars($cert['address_barangay']) ?>, <?= htmlspecialchars($cert['address_city']) ?></span>
+                    </div>
+
+                    <p class="text-slate-700 leading-relaxed max-w-2xl mx-auto">
+                        Has successfully passed full security and sanitation inspection protocols conducted on 
+                        <span class="font-bold"><?= date('F d, Y', strtotime($cert['issue_date'])) ?></span>. 
+                        This establishment is verified to be in full compliance with the Health & Safety 
+                        Standard Operating Procedures (SOP) under existing municipal ordinances.
                     </p>
                 </div>
-                
-                <!-- Signatures -->
-                <div class="signature-section">
-                    <div class="signature-box">
-                        <div class="signature-line">
-                            <?= htmlspecialchars($cert['issued_by_name']) ?>
+
+                <!-- Metadata Grid -->
+                <div class="grid grid-cols-2 gap-8 mb-16 px-10 relative z-10">
+                    <div class="space-y-4 border-l-2 border-slate-200 pl-6">
+                        <div>
+                            <div class="mono text-[10px] text-slate-500 uppercase">Authorization Number</div>
+                            <div class="font-bold text-slate-900"><?= htmlspecialchars($cert['certificate_number']) ?></div>
                         </div>
-                        <p style="margin: 0; font-size: 0.9rem;">Health Inspector</p>
-                        <p style="margin: 0; font-size: 0.85rem; color: #6b7280;">
-                            <?= date('F d, Y', strtotime($cert['issue_date'])) ?>
-                        </p>
-                    </div>
-                    
-                    <div class="signature-box">
-                        <div class="signature-line">
-                            Municipal Health Officer
+                        <div>
+                            <div class="mono text-[10px] text-slate-500 uppercase">Owner / Authorized Representative</div>
+                            <div class="font-bold text-slate-900"><?= htmlspecialchars($cert['owner_name']) ?></div>
                         </div>
-                        <p style="margin: 0; font-size: 0.9rem;">Approving Authority</p>
-                        <p style="margin: 0; font-size: 0.85rem; color: #6b7280;">
-                            <?= date('F d, Y', strtotime($cert['issue_date'])) ?>
-                        </p>
+                        <div>
+                            <div class="mono text-[10px] text-slate-500 uppercase">Issuance Protocol</div>
+                            <div class="font-bold text-slate-900"><?= htmlspecialchars(ucwords(str_replace('_', ' ', $cert['certificate_type']))) ?></div>
+                        </div>
+                    </div>
+                    <div class="space-y-4 border-l-2 border-slate-200 pl-6">
+                        <div>
+                            <div class="mono text-[10px] text-slate-500 uppercase">Effective Date</div>
+                            <div class="font-bold text-emerald-700 uppercase"><?= date('F d, Y', strtotime($cert['issue_date'])) ?></div>
+                        </div>
+                        <div>
+                            <div class="mono text-[10px] text-slate-500 uppercase">Valid Until</div>
+                            <div class="font-bold text-rose-700 uppercase"><?= date('F d, Y', strtotime($cert['expiry_date'])) ?></div>
+                        </div>
+                        <div>
+                            <div class="mono text-[10px] text-slate-500 uppercase">Security Reference</div>
+                            <div class="font-bold text-slate-900 mono text-sm"><?= htmlspecialchars($cert['inspection_reference'] ?: 'SYSTEM_GEN_000') ?></div>
+                        </div>
                     </div>
                 </div>
-                
-                <!-- QR Code -->
-                <div class="qr-code-corner">
-                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=<?= urlencode('https://lgu.gov.ph/verify?cert=' . $cert['certificate_number']) ?>" 
-                         alt="QR Code">
-                    <p style="font-size: 0.7rem; margin: 0.25rem 0 0 0;">Scan to verify</p>
+
+                <!-- Signature Section -->
+                <div class="grid grid-cols-2 gap-12 px-10 mb-12 relative z-10">
+                    <div class="text-center">
+                        <div class="mb-4 h-16 flex items-end justify-center">
+                            <!-- Placeholder for e-signature -->
+                            <div class="italic text-slate-400 opacity-30 mono text-xs uppercase leading-none">[ DIGITAL_STAMP_ID: <?= substr(md5($cert['issued_by_name']), 0, 8) ?> ]</div>
+                        </div>
+                        <div class="border-t border-slate-900 pt-2">
+                            <div class="font-bold text-slate-900 uppercase"><?= htmlspecialchars($cert['issued_by_name']) ?></div>
+                            <div class="text-[10px] text-slate-500 uppercase font-bold tracking-widest">Lead Safety Inspector</div>
+                        </div>
+                    </div>
+                    <div class="text-center">
+                        <div class="mb-4 h-16 flex items-end justify-center">
+                            <div class="italic text-slate-400 opacity-30 mono text-xs uppercase leading-none">[ AUTH_SECURE_OVERRIDE ]</div>
+                        </div>
+                        <div class="border-t border-slate-900 pt-2">
+                            <div class="font-bold text-slate-900 uppercase">Office of the Health Director</div>
+                            <div class="text-[10px] text-slate-500 uppercase font-bold tracking-widest">Approving Authority</div>
+                        </div>
+                    </div>
                 </div>
-                
-                <!-- Footer -->
-                <div style="text-align: center; margin-top: 3rem; font-size: 0.8rem; color: #9ca3af; border-top: 1px solid #e5e7eb; padding-top: 1rem;">
-                    <p style="margin: 0;">This is an official document issued by the Local Government Unit</p>
-                    <p style="margin: 0;">Any alteration or unauthorized use of this certificate is punishable by law</p>
+
+                <!-- Footer / Security -->
+                <div class="flex items-end justify-between border-t-2 border-slate-100 pt-8 mt-auto relative z-10">
+                    <div class="flex-1">
+                        <p class="text-[9px] text-slate-400 italic mb-2">NOTICE: This certificate must be permanently and prominently displayed at the primary entrance of the establishment. Unauthorized alteration, forgery, or misuse of this protocol authorization is strictly prohibited under Republic Act protocols and local ordinances.</p>
+                        <div class="flex gap-4 mono text-[8px] text-slate-500 font-bold">
+                            <span>TOKEN: <?= hash('crc32', $cert['certificate_number']) ?></span>
+                            <span>NODE: <?= strtoupper(gethostname()) ?></span>
+                            <span>GEN_DATE: <?= date('Y.m.d H:i') ?></span>
+                        </div>
+                    </div>
+                    <div class="text-center pl-8">
+                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=80x80&data=<?= urlencode('https://lgu-safety.gov/verify?cert=' . $cert['certificate_number']) ?>" 
+                             class="w-20 h-20 border border-slate-200 p-1 mb-1" alt="Verification QR">
+                        <div class="mono text-[8px] font-bold text-slate-500 uppercase">Scan to Verify</div>
+                    </div>
                 </div>
+
             </div>
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
+
