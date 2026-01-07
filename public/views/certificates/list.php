@@ -1,5 +1,11 @@
 <?php
-// Session already started by index.php
+/**
+ * Health & Safety Inspection System
+ * Certificates List View - Modern Tailwind Layout
+ */
+
+declare(strict_types=1);
+
 if (!isset($_SESSION['user_id'])) {
     header('Location: /views/auth/login.php');
     exit;
@@ -10,20 +16,9 @@ require_once __DIR__ . '/../../../config/database.php';
 try {
     $db = Database::getConnection();
     
-    // Ensure session has first_name and last_name
-    if (!isset($_SESSION['first_name']) || !isset($_SESSION['last_name'])) {
-        $userStmt = $db->prepare("SELECT first_name, last_name FROM users WHERE user_id = ?");
-        $userStmt->execute([$_SESSION['user_id']]);
-        $userData = $userStmt->fetch(PDO::FETCH_ASSOC);
-        if ($userData) {
-            $_SESSION['first_name'] = $userData['first_name'];
-            $_SESSION['last_name'] = $userData['last_name'];
-        }
-    }
-    
     // Pagination
     $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
-    $perPage = 20;
+    $perPage = 15;
     $offset = ($page - 1) * $perPage;
     
     // Filters
@@ -57,7 +52,7 @@ try {
     $countSql = "SELECT COUNT(*) FROM certificates c LEFT JOIN establishments e ON c.establishment_id = e.establishment_id $whereClause";
     $stmt = $db->prepare($countSql);
     $stmt->execute($params);
-    $totalCertificates = $stmt->fetchColumn();
+    $totalCertificates = (int)$stmt->fetchColumn();
     $totalPages = ceil($totalCertificates / $perPage);
     
     // Get certificates
@@ -65,9 +60,6 @@ try {
         SELECT c.*, 
                e.name as establishment_name,
                e.type as establishment_type,
-               e.address_street,
-               e.address_barangay,
-               e.address_city,
                i.reference_number as inspection_reference,
                CONCAT(u.first_name, ' ', u.last_name) as issued_by_name
         FROM certificates c
@@ -92,235 +84,155 @@ try {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Certificates - Health & Safety Inspection System</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
-    <style>
-        .status-badge {
-            padding: 0.35rem 0.75rem;
-            border-radius: 20px;
-            font-size: 0.875rem;
-            font-weight: 500;
-        }
-        .status-active { background: #d4edda; color: #155724; }
-        .status-expired { background: #f8d7da; color: #721c24; }
-        .status-revoked { background: #e2e3e5; color: #383d41; }
-        .status-suspended { background: #fff3cd; color: #856404; }
-        
-        .certificate-card {
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-        .certificate-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        }
-    </style>
+    <title>Certificates - Health & Safety System</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="/dashboard.php">
-                <i class="bi bi-shield-check"></i> Health & Safety Inspection
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="/dashboard.php">Dashboard</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/views/inspections/list.php">Inspections</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link active" href="/views/certificates/list.php">Certificates</a>
-                    </li>
-                    <li class="nav-item">
-                        <span class="nav-link"><?= htmlspecialchars($_SESSION['first_name']) ?> <?= htmlspecialchars($_SESSION['last_name']) ?></span>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/views/auth/logout.php">Logout</a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </nav>
+<body class="bg-slate-50 font-sans antialiased text-slate-900 overflow-hidden">
+    <div class="flex h-screen">
+        <!-- Sidebar Navigation -->
+        <?php 
+            $activePage = 'certificates';
+            include __DIR__ . '/../partials/sidebar.php'; 
+        ?>
 
-    <div class="container-fluid mt-4">
-        <div class="row mb-4">
-            <div class="col-md-6">
-                <h2><i class="bi bi-award"></i> Certificates</h2>
-                <p class="text-muted">Manage health and safety compliance certificates</p>
-            </div>
-            <div class="col-md-6 text-end">
-                <a href="/views/certificates/issue.php" class="btn btn-primary">
-                    <i class="bi bi-plus-circle"></i> Issue New Certificate
-                </a>
-                <a href="/views/certificates/verify.php" class="btn btn-outline-primary">
-                    <i class="bi bi-search"></i> Verify Certificate
-                </a>
-            </div>
-        </div>
+        <!-- Main Content -->
+        <div class="flex-1 flex flex-col min-w-0">
+            <!-- Top Navbar -->
+            <header class="bg-white border-b border-slate-200 h-16 flex items-center justify-between px-8 shrink-0">
+                <h1 class="text-xl font-bold text-slate-800">Compliance Certificates</h1>
+                <div class="flex items-center space-x-4">
+                    <a href="/views/certificates/issue.php" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-semibold flex items-center shadow-sm transition-all active:scale-95">
+                        <i class="fas fa-plus mr-2"></i> Issue New Certificate
+                    </a>
+                </div>
+            </header>
 
-        <!-- Filters -->
-        <div class="card mb-4">
-            <div class="card-body">
-                <form method="GET" class="row g-3">
-                    <div class="col-md-3">
-                        <label class="form-label">Status</label>
-                        <select name="status" class="form-select" onchange="this.form.submit()">
-                            <option value="">All Statuses</option>
-                            <option value="active" <?= $status === 'active' ? 'selected' : '' ?>>Active</option>
-                            <option value="expired" <?= $status === 'expired' ? 'selected' : '' ?>>Expired</option>
-                            <option value="revoked" <?= $status === 'revoked' ? 'selected' : '' ?>>Revoked</option>
-                            <option value="suspended" <?= $status === 'suspended' ? 'selected' : '' ?>>Suspended</option>
-                        </select>
-                    </div>
-                    <div class="col-md-3">
-                        <label class="form-label">Certificate Type</label>
-                        <select name="certificate_type" class="form-select" onchange="this.form.submit()">
-                            <option value="">All Types</option>
-                            <option value="food_safety" <?= $certificateType === 'food_safety' ? 'selected' : '' ?>>Food Safety</option>
-                            <option value="building_safety" <?= $certificateType === 'building_safety' ? 'selected' : '' ?>>Building Safety</option>
-                            <option value="fire_safety" <?= $certificateType === 'fire_safety' ? 'selected' : '' ?>>Fire Safety</option>
-                            <option value="sanitation" <?= $certificateType === 'sanitation' ? 'selected' : '' ?>>Sanitation</option>
-                            <option value="occupational_health" <?= $certificateType === 'occupational_health' ? 'selected' : '' ?>>Occupational Health</option>
-                        </select>
-                    </div>
-                    <div class="col-md-4">
-                        <label class="form-label">Search</label>
-                        <input type="text" name="search" class="form-control" placeholder="Certificate number or establishment name..." value="<?= htmlspecialchars($search) ?>">
-                    </div>
-                    <div class="col-md-2">
-                        <label class="form-label">&nbsp;</label>
-                        <button type="submit" class="btn btn-primary w-100">
-                            <i class="bi bi-search"></i> Search
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
+            <!-- Scrollable Content Area -->
+            <main class="flex-1 overflow-y-auto p-8">
+                <!-- Filters -->
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 mb-8">
+                    <form method="GET" class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <div class="md:col-span-1">
+                            <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Search</label>
+                            <input type="text" name="search" value="<?= htmlspecialchars($search) ?>" placeholder="Number or Establishment..." 
+                                class="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none transition-all">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Type</label>
+                            <select name="certificate_type" class="w-full bg-slate-50 border border-slate-200 rounded-lg py-2 px-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+                                <option value="">All Types</option>
+                                <option value="food_safety" <?= $certificateType === 'food_safety' ? 'selected' : '' ?>>Food Safety</option>
+                                <option value="building_safety" <?= $certificateType === 'building_safety' ? 'selected' : '' ?>>Building Safety</option>
+                                <option value="fire_safety" <?= $certificateType === 'fire_safety' ? 'selected' : '' ?>>Fire Safety</option>
+                                <option value="sanitation" <?= $certificateType === 'sanitation' ? 'selected' : '' ?>>Sanitation</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Status</label>
+                            <select name="status" class="w-full bg-slate-50 border border-slate-200 rounded-lg py-2 px-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+                                <option value="">All Statuses</option>
+                                <option value="active" <?= $status === 'active' ? 'selected' : '' ?>>Active</option>
+                                <option value="expired" <?= $status === 'expired' ? 'selected' : '' ?>>Expired</option>
+                                <option value="revoked" <?= $status === 'revoked' ? 'selected' : '' ?>>Revoked</option>
+                            </select>
+                        </div>
+                        <div class="flex items-end">
+                            <button type="submit" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-semibold py-2 px-4 rounded-lg text-sm transition-colors flex items-center justify-center">
+                                <i class="fas fa-filter mr-2"></i> Apply Filters
+                            </button>
+                        </div>
+                    </form>
+                </div>
 
-        <!-- Certificates Table -->
-        <div class="card">
-            <div class="card-body">
-                <?php if (empty($certificates)): ?>
-                    <div class="text-center py-5">
-                        <i class="bi bi-award" style="font-size: 4rem; color: #dee2e6;"></i>
-                        <p class="text-muted mt-3">No certificates found</p>
-                        <a href="/views/certificates/issue.php" class="btn btn-primary">
-                            <i class="bi bi-plus-circle"></i> Issue First Certificate
-                        </a>
-                    </div>
-                <?php else: ?>
-                    <div class="table-responsive">
-                        <table class="table table-hover">
-                            <thead class="table-light">
-                                <tr>
-                                    <th>Certificate #</th>
-                                    <th>Establishment</th>
-                                    <th>Type</th>
-                                    <th>Issue Date</th>
-                                    <th>Expiry Date</th>
-                                    <th>Status</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php foreach ($certificates as $cert): ?>
-                                <tr>
-                                    <td>
-                                        <strong><?= htmlspecialchars($cert['certificate_number']) ?></strong>
-                                    </td>
-                                    <td>
-                                        <strong><?= htmlspecialchars($cert['establishment_name']) ?></strong><br>
-                                        <small class="text-muted"><?= htmlspecialchars(ucwords(str_replace('_', ' ', $cert['establishment_type']))) ?></small>
-                                    </td>
-                                    <td><?= htmlspecialchars(ucwords(str_replace('_', ' ', $cert['certificate_type']))) ?></td>
-                                    <td><?= date('M d, Y', strtotime($cert['issue_date'])) ?></td>
-                                    <td>
-                                        <?= date('M d, Y', strtotime($cert['expiry_date'])) ?>
-                                        <?php
-                                        $daysUntilExpiry = (strtotime($cert['expiry_date']) - time()) / (60 * 60 * 24);
-                                        if ($daysUntilExpiry <= 30 && $daysUntilExpiry > 0):
-                                        ?>
-                                            <br><small class="text-warning"><i class="bi bi-exclamation-triangle"></i> Expires soon</small>
-                                        <?php endif; ?>
-                                    </td>
-                                    <td>
-                                        <span class="status-badge status-<?= $cert['status'] ?>">
-                                            <?= ucfirst($cert['status']) ?>
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <div class="btn-group btn-group-sm">
-                                            <a href="/views/certificates/view.php?id=<?= $cert['certificate_id'] ?>" class="btn btn-outline-primary" title="View Details">
-                                                <i class="bi bi-eye"></i>
-                                            </a>
-                                            <a href="/views/certificates/certificate.php?id=<?= $cert['certificate_id'] ?>" class="btn btn-outline-success" target="_blank" title="View Certificate">
-                                                <i class="bi bi-file-earmark-text"></i>
-                                            </a>
-                                            <a href="/views/certificates/certificate.php?id=<?= $cert['certificate_id'] ?>&download=1" class="btn btn-outline-info" title="Download PDF">
-                                                <i class="bi bi-download"></i>
-                                            </a>
-                                            <?php if ($cert['status'] === 'active'): ?>
-                                            <button onclick="revokeCertificate(<?= $cert['certificate_id'] ?>)" class="btn btn-outline-danger" title="Revoke">
-                                                <i class="bi bi-x-circle"></i>
-                                            </button>
-                                            <?php endif; ?>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <?php endforeach; ?>
-                            </tbody>
-                        </table>
-                    </div>
+                <!-- Results Table -->
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                    <?php if (!empty($certificates)): ?>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse">
+                                <thead>
+                                    <tr class="bg-slate-50 border-b border-slate-200 text-xs font-bold text-slate-500 uppercase tracking-wider">
+                                        <th class="px-6 py-4">Certificate ID / Est.</th>
+                                        <th class="px-6 py-4">Type</th>
+                                        <th class="px-6 py-4">Validity</th>
+                                        <th class="px-6 py-4">Status</th>
+                                        <th class="px-6 py-4 text-right">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-100">
+                                    <?php foreach ($certificates as $cert): ?>
+                                        <tr class="hover:bg-slate-50 transition-colors">
+                                            <td class="px-6 py-4 italic">
+                                                <div class="font-bold text-slate-900 font-mono text-xs"><?= htmlspecialchars($cert['certificate_number']) ?></div>
+                                                <div class="text-sm text-slate-600 font-medium"><?= htmlspecialchars($cert['establishment_name']) ?></div>
+                                            </td>
+                                            <td class="px-6 py-4">
+                                                <span class="text-sm text-slate-600 font-medium italic"><?= ucwords(str_replace('_', ' ', $cert['certificate_type'])) ?></span>
+                                            </td>
+                                            <td class="px-6 py-4">
+                                                <div class="text-xs text-slate-500">Issued: <?= date('M d, Y', strtotime($cert['issue_date'])) ?></div>
+                                                <div class="text-xs font-bold text-slate-800 italic">Expires: <?= date('M d, Y', strtotime($cert['expiry_date'])) ?></div>
+                                            </td>
+                                            <td class="px-6 py-4">
+                                                <?php
+                                                    $statusClasses = [
+                                                        'active' => 'bg-emerald-100 text-emerald-700',
+                                                        'expired' => 'bg-rose-100 text-rose-700',
+                                                        'revoked' => 'bg-slate-100 text-slate-700',
+                                                        'suspended' => 'bg-amber-100 text-amber-700'
+                                                    ];
+                                                    $class = $statusClasses[$cert['status']] ?? 'bg-slate-100 text-slate-700';
+                                                ?>
+                                                <span class="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider <?= $class ?>">
+                                                    <?= $cert['status'] ?>
+                                                </span>
+                                            </td>
+                                            <td class="px-6 py-4 text-right">
+                                                <div class="flex justify-end space-x-2">
+                                                    <a href="/views/certificates/view.php?id=<?= $cert['certificate_id'] ?>" class="p-2 text-slate-400 hover:text-blue-600 transition-colors" title="View"><i class="fas fa-eye"></i></a>
+                                                    <a href="/views/certificates/certificate.php?id=<?= $cert['certificate_id'] ?>" target="_blank" class="p-2 text-slate-400 hover:text-emerald-600 transition-colors" title="Download"><i class="fas fa-file-pdf"></i></a>
+                                                    <?php if ($cert['status'] === 'active'): ?>
+                                                        <button onclick="confirmRevoke(<?= $cert['certificate_id'] ?>)" class="p-2 text-slate-400 hover:text-rose-600 transition-colors" title="Revoke"><i class="fas fa-ban"></i></button>
+                                                    <?php endif; ?>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                </tbody>
+                            </table>
+                        </div>
 
-                    <!-- Pagination -->
-                    <?php if ($totalPages > 1): ?>
-                    <nav class="mt-4">
-                        <ul class="pagination justify-content-center">
-                            <?php for ($i = 1; $i <= $totalPages; $i++): ?>
-                            <li class="page-item <?= $i === $page ? 'active' : '' ?>">
-                                <a class="page-link" href="?page=<?= $i ?>&status=<?= urlencode($status) ?>&certificate_type=<?= urlencode($certificateType) ?>&search=<?= urlencode($search) ?>">
-                                    <?= $i ?>
-                                </a>
-                            </li>
-                            <?php endfor; ?>
-                        </ul>
-                    </nav>
+                        <!-- Pagination -->
+                        <?php if ($totalPages > 1): ?>
+                            <div class="px-6 py-4 bg-slate-50 border-t border-slate-200 flex items-center justify-between">
+                                <span class="text-xs text-slate-500 italic">Page <?= $page ?> of <?= $totalPages ?></span>
+                                <div class="flex space-x-1">
+                                    <?php for ($i = 1; $i <= $totalPages; $i++): ?>
+                                        <a href="?page=<?= $i ?>&status=<?= $status ?>&type=<?= $certificateType ?>&search=<?= urlencode($search) ?>" 
+                                            class="px-3 py-1 rounded border <?= $i == $page ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50' ?> text-xs font-bold transition-all">
+                                            <?= $i ?>
+                                        </a>
+                                    <?php endfor; ?>
+                                </div>
+                            </div>
+                        <?php endif; ?>
+                    <?php else: ?>
+                        <div class="p-12 text-center italic">
+                            <i class="fas fa-certificate text-4xl text-slate-200 mb-4"></i>
+                            <h3 class="text-lg font-bold text-slate-800">No certificates found</h3>
+                            <p class="text-slate-500">Adjust your search or filters to see results.</p>
+                        </div>
                     <?php endif; ?>
-                <?php endif; ?>
-            </div>
+                </div>
+            </main>
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        function revokeCertificate(certificateId) {
-            if (confirm('Are you sure you want to revoke this certificate? This action cannot be undone.')) {
-                fetch('/views/certificates/revoke.php', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        certificate_id: certificateId
-                    })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        alert('Certificate revoked successfully');
-                        location.reload();
-                    } else {
-                        alert('Error: ' + data.message);
-                    }
-                })
-                .catch(error => {
-                    alert('An error occurred: ' + error.message);
-                });
+        function confirmRevoke(id) {
+            if (confirm('Are you sure you want to revoke this certificate?')) {
+                // We would normally call the revoke API here
+                window.location.href = '/views/certificates/revoke.php?id=' + id;
             }
         }
     </script>

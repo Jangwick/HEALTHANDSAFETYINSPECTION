@@ -19,6 +19,7 @@ $webRoutes = [
     '/register' => ['type' => 'view', 'file' => 'auth/register.php'],
     '/forgot-password' => ['type' => 'view', 'file' => 'auth/forgot-password.php'],
     '/inspections' => ['type' => 'view', 'file' => 'inspections/list.php'],
+    '/inspections/scheduling' => ['type' => 'view', 'file' => 'inspections/scheduling.php'],
     '/inspections/create' => ['type' => 'view', 'file' => 'inspections/create.php'],
     '/inspections/list.php' => ['type' => 'view', 'file' => 'inspections/list.php'],
     '/establishments' => ['type' => 'view', 'file' => 'establishments/list.php'],
@@ -34,6 +35,8 @@ $webRoutes = [
     '/certificates/verify.php' => ['type' => 'view', 'file' => 'certificates/verify.php'],
     '/certificates/issue.php' => ['type' => 'view', 'file' => 'certificates/issue.php'],
     '/certificates/view.php' => ['type' => 'view', 'file' => 'certificates/view.php'],
+    '/violations' => ['type' => 'view', 'file' => 'violations/list.php'],
+    '/violations/list.php' => ['type' => 'view', 'file' => 'violations/list.php'],
 ];
 
 // Match route - strip query parameters for route matching

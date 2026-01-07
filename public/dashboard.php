@@ -8,56 +8,46 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
-<body class="bg-gray-100">
-    <!-- Navigation -->
-    <nav class="bg-white shadow-lg">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between h-16">
-                <div class="flex items-center">
-                    <div class="flex-shrink-0 flex items-center">
-                        <div class="h-10 w-10 bg-blue-600 rounded-lg flex items-center justify-center">
-                            <i class="fas fa-shield-alt text-white text-xl"></i>
-                        </div>
-                        <span class="ml-3 text-xl font-bold text-gray-900">H&S Inspections</span>
+<body class="bg-gray-100 font-sans antialiased text-slate-900">
+    <div class="flex h-screen overflow-hidden">
+        <!-- Sidebar -->
+        <?php 
+            $activePage = 'dashboard';
+            include __DIR__ . '/views/partials/sidebar.php'; 
+        ?>
+
+        <!-- Main Content Area -->
+        <div class="flex-1 flex flex-col overflow-hidden">
+            <!-- Header -->
+            <header class="bg-white border-b border-slate-200 z-10">
+                <div class="px-6 h-16 flex items-center justify-between">
+                    <div class="flex items-center">
+                        <button class="md:hidden p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none">
+                            <i class="fas fa-bars"></i>
+                        </button>
+                        <h2 class="text-xl font-bold text-slate-800 ml-2 md:ml-0">Dashboard</h2>
                     </div>
-                    <div class="hidden md:ml-10 md:flex md:space-x-8">
-                        <a href="/dashboard.php" class="border-blue-500 text-gray-900 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
-                            <i class="fas fa-home mr-2"></i>Dashboard
-                        </a>
-                        <a href="/inspections" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
-                            <i class="fas fa-clipboard-check mr-2"></i>Inspections
-                        </a>
-                        <a href="/establishments" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
-                            <i class="fas fa-building mr-2"></i>Establishments
-                        </a>
-                        <a href="/certificates" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
-                            <i class="fas fa-certificate mr-2"></i>Certificates
-                        </a>
-                    </div>
-                </div>
-                <div class="flex items-center">
-                    <button class="p-2 rounded-lg text-gray-400 hover:text-gray-500 hover:bg-gray-100 mr-2">
-                        <i class="fas fa-bell text-xl"></i>
-                        <span class="absolute top-2 right-2 h-2 w-2 bg-red-500 rounded-full"></span>
-                    </button>
-                    <div class="ml-3 relative">
-                        <div class="flex items-center cursor-pointer" onclick="toggleUserMenu()">
-                            <img id="userAvatar" class="h-10 w-10 rounded-full border-2 border-blue-500" src="https://ui-avatars.com/api/?name=User&background=3B82F6&color=fff" alt="User">
-                            <div class="ml-3 hidden md:block">
-                                <p id="userName" class="text-sm font-medium text-gray-700">Loading...</p>
-                                <p id="userRole" class="text-xs text-gray-500">User</p>
-                            </div>
-                            <i class="fas fa-chevron-down ml-2 text-gray-400"></i>
-                        </div>
-                        <div id="userMenu" class="hidden absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-50">
-                            <div class="py-1">
+                    
+                    <div class="flex items-center space-x-4">
+                        <button class="p-2 rounded-full text-gray-400 hover:text-gray-500 hover:bg-gray-100 transition-colors relative">
+                            <i class="fas fa-bell"></i>
+                            <span class="absolute top-2 right-2 h-2 w-2 bg-red-500 rounded-full border-2 border-white"></span>
+                        </button>
+                        
+                        <div class="relative">
+                            <button onclick="toggleUserMenu()" class="flex items-center space-x-2 focus:outline-none p-1 rounded-full hover:bg-gray-100 transition-colors">
+                                <img id="userAvatar" class="h-8 w-8 rounded-full border border-gray-200" src="https://ui-avatars.com/api/?name=User&background=3B82F6&color=fff" alt="">
+                                <i class="fas fa-chevron-down text-xs text-gray-400 hidden sm:block"></i>
+                            </button>
+                            
+                            <div id="userMenu" class="hidden absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 py-1 z-50">
                                 <a href="/profile" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                                    <i class="fas fa-user mr-2"></i>Profile
+                                    <i class="fas fa-user mr-2 text-gray-400"></i>Profile
                                 </a>
                                 <a href="/settings" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                                    <i class="fas fa-cog mr-2"></i>Settings
+                                    <i class="fas fa-cog mr-2 text-gray-400"></i>Settings
                                 </a>
-                                <hr class="my-1">
+                                <hr class="my-1 border-gray-100">
                                 <a href="#" onclick="handleLogout()" class="block px-4 py-2 text-sm text-red-600 hover:bg-gray-100">
                                     <i class="fas fa-sign-out-alt mr-2"></i>Logout
                                 </a>
@@ -65,27 +55,23 @@
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
-    </nav>
+            </header>
 
-    <!-- Main Content -->
-    <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-        <!-- Welcome Banner -->
-        <div class="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-lg shadow-lg p-6 mb-6 text-white">
-            <div class="flex items-center justify-between">
-                <div>
-                    <h1 class="text-3xl font-bold mb-2">Welcome back, <span id="welcomeName">User</span>!</h1>
-                    <p class="text-blue-100">Here's what's happening with your inspections today.</p>
-                </div>
-                <div class="hidden md:block">
-                    <i class="fas fa-clipboard-list text-6xl opacity-30"></i>
-                </div>
-            </div>
-        </div>
+            <!-- Scrollable Content -->
+            <main class="flex-1 overflow-y-auto p-4 md:p-8">
+                <div class="max-w-7xl mx-auto">
+                    <!-- Welcome Banner -->
+                    <div class="bg-gradient-to-r from-blue-700 to-indigo-800 rounded-2xl shadow-xl p-8 mb-8 text-white relative overflow-hidden">
+                        <div class="relative z-10">
+                            <h1 class="text-4xl font-extrabold mb-2">Welcome back, <span id="welcomeName">User</span>!</h1>
+                            <p class="text-blue-100 text-lg opacity-90">Here's a snapshot of the health and safety compliance today.</p>
+                        </div>
+                        <i class="fas fa-shield-alt absolute -right-4 -bottom-4 text-9xl opacity-10"></i>
+                    </div>
 
-        <!-- Stats Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+                    <!-- Stats Grid -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+
             <!-- Total Inspections -->
             <div class="bg-white rounded-lg shadow p-6">
                 <div class="flex items-center">
@@ -219,19 +205,31 @@
                 </table>
             </div>
         </div>
-    </div>
+    </main>
+</div>
 
     <script>
         // Load user data
         function loadUserData() {
             const user = JSON.parse(localStorage.getItem('user') || '{}');
             if (user.first_name) {
+                const fullName = `${user.first_name} ${user.last_name}`;
+                const role = user.role || 'User';
+                const avatarUrl = user.profile_photo_url || `https://ui-avatars.com/api/?name=${user.first_name}+${user.last_name}&background=3B82F6&color=fff`;
+
                 document.getElementById('welcomeName').textContent = user.first_name;
-                document.getElementById('userName').textContent = `${user.first_name} ${user.last_name}`;
-                document.getElementById('userRole').textContent = user.role || 'User';
                 
-                const avatar = document.getElementById('userAvatar');
-                avatar.src = user.profile_photo_url || `https://ui-avatars.com/api/?name=${user.first_name}+${user.last_name}&background=3B82F6&color=fff`;
+                // Header user info
+                if (document.getElementById('userName')) {
+                    document.getElementById('userName').textContent = fullName;
+                    document.getElementById('userRole').textContent = role;
+                }
+                document.getElementById('userAvatar').src = avatarUrl;
+                
+                // Sidebar user info
+                document.getElementById('sideUserName').textContent = fullName;
+                document.getElementById('sideUserRole').textContent = role;
+                document.getElementById('sideUserAvatar').src = avatarUrl;
             }
         }
 

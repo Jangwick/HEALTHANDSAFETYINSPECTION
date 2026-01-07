@@ -109,12 +109,13 @@ try {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Establishment Statistics - Health & Safety Inspection System</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
     <style>
         body { background-color: #f8f9fa; }
-        .navbar { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
         .card { box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-bottom: 1.5rem; }
         .stat-card { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 1.5rem; border-radius: 10px; }
         .stat-number { font-size: 2.5rem; font-weight: bold; margin: 0; }
@@ -124,35 +125,58 @@ try {
         .alert-warning-custom { background-color: #fef3c7; border-left: 4px solid #f59e0b; }
     </style>
 </head>
-<body>
-    <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-dark mb-4">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="/dashboard.php">
-                <i class="bi bi-shield-check"></i> Health & Safety Inspection
-            </a>
-            <div class="navbar-nav ms-auto">
-                <span class="nav-link text-white">
-                    <i class="bi bi-person-circle"></i> <?= htmlspecialchars($_SESSION['first_name'] ?? '') ?> <?= htmlspecialchars($_SESSION['last_name'] ?? '') ?>
-                </span>
-                <a class="nav-link text-white" href="/views/auth/logout.php">
-                    <i class="bi bi-box-arrow-right"></i> Logout
-                </a>
-            </div>
-        </div>
-    </nav>
+<body class="bg-gray-100 font-sans antialiased text-slate-900">
+    <div class="flex h-screen overflow-hidden">
+        <!-- Sidebar -->
+        <?php 
+            $activePage = 'statistics';
+            include __DIR__ . '/../partials/sidebar.php'; 
+        ?>
 
-    <div class="container-fluid">
-        <!-- Header -->
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <div>
-                <h2><i class="bi bi-graph-up"></i> Establishment Statistics & Analytics</h2>
-                <p class="text-muted mb-0">Overview of establishment compliance and inspection trends</p>
-            </div>
-            <a href="/views/establishments/list.php" class="btn btn-primary">
-                <i class="bi bi-list"></i> View All Establishments
-            </a>
-        </div>
+        <!-- Main Content Area -->
+        <div class="flex-1 flex flex-col overflow-hidden text-sm">
+            <!-- Header -->
+            <header class="bg-white border-b border-slate-200 z-10">
+                <div class="px-6 h-16 flex items-center justify-between">
+                    <div class="flex items-center">
+                        <button class="md:hidden p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none">
+                            <i class="fas fa-bars"></i>
+                        </button>
+                        <h2 class="text-xl font-bold text-slate-800 ml-2 md:ml-0">Compliance Analytics</h2>
+                    </div>
+                    
+                    <div class="flex items-center space-x-4">
+                        <span class="text-sm font-medium text-slate-600">
+                            <i class="fas fa-calendar-alt mr-2"></i> <?= date('F d, Y') ?>
+                        </span>
+                        <div class="h-8 w-px bg-slate-200 mx-2"></div>
+                        <div class="flex items-center">
+                             <span class="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-blue-100 text-blue-800">
+                                <?= strtoupper($_SESSION['role'] ?? 'OFFICER') ?>
+                             </span>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Scrollable Content -->
+            <main class="flex-1 overflow-y-auto p-6 md:p-8">
+                <div class="container-fluid">
+                    <!-- Header -->
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <div>
+                            <h2 class="h3 mb-1"><i class="bi bi-graph-up"></i> Statistics & Performance</h2>
+                            <p class="text-muted mb-0">Live monitoring of establishment compliance</p>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <a href="/dashboard" class="btn btn-outline-secondary">
+                                <i class="bi bi-house"></i> Home
+                            </a>
+                            <a href="/establishments" class="btn btn-primary">
+                                <i class="bi bi-list"></i> View All
+                            </a>
+                        </div>
+                    </div>
 
         <!-- Main Statistics -->
         <div class="row mb-4">
@@ -415,9 +439,19 @@ try {
             </div>
         </div>
     </div>
+</main>
+</div>
+</div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    async function handleLogout() {
+        if (confirm('Are you sure you want to sign out?')) {
+            window.location.href = '/views/auth/logout.php';
+        }
+    }
+    
+    // Original chart scripts
         // Type Distribution Chart
         const typeCtx = document.getElementById('typeChart').getContext('2d');
         const typeChart = new Chart(typeCtx, {
