@@ -36,7 +36,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' || $certificateNumber) {
                 $error = 'Certificate not found. Please check the certificate number.';
             }
             
-        } catch (PDOException $e) {
+        } catch (PDOException $e) 
             error_log("Database error: " . $e->getMessage());
             $error = 'An error occurred while verifying the certificate.';
         }
