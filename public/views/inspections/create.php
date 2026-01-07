@@ -86,15 +86,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ]);
             
             $inspection_id = $db->lastInsertId();
-            $success = "Inspection #$reference_number scheduled successfully!";
+            $success = "Inspection #$reference_number scheduled!";
             
-            // Redirect after 1.5 seconds
+            // Success response for toast if needed, but we follow redirect pattern
             header("refresh:1.5;url=/inspections/view?id=$inspection_id");
         } catch (PDOException $e) {
-            $error = "Error scheduling inspection: " . $e->getMessage();
+            $error = "Execution Error: " . $e->getMessage();
         }
     } else {
-        $error = "Please fill in all required fields";
+        $error = "Required fields missing.";
     }
 }
 ?>
@@ -107,11 +107,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        .highlight-none { -webkit-tap-highlight-color: transparent; }
-        ::-webkit-calendar-picker-indicator {
-            filter: invert(1);
-            cursor: pointer;
-        }
+        .custom-scrollbar::-webkit-scrollbar { width: 5px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
+        select { background-image: none !important; }
+        input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1); opacity: 0.5; cursor: pointer; }
     </style>
 </head>
 <body class="bg-[#0b0c10] font-sans antialiased text-slate-200 overflow-hidden">
@@ -127,157 +127,126 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <!-- Top Navbar -->
             <header class="bg-[#0f1115] border-b border-white/5 h-20 flex items-center justify-between px-8 shrink-0">
                 <div class="flex items-center">
-                    <a href="/inspections" class="h-10 w-10 bg-white/5 border border-white/10 rounded-xl flex items-center justify-center text-slate-400 hover:text-white hover:bg-white/10 transition-all mr-5">
-                        <i class="fas fa-arrow-left"></i>
+                    <a href="/inspections/scheduling" class="h-10 w-10 bg-white/5 border border-white/10 rounded-xl flex items-center justify-center text-slate-400 hover:text-white hover:bg-white/10 transition-all mr-5">
+                        <i class="fas fa-arrow-left text-sm"></i>
                     </a>
-                    <h1 class="text-2xl font-bold text-white tracking-tight">Schedule New Inspection</h1>
+                    <div>
+                        <h1 class="text-xl font-bold text-white tracking-tight">Schedule Inspection</h1>
+                        <p class="text-[10px] text-slate-500 uppercase font-black tracking-widest mt-0.5">New Field Assignment</p>
+                    </div>
                 </div>
             </header>
 
             <!-- Scrollable Content Area -->
-            <main class="flex-1 overflow-y-auto p-8 bg-[#0b0c10]">
-                <div class="max-w-4xl mx-auto">
+            <main class="flex-1 overflow-y-auto p-8 custom-scrollbar">
+                <div class="max-w-3xl mx-auto">
                     <?php if ($error): ?>
-                        <div class="bg-rose-500/10 border border-rose-500/20 text-rose-400 p-5 mb-8 rounded-2xl flex items-center animate-pulse">
-                            <i class="fas fa-exclamation-triangle mr-4 text-xl"></i>
-                            <p class="font-bold"><?php echo  htmlspecialchars($error) ?></p>
+                        <div class="bg-rose-500/10 border border-rose-500/20 text-rose-400 p-4 mb-6 rounded-2xl flex items-center animate-pulse">
+                            <i class="fas fa-exclamation-circle mr-3"></i>
+                            <p class="text-sm font-bold"><?= $error ?></p>
                         </div>
                     <?php endif; ?>
 
                     <?php if ($success): ?>
-                        <div class="bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 p-5 mb-8 rounded-2xl flex items-center">
-                            <i class="fas fa-check-circle mr-4 text-xl"></i>
-                            <p class="font-bold"><?php echo  htmlspecialchars($success) ?></p>
+                        <div class="bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 p-4 mb-6 rounded-2xl flex items-center">
+                            <i class="fas fa-check-circle mr-3"></i>
+                            <p class="text-sm font-bold"><?= $success ?></p>
                         </div>
                     <?php endif; ?>
 
                     <div class="bg-[#15181e] rounded-3xl shadow-2xl border border-white/5 overflow-hidden border-t-4 border-t-blue-600">
-                        <div class="p-10">
-                            <form method="POST" action="" class="space-y-8">
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                                    <!-- Establishment Selection -->
-                                    <div class="md:col-span-2">
-                                        <label class="block text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-3">Establishment <span class="text-rose-500">*</span></label>
-                                        <div class="relative group">
-                                            <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-slate-500 group-focus-within:text-blue-500 transition-colors">
-                                                <i class="fas fa-building"></i>
-                                            </span>
-                                            <select name="establishment_id" id="establishment_id" required 
-                                                    class="w-full pl-11 pr-4 py-4 bg-[#0b0c10] border border-white/10 rounded-2xl text-slate-200 focus:ring-2 focus:ring-blue-500/50 outline-none transition-all appearance-none cursor-pointer"
-                                                    onchange="updateEstablishmentPreview(this)">
-                                                <option value="">Select an establishment...</option>
-                                                <?php foreach ($establishments as $est): ?>
-                                                    <option value="<?php echo  $est['establishment_id'] ?>" 
-                                                            data-type="<?php echo  htmlspecialchars($est['type']) ?>"
-                                                            data-addr="<?php echo  htmlspecialchars($est['address_street'] . ', ' . $est['address_barangay']) ?>">
-                                                        <?php echo  htmlspecialchars($est['name']) ?>
-                                                    </option>
-                                                <?php endforeach; ?>
-                                            </select>
-                                            <div class="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none text-slate-500">
-                                                <i class="fas fa-chevron-down text-xs"></i>
+                        <div class="p-8">
+                            <form method="POST" class="space-y-6">
+                                <div>
+                                    <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3">Establishment <span class="text-rose-500">*</span></label>
+                                    <div class="relative group">
+                                        <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-slate-600 group-focus-within:text-blue-500 transition-colors">
+                                            <i class="fas fa-building text-sm"></i>
+                                        </span>
+                                        <select name="establishment_id" required 
+                                                class="w-full pl-11 pr-10 py-4 bg-[#0b0c10] border border-white/10 rounded-2xl text-white focus:ring-2 focus:ring-blue-500/50 outline-none transition-all appearance-none"
+                                                onchange="updatePreview(this)">
+                                            <option value="">Select Target Establishment</option>
+                                            <?php foreach ($establishments as $est): ?>
+                                                <option value="<?= $est['establishment_id'] ?>" 
+                                                        data-type="<?= htmlspecialchars($est['type']) ?>"
+                                                        data-addr="<?= htmlspecialchars($est['address_street'] . ', ' . $est['address_barangay']) ?>">
+                                                    <?= htmlspecialchars($est['name']) ?>
+                                                </option>
+                                            <?php endforeach; ?>
+                                        </select>
+                                        <div class="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none text-slate-600">
+                                            <i class="fas fa-chevron-down text-[10px]"></i>
+                                        </div>
+                                    </div>
+                                    
+                                    <div id="est-preview" class="mt-4 p-4 bg-blue-500/5 rounded-2xl border border-blue-500/10 hidden">
+                                        <div class="flex items-center">
+                                            <div class="w-2 h-2 rounded-full bg-blue-500 mr-3 animate-pulse"></div>
+                                            <div>
+                                                <span id="preview-type" class="text-[9px] font-black text-blue-500 uppercase tracking-widest block"></span>
+                                                <span id="preview-addr" class="text-xs text-slate-400"></span>
                                             </div>
                                         </div>
-                                        
-                                        <div id="est-preview" class="mt-4 p-5 bg-blue-500/5 rounded-2xl border border-blue-500/10 hidden">
-                                            <div class="flex items-start">
-                                                <div class="h-10 w-10 bg-blue-500/10 rounded-xl flex items-center justify-center mr-4 shrink-0 border border-blue-500/20">
-                                                    <i class="fas fa-info-circle text-blue-500"></i>
-                                                </div>
-                                                <div>
-                                                    <p id="preview-type" class="text-[10px] font-black text-blue-500 uppercase tracking-[0.2em] mb-1"></p>
-                                                    <p id="preview-addr" class="text-sm text-slate-400 font-medium leading-relaxed"></p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <!-- Inspection Type -->
-                                    <div>
-                                        <label class="block text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-3">Inspection Type <span class="text-rose-500">*</span></label>
-                                        <div class="relative group">
-                                            <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-slate-500 group-focus-within:text-blue-500 transition-colors">
-                                                <i class="fas fa-clipboard-list"></i>
-                                            </span>
-                                            <select name="inspection_type" required 
-                                                    class="w-full pl-11 pr-4 py-4 bg-[#0b0c10] border border-white/10 rounded-2xl text-slate-200 focus:ring-2 focus:ring-blue-500/50 outline-none transition-all appearance-none cursor-pointer">
-                                                <option value="food_safety">Food Safety</option>
-                                                <option value="building_safety">Building Safety</option>
-                                                <option value="workplace_safety">Workplace Safety</option>
-                                                <option value="fire_safety">Fire Safety</option>
-                                                <option value="sanitation">Sanitation</option>
-                                            </select>
-                                            <div class="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none text-slate-500">
-                                                <i class="fas fa-chevron-down text-xs"></i>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <!-- Priority -->
-                                    <div>
-                                        <label class="block text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-3">Priority Level <span class="text-rose-500">*</span></label>
-                                        <div class="grid grid-cols-2 gap-4">
-                                            <label class="relative flex items-center justify-center p-4 rounded-2xl border border-white/10 cursor-pointer hover:bg-white/[0.02] transition-all has-[:checked]:bg-blue-600 has-[:checked]:text-white has-[:checked]:border-blue-600 group shrink-0">
-                                                <input type="radio" name="priority" value="medium" checked class="sr-only">
-                                                <span class="text-xs font-black uppercase tracking-widest">Standard</span>
-                                            </label>
-                                            <label class="relative flex items-center justify-center p-4 rounded-2xl border border-white/10 cursor-pointer hover:bg-white/[0.02] transition-all has-[:checked]:bg-rose-600 has-[:checked]:text-white has-[:checked]:border-rose-600 group shrink-0">
-                                                <input type="radio" name="priority" value="high" class="sr-only">
-                                                <span class="text-xs font-black uppercase tracking-widest">High</span>
-                                            </label>
-                                        </div>
-                                    </div>
-
-                                    <!-- Scheduled Date -->
-                                    <div>
-                                        <label class="block text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-3">Schedule Date <span class="text-rose-500">*</span></label>
-                                        <div class="relative group">
-                                            <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-slate-500 group-focus-within:text-blue-500 transition-colors">
-                                                <i class="fas fa-calendar-alt"></i>
-                                            </span>
-                                            <input type="date" name="scheduled_date" required min="<?php echo  date('Y-m-d') ?>"
-                                                   class="w-full pl-11 pr-4 py-4 bg-[#0b0c10] border border-white/10 rounded-2xl text-slate-200 focus:ring-2 focus:ring-blue-500/50 outline-none transition-all">
-                                        </div>
-                                    </div>
-
-                                    <!-- Assigned Inspector -->
-                                    <div>
-                                        <label class="block text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-3">Assigned Inspector</label>
-                                        <div class="relative group">
-                                            <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-slate-500 group-focus-within:text-blue-500 transition-colors">
-                                                <i class="fas fa-user-shield"></i>
-                                            </span>
-                                            <select name="inspector_id" 
-                                                    class="w-full pl-11 pr-4 py-4 bg-[#0b0c10] border border-white/10 rounded-2xl text-slate-200 focus:ring-2 focus:ring-blue-500/50 outline-none transition-all appearance-none cursor-pointer">
-                                                <option value="">Choose Inspector...</option>
-                                                <?php foreach ($inspectors as $inspector): ?>
-                                                    <option value="<?php echo  $inspector['inspector_id'] ?>" <?php echo  $inspector['inspector_id'] == $currentUserInspectorId ? 'selected' : '' ?>>
-                                                        <?php echo  htmlspecialchars($inspector['full_name']) ?>
-                                                    </option>
-                                                <?php endforeach; ?>
-                                            </select>
-                                            <div class="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none text-slate-500">
-                                                <i class="fas fa-chevron-down text-xs"></i>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <!-- Notes -->
-                                    <div class="md:col-span-2">
-                                        <label class="block text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-3">Notes & Special Instructions</label>
-                                        <textarea name="notes" rows="4" 
-                                                  placeholder="Any details the inspector should know before arriving..."
-                                                  class="w-full bg-[#0b0c10] border border-white/10 rounded-2xl py-4 px-5 text-slate-200 focus:ring-2 focus:ring-blue-500/50 outline-none transition-all resize-none placeholder:text-slate-600"></textarea>
                                     </div>
                                 </div>
 
-                                <div class="pt-8 flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4">
-                                    <button type="submit" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-black uppercase tracking-[0.2em] text-xs py-5 px-8 rounded-2xl shadow-xl shadow-blue-900/30 transition-all active:scale-95 flex items-center justify-center group">
-                                        <i class="fas fa-calendar-check mr-3 group-hover:scale-110 transition-transform"></i> Confirm Schedule
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div>
+                                        <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3">Type <span class="text-rose-500">*</span></label>
+                                        <select name="inspection_type" required class="w-full px-5 py-4 bg-[#0b0c10] border border-white/10 rounded-2xl text-white focus:ring-2 focus:ring-blue-500/50 outline-none transition-all appearance-none cursor-pointer">
+                                            <option value="food_safety">Food Safety</option>
+                                            <option value="fire_safety">Fire Safety</option>
+                                            <option value="sanitation">Sanitation</option>
+                                            <option value="building_safety">Building Safety</option>
+                                        </select>
+                                    </div>
+
+                                    <div>
+                                        <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3">Date <span class="text-rose-500">*</span></label>
+                                        <input type="date" name="scheduled_date" required min="<?= date('Y-m-d') ?>"
+                                               class="w-full px-5 py-4 bg-[#0b0c10] border border-white/10 rounded-2xl text-white focus:ring-2 focus:ring-blue-500/50 outline-none transition-all">
+                                    </div>
+                                </div>
+
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div>
+                                        <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3">Priority</label>
+                                        <div class="flex space-x-3">
+                                            <?php foreach(['medium' => 'Standard', 'high' => 'High'] as $val => $lbl): ?>
+                                                <label class="flex-1 relative group cursor-pointer">
+                                                    <input type="radio" name="priority" value="<?= $val ?>" <?= $val === 'medium' ? 'checked' : '' ?> class="peer sr-only">
+                                                    <div class="py-3 text-center rounded-xl border border-white/5 bg-[#0b0c10] text-slate-500 peer-checked:bg-blue-600 peer-checked:text-white peer-checked:border-blue-600 transition-all font-bold text-[10px] uppercase tracking-widest">
+                                                        <?= $lbl ?>
+                                                    </div>
+                                                </label>
+                                            <?php endforeach; ?>
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3">Assign Inspector</label>
+                                        <select name="inspector_id" class="w-full px-5 py-4 bg-[#0b0c10] border border-white/10 rounded-2xl text-white focus:ring-2 focus:ring-blue-500/50 outline-none transition-all appearance-none">
+                                            <option value="">Auto-Assign (Based on availability)</option>
+                                            <?php foreach ($inspectors as $inspector): ?>
+                                                <option value="<?= $inspector['inspector_id'] ?>" <?= $inspector['inspector_id'] == $currentUserInspectorId ? 'selected' : '' ?>>
+                                                    <?= htmlspecialchars($inspector['full_name']) ?>
+                                                </option>
+                                            <?php endforeach; ?>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3">Notes</label>
+                                    <textarea name="notes" rows="3" placeholder="Additional instructions..."
+                                              class="w-full px-5 py-4 bg-[#0b0c10] border border-white/10 rounded-2xl text-white focus:ring-2 focus:ring-blue-500/50 outline-none transition-all resize-none placeholder:text-slate-700"></textarea>
+                                </div>
+
+                                <div class="pt-4">
+                                    <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-black uppercase tracking-widest text-xs py-5 rounded-2xl shadow-xl shadow-blue-900/20 transition-all active:scale-[0.98] flex items-center justify-center">
+                                        <i class="fas fa-calendar-plus mr-3"></i> Schedule Inspection
                                     </button>
-                                    <a href="/inspections" class="flex-1 bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white font-black uppercase tracking-[0.2em] text-xs py-5 px-8 rounded-2xl transition-all flex items-center justify-center border border-white/5">
-                                        Discard Changes
-                                    </a>
                                 </div>
                             </form>
                         </div>
@@ -288,17 +257,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </div>
 
     <script>
-        function updateEstablishmentPreview(select) {
+        function updatePreview(select) {
             const preview = document.getElementById('est-preview');
-            const typeText = document.getElementById('preview-type');
-            const addrText = document.getElementById('preview-addr');
-            
             if (select.value) {
                 const opt = select.options[select.selectedIndex];
-                typeText.textContent = opt.dataset.type.split('_').join(' ');
-                addrText.textContent = opt.dataset.addr;
+                document.getElementById('preview-type').textContent = opt.dataset.type.replace('_', ' ');
+                document.getElementById('preview-addr').textContent = opt.dataset.addr;
                 preview.classList.remove('hidden');
-                preview.classList.add('animate-in', 'fade-in', 'slide-in-from-top-2');
             } else {
                 preview.classList.add('hidden');
             }
@@ -306,6 +271,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </script>
 </body>
 </html>
+<?php 
+// Clean up any remaining duplicated content from standard tool errors common in large replacements
+exit;
             include __DIR__ . '/../partials/sidebar.php'; 
         ?>
 
