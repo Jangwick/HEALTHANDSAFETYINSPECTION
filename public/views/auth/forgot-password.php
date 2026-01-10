@@ -59,7 +59,7 @@
 
                 <!-- Back to Login -->
                 <div class="mt-6 text-center">
-                    <a href="login.php" class="inline-flex items-center text-sm font-medium text-blue-600 hover:text-blue-500 transition duration-150">
+                    <a href="/login" class="inline-flex items-center text-sm font-medium text-blue-600 hover:text-blue-500 transition duration-150">
                         <i class="fas fa-arrow-left mr-2"></i>
                         Back to login
                     </a>

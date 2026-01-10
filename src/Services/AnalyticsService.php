@@ -141,4 +141,81 @@ class AnalyticsService
 
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+
+    /**
+     * Get aggregate compliance status by establishment type
+     */
+    public function getComplianceStatsByType(): array
+    {
+        $stmt = $this->pdo->query("
+            SELECT 
+                type,
+                compliance_status,
+                COUNT(*) as count
+            FROM establishments
+            GROUP BY type, compliance_status
+        ");
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    /**
+     * Get compliance statistics by geographic area (barangay)
+     */
+    public function getComplianceStatsByArea(): array
+    {
+        $stmt = $this->pdo->query("
+            SELECT 
+                address_barangay as barangay,
+                compliance_status,
+                COUNT(*) as count
+            FROM establishments
+            GROUP BY address_barangay, compliance_status
+            ORDER BY count DESC
+        ");
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    /**
+     * Get monthly compliance rate (percentage of compliant establishments)
+     * This relies on inspection history
+     */
+    public function getComplianceTrends(int $months = 6): array
+    {
+        $stmt = $this->pdo->prepare("
+            SELECT 
+                DATE_FORMAT(scheduled_date, '%Y-%m') as month,
+                SUM(CASE WHEN status = 'completed' AND overall_rating IN ('excellent', 'satisfactory') THEN 1 ELSE 0 END) as passed_inspections,
+                COUNT(*) as total_inspections,
+                ROUND(SUM(CASE WHEN status = 'completed' AND overall_rating IN ('excellent', 'satisfactory') THEN 1 ELSE 0 END) * 100.0 / NULLIF(COUNT(*), 0), 2) as compliance_rate
+            FROM inspections
+            WHERE scheduled_date >= DATE_SUB(NOW(), INTERVAL :months MONTH)
+            AND status = 'completed'
+            GROUP BY DATE_FORMAT(scheduled_date, '%Y-%m')
+            ORDER BY month
+        ");
+
+        $stmt->execute(['months' => $months]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    /**
+     * Get violation trends over time
+     */
+    public function getViolationTrends(int $months = 6): array
+    {
+        $stmt = $this->pdo->prepare("
+            SELECT 
+                DATE_FORMAT(reported_at, '%Y-%m') as month,
+                COUNT(*) as count
+            FROM violations
+            WHERE reported_at >= DATE_SUB(NOW(), INTERVAL :months MONTH)
+            GROUP BY DATE_FORMAT(reported_at, '%Y-%m')
+            ORDER BY month
+        ");
+
+        $stmt->execute(['months' => $months]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
 }

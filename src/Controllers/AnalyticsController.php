@@ -64,4 +64,29 @@ class AnalyticsController
             ]
         ]);
     }
+
+    public function violationTrends(): void
+    {
+        $this->roleMiddleware->requirePermission('analytics.read');
+
+        $months = isset($_GET['months']) ? (int)$_GET['months'] : 6;
+        $trends = $this->analyticsService->getViolationTrends($months);
+        
+        Response::success(['trends' => $trends]);
+    }
+
+    public function complianceAnalytics(): void
+    {
+        $this->roleMiddleware->requirePermission('analytics.read');
+
+        $statsByType = $this->analyticsService->getComplianceStatsByType();
+        $statsByArea = $this->analyticsService->getComplianceStatsByArea();
+        $trends = $this->analyticsService->getComplianceTrends();
+
+        Response::success([
+            'by_type' => $statsByType,
+            'by_area' => $statsByArea,
+            'trends' => $trends
+        ]);
+    }
 }

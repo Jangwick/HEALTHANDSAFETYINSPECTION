@@ -61,8 +61,8 @@ $startTime = microtime(true);
 try {
     // API Routes
     if (strpos($requestUri, '/api/') === 0) {
-        // Remove /api/ prefix
-        $route = substr($requestUri, 5);
+        // Remove /api prefix but keep the leading slash for the route
+        $route = substr($requestUri, 4);
         
         // Get request body for POST/PUT/PATCH
         $requestBody = null;

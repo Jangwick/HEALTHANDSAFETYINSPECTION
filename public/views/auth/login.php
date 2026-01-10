@@ -1,7 +1,4 @@
 <?php
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
 
 // Handle login form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -38,7 +35,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_SESSION['logged_in'] = true;
             
             // Redirect to dashboard
-            header('Location: /dashboard.php');
+            header('Location: dashboard');
             exit;
         } else {
             $error = 'Invalid username or password';
@@ -84,7 +81,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <div class="flex items-start">
                         <i class="fas fa-exclamation-circle text-red-500 mt-0.5 mr-3"></i>
                         <div class="flex-1">
-                            <p class="text-sm font-medium text-red-800"><?php echo  htmlspecialchars($error) ?></p>
+                            <p class="text-sm font-medium text-red-800"><?php echo htmlspecialchars($error) ?></p>
                         </div>
                     </div>
                 </div>
@@ -148,7 +145,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         </div>
 
                         <div class="text-sm">
-                            <a href="forgot-password.php" class="font-medium text-blue-600 hover:text-blue-500 transition duration-150">
+                            <a href="/forgot-password" class="font-medium text-blue-600 hover:text-blue-500 transition duration-150">
                                 Forgot password?
                             </a>
                         </div>
@@ -180,7 +177,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 <!-- Register Link -->
                 <div class="mt-6 text-center">
-                    <a href="register.php" class="inline-flex items-center text-sm font-medium text-blue-600 hover:text-blue-500 transition duration-150">
+                    <a href="/register" class="inline-flex items-center text-sm font-medium text-blue-600 hover:text-blue-500 transition duration-150">
                         <i class="fas fa-user-plus mr-2"></i>
                         Request an account
                     </a>

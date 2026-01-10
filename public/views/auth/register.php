@@ -369,7 +369,7 @@
                     
                     // Redirect to login after 2 seconds
                     setTimeout(() => {
-                        window.location.href = 'login.php';
+                        window.location.href = '/login';
                     }, 2000);
                 } else {
                     showAlert(data.error.message, 'error');

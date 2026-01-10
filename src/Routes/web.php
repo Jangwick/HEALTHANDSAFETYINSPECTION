@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+use HealthSafety\Utils\Logger;
+
 /**
  * Web Routes (UI Pages)
  * Health & Safety Inspections System
@@ -16,6 +18,7 @@ $webRoutes = [
     '/' => ['type' => 'public', 'file' => 'dashboard.php'],
     '/dashboard' => ['type' => 'public', 'file' => 'dashboard.php'],
     '/login' => ['type' => 'view', 'file' => 'auth/login.php'],
+    '/views/auth/login.php' => ['type' => 'view', 'file' => 'auth/login.php'],
     '/register' => ['type' => 'view', 'file' => 'auth/register.php'],
     '/forgot-password' => ['type' => 'view', 'file' => 'auth/forgot-password.php'],
     '/inspections' => ['type' => 'view', 'file' => 'inspections/list.php'],
@@ -61,12 +64,12 @@ if (isset($webRoutes[$baseUri])) {
     
     if (file_exists($viewFile)) {
         // Check authentication for protected routes
-        $publicRoutes = ['/login', '/register', '/forgot-password', '/certificates/verify', '/certificates/verify.php'];
+        $publicRoutes = ['/login', '/views/auth/login.php', '/register', '/forgot-password', '/certificates/verify', '/certificates/verify.php'];
         
         if (!in_array($baseUri, $publicRoutes)) {
             // Check if user is logged in
             if (!isset($_SESSION['user_id'])) {
-                header('Location: /login');
+                header('Location: login');
                 exit;
             }
         }

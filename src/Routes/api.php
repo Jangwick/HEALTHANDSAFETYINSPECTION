@@ -68,6 +68,7 @@ $routes = [
     // Analytics
     'GET /v1/analytics/dashboard' => ['AnalyticsController', 'dashboard'],
     'GET /v1/analytics/compliance-report' => ['AnalyticsController', 'complianceReport'],
+    'GET /v1/analytics/compliance-analytics' => ['AnalyticsController', 'complianceAnalytics'],
     'GET /v1/analytics/violation-trends' => ['AnalyticsController', 'violationTrends'],
 ];
 
