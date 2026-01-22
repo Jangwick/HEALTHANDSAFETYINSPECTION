@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 // Session handled by index.php
 if (isset($_SESSION['user_id'])) {
     header('Location: /dashboard');

@@ -1,4 +1,4 @@
-﻿<!-- Institutional Sidebar Navigation -->
+<!-- Institutional Sidebar Navigation -->
 <aside class="w-72 bg-white text-slate-600 flex-shrink-0 hidden md:flex flex-col border-r border-slate-200 shadow-sm z-30">
     
     <!-- Institutional Branding -->
