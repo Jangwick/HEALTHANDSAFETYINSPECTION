@@ -139,15 +139,21 @@
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-10">
                         <!-- Inspection Trends -->
                         <div class="bg-[#15181e] p-7 rounded-3xl border border-white/5 shadow-xl">
-                            <h3 class="text-lg font-semibold text-gray-900 mb-4">Inspection Trends</h3>
-                            <canvas id="inspectionTrendsChart"></canvas>
+                            <h3 class="text-xs font-black text-slate-500 uppercase tracking-widest mb-4">Inspection Trends</h3>
+                            <div class="h-[300px] relative">
+                                <canvas id="inspectionTrendsChart"></canvas>
+                            </div>
                         </div>
 
                         <!-- Violation Categories -->
                         <div class="bg-[#15181e] p-7 rounded-3xl border border-white/5 shadow-xl">
-                            <h3 class="text-lg font-semibold text-gray-900 mb-4">Violation Categories</h3>
-                            <canvas id="violationCategoriesChart"></canvas>
+                            <h3 class="text-xs font-black text-slate-500 uppercase tracking-widest mb-4">Violation Categories</h3>
+                            <div class="h-[300px] relative">
+                                <canvas id="violationCategoriesChart"></canvas>
+                            </div>
                         </div>
+                    </div>
+
                     <!-- Recent Inspections -->
                     <div class="bg-[#15181e] rounded-3xl border border-white/5 shadow-xl overflow-hidden mt-8">
                         <div class="px-8 py-6 border-b border-white/5 bg-white/[0.02] flex justify-between items-center">
@@ -216,7 +222,7 @@
                         labels: ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN'],
                         datasets: [{
                             label: 'Inspections',
-                            data: [45, 52, 48, 61, 58, 67],
+                            data: [45, 52, 58, 62, 68, 75],
                             borderColor: '#3b82f6',
                             backgroundColor: 'rgba(59, 130, 246, 0.1)',
                             borderWidth: 3,
@@ -273,8 +279,8 @@
                                     usePointStyle: true,
                                     pointStyle: 'circle',
                                     font: { size: 10, weight: '900' },
-                                    generateLabels: (chart) => {
-                                        const original = Chart.overrides.doughnut.plugins.legend.labels.generateLabels;
+                                    generateLabels: function(chart) {
+                                        const original = Chart.defaults.plugins.legend.labels.generateLabels;
                                         const labels = original.call(this, chart);
                                         return labels.map(label => ({ ...label, text: label.text.toUpperCase() }));
                                     }
