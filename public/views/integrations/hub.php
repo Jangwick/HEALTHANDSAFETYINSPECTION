@@ -67,34 +67,42 @@ $recent_alerts = [
         ?>
 
         <!-- Main Content -->
-        <div class="flex-1 flex flex-col min-w-0 bg-slate-50 relative">
+        <!-- Main Content -->
+        <div class="flex-1 flex flex-col min-w-0 overflow-hidden bg-slate-50">
             <!-- Institutional Header -->
-            <header class="h-20 bg-white border-b border-slate-200 flex items-center justify-between px-10 shrink-0 z-20">
+            <header class="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-10 shrink-0 z-20">
                 <div class="flex items-center space-x-4">
-                    <div class="w-10 h-10 bg-blue-700 rounded-xl flex items-center justify-center shadow-lg shadow-blue-900/20 -rotate-3">
-                        <i class="fas fa-hubspot text-white text-lg"></i>
-                    </div>
-                    <div>
-                        <h1 class="text-sm font-black text-slate-900 tracking-tighter uppercase italic leading-none">Interoperability Hub</h1>
-                        <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-1">Cross-Agency Cluster Data Exchange</p>
+                    <div class="w-1.5 h-6 bg-blue-600 rounded-full"></div>
+                    <h1 class="text-xl font-bold tracking-tight text-slate-800">Integration Hub</h1>
+                    <div class="px-3 py-1 bg-blue-50 border border-blue-100 rounded-full">
+                        <span class="text-[10px] font-bold text-blue-600 uppercase tracking-widest leading-none">Interoperability</span>
                     </div>
                 </div>
 
                 <div class="flex items-center space-x-6">
                     <div class="hidden md:flex flex-col items-end mr-4">
-                        <span class="text-[10px] font-black text-slate-900 uppercase italic leading-none">Cluster Hub Controller</span>
-                        <span class="text-[8px] font-bold text-blue-600 uppercase tracking-[0.2em] mt-1 italic">Inter-Agency Liaison</span>
+                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Gateway Context</span>
+                        <span class="text-sm font-bold text-slate-900 leading-none mt-1 uppercase">Inter-Agency Liaison</span>
                     </div>
-                    <button onclick="location.reload()" class="h-11 px-6 bg-white border border-slate-200 hover:border-blue-700 text-slate-600 hover:text-blue-700 font-black text-[10px] uppercase tracking-widest rounded-xl transition-all shadow-sm flex items-center gap-3 group active:scale-95">
-                        <i class="fas fa-sync-alt group-hover:rotate-180 transition-transform duration-700"></i>
+                    <button onclick="location.reload()" class="bg-white border border-slate-200 hover:border-blue-600 text-slate-600 hover:text-blue-600 px-5 py-2.5 rounded-xl text-xs font-bold transition-all shadow-sm flex items-center gap-3 active:scale-95 group">
+                        <i class="fas fa-sync-alt group-hover:rotate-180 transition-transform duration-700 text-[10px]"></i>
                         Execute Global Sync
                     </button>
                 </div>
             </header>
 
             <!-- Scrollable Content -->
-            <main class="flex-1 overflow-y-auto p-10">
-                
+            <main class="flex-1 overflow-y-auto bg-[#f8fafc] p-10">
+                <div class="max-w-7xl mx-auto space-y-10">
+                    
+                    <!-- Page Intro -->
+                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                        <div>
+                            <h2 class="text-3xl font-black text-slate-900 tracking-tight">Inter-Agency Hub</h2>
+                            <p class="text-slate-500 mt-2 font-medium">Central gateway for institutional synchronization with public safety and licensing agencies.</p>
+                        </div>
+                    </div>
+
                 <!-- Institutional Intelligence Brief -->
                 <div class="mb-10 bg-blue-700 rounded-[2.5rem] shadow-2xl shadow-blue-900/20 p-10 text-white relative overflow-hidden">
                     <div class="absolute top-0 right-0 w-96 h-96 bg-white/5 rounded-full -mr-48 -mt-48 blur-3xl"></div>
@@ -213,6 +221,7 @@ $recent_alerts = [
                             </div>
                         </div>
                     </div>
+                </div>
                 </div>
             </main>
         </div>

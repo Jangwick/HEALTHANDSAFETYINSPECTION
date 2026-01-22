@@ -102,28 +102,40 @@ try {
         ?>
 
         <!-- Main Content Area -->
-        <div class="flex-1 flex flex-col min-w-0 overflow-hidden text-base">
+        <div class="flex-1 flex flex-col min-w-0 overflow-hidden bg-slate-50">
             <!-- Institutional Header -->
-            <header class="bg-white border-b border-slate-200 h-16 flex items-center justify-between px-8 shrink-0 z-10">
+            <header class="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-10 shrink-0 z-20">
                 <div class="flex items-center space-x-4">
-                    <a href="/inspections" class="text-slate-400 hover:text-slate-600 transition-colors">
-                        <i class="fas fa-arrow-left"></i>
-                    </a>
-                    <h1 class="text-sm font-bold text-slate-800 tracking-tight uppercase">Audit Dossier</h1>
-                    <div class="h-4 w-px bg-slate-200"></div>
-                    <span class="text-[10px] font-bold text-blue-700 uppercase tracking-widest italic">Reference #<?= htmlspecialchars($inspection['reference_number']) ?></span>
+                    <div class="w-1.5 h-6 bg-blue-600 rounded-full"></div>
+                    <h1 class="text-xl font-bold tracking-tight text-slate-800">Inspection Dossier</h1>
+                    <div class="px-3 py-1 bg-blue-50 border border-blue-100 rounded-full">
+                        <span class="text-[10px] font-bold text-blue-600 uppercase tracking-widest leading-none">Audit Record</span>
+                    </div>
                 </div>
-                <div class="flex items-center space-x-3">
+                <div class="flex items-center gap-4">
                     <?php if ($inspection['status'] === 'completed'): ?>
-                        <button class="bg-blue-700 hover:bg-blue-800 text-white px-4 py-2 rounded-lg text-xs font-bold transition-all shadow-sm">
-                            <i class="fas fa-print mr-2 opacity-70"></i> Official Report
+                        <button class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl text-xs font-bold transition-all shadow-lg shadow-blue-500/20 flex items-center">
+                            <i class="fas fa-print mr-2 text-[10px] opacity-70"></i>
+                            Official Report
                         </button>
                     <?php endif; ?>
                 </div>
             </header>
 
             <!-- Scrollable Content -->
-            <main class="flex-1 overflow-y-auto p-8 bg-slate-50">
+            <main class="flex-1 overflow-y-auto bg-[#f8fafc] p-10 font-sans">
+                <div class="max-w-7xl mx-auto space-y-8">
+                    <!-- Page Intro -->
+                    <div class="flex items-end justify-between">
+                        <div>
+                            <h2 class="text-3xl font-black text-slate-900 tracking-tight leading-none">Audit Specification</h2>
+                            <p class="text-slate-500 mt-3 font-medium">Validation record for <span class="text-slate-900 font-bold underline decoration-blue-200"><?= htmlspecialchars($inspection['establishment_name']) ?></span> — Reference ID: <?= htmlspecialchars($inspection['reference_number']) ?>.</p>
+                        </div>
+                        <a href="/inspections" class="flex items-center gap-2 px-4 py-2.5 bg-white border border-slate-200 text-slate-600 rounded-xl text-sm font-bold hover:bg-slate-50 transition-all shadow-sm">
+                            <i class="fas fa-arrow-left opacity-50"></i>
+                            Back to Registry
+                        </a>
+                    </div>
                 <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
                     <!-- Column 1: Core Audit Parameters -->
                     <div class="lg:col-span-3 space-y-8">
@@ -284,6 +296,7 @@ try {
                         </div>
                     </div>
                 </div>
+            </div>
             </main>
         </div>
     </div>

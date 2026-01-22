@@ -34,7 +34,7 @@
         </p>
 
         <div class="flex flex-col items-center gap-4">
-            <a href="/public/dashboard.php" class="inline-flex items-center gap-3 px-8 py-4 bg-blue-700 hover:bg-blue-800 text-white font-black text-[10px] uppercase tracking-[0.2em] rounded-2xl transition-all shadow-xl shadow-blue-900/10 active:scale-95">
+            <a href="/dashboard" class="inline-flex items-center gap-3 px-8 py-4 bg-blue-700 hover:bg-blue-800 text-white font-black text-[10px] uppercase tracking-[0.2em] rounded-2xl transition-all shadow-xl shadow-blue-900/10 active:scale-95">
                 <i class="fas fa-home"></i>
                 Return to Command Dashboard
             </a>

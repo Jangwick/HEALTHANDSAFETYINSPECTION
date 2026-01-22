@@ -75,17 +75,13 @@
             </header>
 
             <!-- Scrollable Content -->
-            <main class="flex-1 overflow-y-auto p-8 bg-slate-50">
-                <div class="max-w-7xl mx-auto">
+            <main class="flex-1 overflow-y-auto bg-[#f8fafc] p-10 font-sans">
+                <div class="max-w-7xl mx-auto space-y-8">
                     <!-- Statistics Header -->
-                    <div class="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
                         <div>
-                            <h1 class="text-2xl font-bold text-slate-900 tracking-tight">System Operational Status</h1>
-                            <p class="text-sm text-slate-500 font-medium mt-1">Personnel and inspection metrics for the current fiscal period.</p>
-                        </div>
-                        <div class="flex items-center bg-white border border-slate-200 rounded-lg p-1 shadow-sm">
-                            <span class="px-4 py-1.5 text-xs font-bold text-blue-700 bg-blue-50 rounded-md">Live Statistics</span>
-                            <span class="px-4 py-1.5 text-xs font-semibold text-slate-500">Last Sync: Just Now</span>
+                            <h1 class="text-3xl font-black text-slate-900 tracking-tight">System Oversight</h1>
+                            <p class="text-slate-500 mt-2 font-medium">Personnel and inspection metrics for the current fiscal period.</p>
                         </div>
                     </div>
 

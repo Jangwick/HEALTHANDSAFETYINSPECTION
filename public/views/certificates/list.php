@@ -113,14 +113,12 @@ try {
         <!-- Main Content -->
         <div class="flex-1 flex flex-col min-w-0 overflow-hidden bg-slate-50">
             <!-- Institutional Header -->
-            <header class="bg-white border-b border-slate-200 h-20 flex items-center justify-between px-10 shrink-0 z-20">
+            <header class="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-10 shrink-0 z-20">
                 <div class="flex items-center space-x-4">
-                    <div class="bg-blue-50 p-2.5 rounded-xl border border-blue-100">
-                        <i class="fas fa-stamp text-blue-600"></i>
-                    </div>
-                    <div>
-                        <h1 class="text-sm font-bold text-slate-900 tracking-tight uppercase">Certification Registry</h1>
-                        <p class="text-[10px] font-medium text-slate-400 uppercase tracking-widest mt-0.5">Authorization Compliance Logs</p>
+                    <div class="w-1.5 h-6 bg-blue-600 rounded-full"></div>
+                    <h1 class="text-xl font-bold tracking-tight text-slate-800">Compliance Certification</h1>
+                    <div class="px-3 py-1 bg-blue-50 border border-blue-100 rounded-full">
+                        <span class="text-[10px] font-bold text-blue-600 uppercase tracking-widest leading-none">Security Ledger</span>
                     </div>
                 </div>
                 <div class="flex items-center space-x-6 text-base">
@@ -138,9 +136,17 @@ try {
             </header>
 
             <!-- Scrollable Content -->
-            <main class="flex-1 overflow-y-auto p-10">
+            <main class="flex-1 overflow-y-auto bg-[#f8fafc] p-10">
                 <div class="max-w-7xl mx-auto space-y-8">
                     
+                    <!-- Page Intro -->
+                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                        <div>
+                            <h2 class="text-3xl font-black text-slate-900 tracking-tight">Certification Index</h2>
+                            <p class="text-slate-500 mt-2 font-medium">Operational protocol for automated verification and issuance of compliance status.</p>
+                        </div>
+                    </div>
+
                     <!-- Search & Filter Parameters -->
                     <div class="card p-6">
                         <form method="GET" class="grid grid-cols-1 md:grid-cols-4 gap-6">

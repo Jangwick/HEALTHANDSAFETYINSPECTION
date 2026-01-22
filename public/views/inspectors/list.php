@@ -47,33 +47,40 @@ $inspectors = $inspectorService->listInspectors(1, 100)['data'];
         <!-- Main Content -->
         <div class="flex-1 flex flex-col min-w-0 bg-slate-50 relative">
             <!-- Institutional Header -->
-            <header class="h-20 bg-white border-b border-slate-200 flex items-center justify-between px-10 shrink-0 z-20">
+            <header class="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-10 shrink-0 z-20">
                 <div class="flex items-center space-x-4">
-                    <div class="w-10 h-10 bg-blue-700 rounded-xl flex items-center justify-center shadow-lg shadow-blue-900/20 rotate-3">
-                        <i class="fas fa-user-shield text-white text-lg"></i>
-                    </div>
-                    <div>
-                        <h1 class="text-sm font-black text-slate-900 tracking-tighter uppercase italic leading-none">Personnel Registry</h1>
-                        <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-1">Official Inspector Dossier Management</p>
+                    <div class="w-1.5 h-6 bg-blue-600 rounded-full"></div>
+                    <h1 class="text-xl font-bold tracking-tight text-slate-800">Inspector Personnel</h1>
+                    <div class="px-3 py-1 bg-blue-50 border border-blue-100 rounded-full">
+                        <span class="text-[10px] font-bold text-blue-600 uppercase tracking-widest leading-none">Security Registry</span>
                     </div>
                 </div>
 
                 <div class="flex items-center space-x-6">
                     <div class="hidden md:flex flex-col items-end mr-4">
-                        <span class="text-[10px] font-black text-slate-900 uppercase italic leading-none"><?= $_SESSION['username'] ?? 'OPERATOR' ?></span>
-                        <span class="text-[8px] font-bold text-blue-600 uppercase tracking-[0.2em] mt-1 italic">Registry Officer</span>
+                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Operator Context</span>
+                        <span class="text-sm font-bold text-slate-900 leading-none mt-1 uppercase"><?= $_SESSION['role'] ?? 'OFFICER' ?></span>
                     </div>
-                    <button onclick="openRegistration()" class="h-11 px-6 bg-blue-700 hover:bg-blue-800 text-white font-black text-[10px] uppercase tracking-widest rounded-xl transition-all shadow-lg shadow-blue-900/10 flex items-center gap-3 group active:scale-95">
-                        <i class="fas fa-plus group-hover:rotate-90 transition-transform"></i>
+                    <button onclick="openRegistration()" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl text-xs font-bold transition-all shadow-lg shadow-blue-500/20 flex items-center gap-3 active:scale-95 group">
+                        <i class="fas fa-plus group-hover:rotate-90 transition-transform text-[10px]"></i>
                         Enlist Personnel
                     </button>
                 </div>
             </header>
 
             <!-- Scrollable Content -->
-            <main class="flex-1 overflow-y-auto p-10">
-                
-                <!-- Compliance Horizon (Expiring Certifications) -->
+            <main class="flex-1 overflow-y-auto bg-[#f8fafc] p-10">
+                <div class="max-w-7xl mx-auto space-y-10">
+                    
+                    <!-- Page Intro -->
+                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                        <div>
+                            <h2 class="text-3xl font-black text-slate-900 tracking-tight">Personnel Dossier</h2>
+                            <p class="text-slate-500 mt-2 font-medium">Institutional registry of authorized field inspectors and certification compliance monitoring.</p>
+                        </div>
+                    </div>
+
+                    <!-- Compliance Horizon (Expiring Certifications) -->
                 <?php if (!empty($expiringCerts)): ?>
                 <div class="mb-10 bg-white rounded-[2rem] border border-rose-100 shadow-xl shadow-rose-900/5 p-8 relative overflow-hidden">
                     <div class="absolute -top-10 -right-10 w-40 h-40 bg-rose-50 rounded-full blur-3xl opacity-50"></div>
@@ -181,6 +188,7 @@ $inspectors = $inspectorService->listInspectors(1, 100)['data'];
                             </tbody>
                         </table>
                     </div>
+                </div>
                 </div>
             </main>
         </div>

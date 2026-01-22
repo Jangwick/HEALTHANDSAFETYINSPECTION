@@ -102,28 +102,34 @@ $violations = $stmt->fetchAll(PDO::FETCH_ASSOC);
         <!-- Main Content Area -->
         <div class="flex-1 flex flex-col min-w-0 overflow-hidden bg-slate-50">
             <!-- Institutional Header -->
-            <header class="bg-white border-b border-slate-200 h-20 flex items-center justify-between px-10 shrink-0 z-20">
+            <header class="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-10 shrink-0 z-20">
                 <div class="flex items-center space-x-4">
-                    <div class="bg-rose-50 p-2.5 rounded-xl border border-rose-100">
-                        <i class="fas fa-skull-crossbones text-rose-600"></i>
-                    </div>
-                    <div>
-                        <h1 class="text-sm font-bold text-slate-900 tracking-tight uppercase">Violations Registry</h1>
-                        <p class="text-[10px] font-medium text-slate-400 uppercase tracking-widest mt-0.5">Penalty and Citation Ledger</p>
+                    <div class="w-1.5 h-6 bg-blue-600 rounded-full"></div>
+                    <h1 class="text-xl font-bold tracking-tight text-slate-800">Violation Enforcement</h1>
+                    <div class="px-3 py-1 bg-blue-50 border border-blue-100 rounded-full">
+                        <span class="text-[10px] font-bold text-blue-600 uppercase tracking-widest leading-none">Security Protocol</span>
                     </div>
                 </div>
                 <div class="flex items-center space-x-6">
                     <div class="flex flex-col items-end">
                         <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Active Citations</span>
-                        <span class="text-lg font-bold text-slate-900 leading-none mt-1"><?= number_format($totalViolations) ?></span>
+                        <span class="text-sm font-bold text-slate-900 leading-none mt-1"><?= number_format($totalViolations) ?></span>
                     </div>
                 </div>
             </header>
 
             <!-- Scrollable Content -->
-            <main class="flex-1 overflow-y-auto p-10">
+            <main class="flex-1 overflow-y-auto bg-[#f8fafc] p-10">
                 <div class="max-w-7xl mx-auto space-y-8">
                     
+                    <!-- Page Intro -->
+                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                        <div>
+                            <h2 class="text-3xl font-black text-slate-900 tracking-tight">Violation Ledger</h2>
+                            <p class="text-slate-500 mt-2 font-medium">Registry of identified safety breaches and historical corrective action protocols.</p>
+                        </div>
+                    </div>
+
                     <!-- Search & Filtering Protocol -->
                     <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
                         <form method="GET" class="grid grid-cols-1 md:grid-cols-4 gap-6">

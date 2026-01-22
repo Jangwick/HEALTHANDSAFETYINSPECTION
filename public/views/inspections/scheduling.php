@@ -98,24 +98,35 @@ $overdueInspections = $stmt->fetchAll(PDO::FETCH_ASSOC);
         ?>
 
         <!-- Main Content -->
-        <div class="flex-1 flex flex-col min-w-0 overflow-hidden text-base">
+        <div class="flex-1 flex flex-col min-w-0 overflow-hidden bg-slate-50">
             <!-- Institutional Header -->
-            <header class="bg-white border-b border-slate-200 h-16 flex items-center justify-between px-8 shrink-0 z-10">
+            <header class="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-10 shrink-0 z-20">
                 <div class="flex items-center space-x-4">
-                    <h1 class="text-sm font-bold text-slate-800 tracking-tight uppercase">Deployment & Scheduling</h1>
-                    <div class="h-4 w-px bg-slate-200"></div>
-                    <span class="text-[10px] font-bold text-blue-700 uppercase tracking-widest italic">Institutional Registry</span>
+                    <div class="w-1.5 h-6 bg-blue-600 rounded-full"></div>
+                    <h1 class="text-xl font-bold tracking-tight text-slate-800">Deployment & Scheduling</h1>
+                    <div class="px-3 py-1 bg-blue-50 border border-blue-100 rounded-full">
+                        <span class="text-[10px] font-bold text-blue-600 uppercase tracking-widest leading-none">Resource Allocation</span>
+                    </div>
                 </div>
-                <div class="flex items-center space-x-3">
-                    <a href="/inspections/create" class="bg-blue-700 hover:bg-blue-800 text-white px-5 py-2 rounded-lg text-xs font-bold uppercase tracking-widest flex items-center shadow-md transition-all active:scale-95">
-                        <i class="fas fa-calendar-plus mr-2 text-[10px]"></i> Create Assignment
+                <div class="flex items-center gap-4">
+                    <a href="/inspections/create" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl text-xs font-bold transition-all shadow-lg shadow-blue-500/20 flex items-center">
+                        <i class="fas fa-calendar-plus mr-2 text-[10px]"></i>
+                        Create Assignment
                     </a>
                 </div>
             </header>
 
             <!-- Main Scrollable Area -->
-            <main class="flex-1 overflow-y-auto p-8">
+            <main class="flex-1 overflow-y-auto bg-[#f8fafc] p-10">
                 <div class="max-w-7xl mx-auto space-y-8">
+                    
+                    <!-- Page Intro -->
+                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                        <div>
+                            <h2 class="text-3xl font-black text-slate-900 tracking-tight">Scheduling Matrix</h2>
+                            <p class="text-slate-500 mt-2 font-medium italic">Real-time inspection assignments and protocol distribution metrics.</p>
+                        </div>
+                    </div>
                     
                     <!-- Performance & Assignment Matrix -->
                     <div class="grid grid-cols-1 md:grid-cols-4 gap-6">

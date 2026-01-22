@@ -124,21 +124,38 @@ try {
         ?>
 
         <!-- Main Content -->
-        <div class="flex-1 flex flex-col min-w-0">
-            <!-- Top Navbar -->
-            <header class="bg-white border-b border-slate-200 h-16 flex items-center justify-between px-8 shrink-0 z-10">
-                <h1 class="text-sm font-bold text-slate-700 tracking-tight">Establishment Registry</h1>
-                <div class="flex items-center space-x-3">
-                    <a href="/establishments/create" class="bg-blue-700 hover:bg-blue-800 text-white px-4 py-2 rounded-lg text-xs font-bold flex items-center shadow-sm transition-all active:scale-95">
-                        <i class="fas fa-plus mr-2 text-[10px]"></i> Register Establishment
+        <div class="flex-1 flex flex-col min-w-0 overflow-hidden bg-slate-50">
+            <!-- Institutional Header -->
+            <header class="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-10 shrink-0 z-20">
+                <div class="flex items-center space-x-4">
+                    <div class="w-1.5 h-6 bg-blue-600 rounded-full"></div>
+                    <h1 class="text-xl font-bold tracking-tight text-slate-800">Establishment Registry</h1>
+                    <div class="px-3 py-1 bg-blue-50 border border-blue-100 rounded-full">
+                        <span class="text-[10px] font-bold text-blue-600 uppercase tracking-widest leading-none">Entity Management</span>
+                    </div>
+                </div>
+                <div class="flex items-center gap-4">
+                    <a href="/establishments/create" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl text-xs font-bold transition-all shadow-lg shadow-blue-500/20 flex items-center">
+                        <i class="fas fa-plus mr-2 text-[10px]"></i>
+                        Register Entity
                     </a>
                 </div>
             </header>
 
             <!-- Scrollable Content Area -->
-            <main class="flex-1 overflow-y-auto p-8 bg-slate-50">
-                <!-- Administrative Stats -->
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+            <main class="flex-1 overflow-y-auto bg-[#f8fafc] p-10">
+                <div class="max-w-7xl mx-auto space-y-8">
+                    
+                    <!-- Page Intro -->
+                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                        <div>
+                            <h2 class="text-3xl font-black text-slate-900 tracking-tight">Institutional Entity Index</h2>
+                            <p class="text-slate-500 mt-2 font-medium">Management of commercial and public establishments subject to safety auditing.</p>
+                        </div>
+                    </div>
+
+                    <!-- Administrative Stats -->
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
                     <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
                         <div class="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Total Registered</div>
                         <div class="text-2xl font-bold text-slate-900"><?php echo number_format((float)($stats['total'] ?? 0)) ?></div>
@@ -306,6 +323,7 @@ try {
                         </div>
                     <?php endif; ?>
                 </div>
+            </div>
             </main>
         </div>
     </div>

@@ -104,25 +104,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         ?>
 
         <!-- Main Content Area -->
-        <div class="flex-1 flex flex-col min-w-0 overflow-hidden text-base">
+        <div class="flex-1 flex flex-col min-w-0 overflow-hidden bg-slate-50">
             <!-- Institutional Header -->
-            <header class="bg-white border-b border-slate-200 h-16 flex items-center justify-between px-8 shrink-0 z-10">
+            <header class="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-10 shrink-0 z-20">
                 <div class="flex items-center space-x-4">
-                    <a href="/establishments" class="text-slate-400 hover:text-slate-600 transition-colors">
-                        <i class="fas fa-arrow-left"></i>
-                    </a>
-                    <h1 class="text-sm font-bold text-slate-800 tracking-tight uppercase">Institutional Registry</h1>
-                    <div class="h-4 w-px bg-slate-200"></div>
-                    <span class="text-[10px] font-bold text-blue-700 uppercase tracking-widest italic">New Entity Registration</span>
+                    <div class="w-1.5 h-6 bg-blue-600 rounded-full"></div>
+                    <h1 class="text-xl font-bold tracking-tight text-slate-800">Establishment Registration</h1>
+                    <div class="px-3 py-1 bg-blue-50 border border-blue-100 rounded-full">
+                        <span class="text-[10px] font-bold text-blue-600 uppercase tracking-widest leading-none">Entity Protocol</span>
+                    </div>
                 </div>
-                <div class="flex items-center space-x-3 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-                    <i class="fas fa-calendar-alt mr-2"></i> <?= date('M d, Y') ?>
+                <div class="flex items-center gap-4">
+                    <a href="/establishments" class="flex items-center gap-2 px-4 py-2.5 bg-white border border-slate-200 text-slate-600 rounded-xl text-sm font-bold hover:bg-slate-50 transition-all shadow-sm">
+                        <i class="fas fa-arrow-left opacity-50"></i>
+                        Back to Registry
+                    </a>
                 </div>
             </header>
 
             <!-- Scrollable Content -->
-            <main class="flex-1 overflow-y-auto p-8 bg-slate-50">
-                <div class="max-w-4xl mx-auto">
+            <main class="flex-1 overflow-y-auto bg-[#f8fafc] p-10 font-sans">
+                <div class="max-w-4xl mx-auto space-y-8">
+                    <!-- Page Intro -->
+                    <div>
+                        <h2 class="text-3xl font-black text-slate-900 tracking-tight">Register New Entity</h2>
+                        <p class="text-slate-500 mt-2 font-medium">Provision new commercial or public institutional records into the master registry.</p>
+                    </div>
+
                     <?php if (!empty($error)): ?>
                         <div class="mb-8 p-4 bg-rose-50 border border-rose-100 rounded-xl flex items-center text-rose-700 text-xs font-bold uppercase tracking-wider">
                             <i class="fas fa-exclamation-circle mr-3"></i> <?= htmlspecialchars($error) ?>

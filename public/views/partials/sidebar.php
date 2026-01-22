@@ -76,22 +76,27 @@
     </nav>
 
     <!-- Personnel Authentication Context -->
-    <div class="px-4 py-6 bg-white border-t border-slate-100">
-        <div class="p-4 bg-slate-50 rounded-2xl border border-slate-100 mb-4 transition-all hover:border-slate-200 shadow-sm">
+    <div class="px-5 py-6 bg-white border-t border-slate-100">
+        <div class="p-4 bg-slate-50 rounded-2xl border border-slate-100 mb-4 transition-all hover:border-slate-200 shadow-sm overflow-hidden group">
             <div class="flex items-center">
                 <div class="relative shrink-0">
-                    <img class="h-10 w-10 rounded-xl border border-white shadow-sm" 
-                         src="https://ui-avatars.com/api/?name=<?php echo urlencode($_SESSION['username'] ?? 'User'); ?>&background=1d4ed8&color=fff&bold=true" alt="Avatar">
-                    <span class="absolute -top-0.5 -right-0.5 h-3 w-3 bg-emerald-500 border-2 border-white rounded-full"></span>
+                    <div class="h-10 w-10 rounded-xl bg-blue-600 flex items-center justify-center text-white text-xs font-black shadow-lg shadow-blue-500/20 group-hover:scale-110 transition-transform duration-300">
+                        <?php 
+                            $nameParts = explode(' ', $_SESSION['username'] ?? 'Personnel');
+                            $initials = (isset($nameParts[0][0]) ? $nameParts[0][0] : '') . (isset($nameParts[1][0]) ? $nameParts[1][0] : '');
+                            echo strtoupper($initials ?: 'AD'); 
+                        ?>
+                    </div>
+                    <span class="absolute -top-1 -right-1 h-3.5 w-3.5 bg-emerald-500 border-2 border-white rounded-full"></span>
                 </div>
                 <div class="ml-3 overflow-hidden">
-                    <p class="text-[12px] font-bold text-slate-900 truncate"><?php echo htmlspecialchars($_SESSION['username'] ?? 'Personnel'); ?></p>
-                    <p class="text-[10px] text-slate-500 font-medium truncate uppercase tracking-tight mt-0.5"><?php echo htmlspecialchars($_SESSION['role'] ?? 'Authorized'); ?></p>
+                    <p class="text-[13px] font-bold text-slate-900 truncate leading-tight"><?php echo htmlspecialchars($_SESSION['username'] ?? 'Personnel'); ?></p>
+                    <p class="text-[9px] text-slate-400 font-bold truncate uppercase tracking-widest mt-0.5"><?php echo htmlspecialchars($_SESSION['role'] ?? 'Authorized'); ?></p>
                 </div>
             </div>
         </div>
-        <a href="/logout" class="flex items-center justify-center gap-3 w-full h-11 text-xs font-bold text-slate-500 hover:text-rose-600 border border-slate-100 rounded-xl transition-all hover:bg-rose-50 hover:border-rose-100 shadow-sm">
-            <i class="fas fa-power-off text-sm opacity-60"></i>
+        <a href="/logout" class="flex items-center justify-center gap-3 w-full h-11 text-xs font-bold text-slate-400 hover:text-rose-600 border border-slate-100 rounded-xl transition-all hover:bg-rose-50 hover:border-rose-100 hover:shadow-sm">
+            <i class="fas fa-power-off text-sm opacity-40 group-hover:animate-pulse"></i>
             Sign Out
         </a>
     </div>

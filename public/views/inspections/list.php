@@ -101,25 +101,42 @@ $inspections = $stmt->fetchAll(PDO::FETCH_ASSOC);
         ?>
 
         <!-- Main Content -->
-        <div class="flex-1 flex flex-col min-w-0 overflow-hidden">
-            <!-- Top Navbar -->
-            <header class="bg-white border-b border-slate-200 h-16 flex items-center justify-between px-8 z-10 shrink-0">
-                <h1 class="text-sm font-bold text-slate-700 tracking-tight">Inspection Management</h1>
-                <div class="flex items-center space-x-3">
+        <div class="flex-1 flex flex-col min-w-0 overflow-hidden bg-slate-50">
+            <!-- Institutional Header -->
+            <header class="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-10 shrink-0 z-20">
+                <div class="flex items-center space-x-4">
+                    <div class="w-1.5 h-6 bg-blue-600 rounded-full"></div>
+                    <h1 class="text-xl font-bold tracking-tight text-slate-800">Inspection Management</h1>
+                    <div class="px-3 py-1 bg-blue-50 border border-blue-100 rounded-full">
+                        <span class="text-[10px] font-bold text-blue-600 uppercase tracking-widest leading-none">Operational Registry</span>
+                    </div>
+                </div>
+                <div class="flex items-center gap-4">
                     <button id="aiPrioritizeBtn"
-                       class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 px-4 py-2 rounded-lg text-xs font-bold flex items-center border border-indigo-200 transition-all active:scale-95 group">
-                        <i class="fas fa-microchip mr-2"></i> AI Insights
+                       class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 px-4 py-2.5 rounded-xl text-xs font-bold flex items-center border border-indigo-200 transition-all active:scale-95 group">
+                        <i class="fas fa-microchip mr-2 text-[10px]"></i> AI Insights
                     </button>
-                    <a href="/inspections/create" class="bg-blue-700 hover:bg-blue-800 text-white px-4 py-2 rounded-lg text-xs font-bold flex items-center shadow-sm transition-all active:scale-95">
-                        <i class="fas fa-plus mr-2"></i> Register Inspection
+                    <a href="/inspections/create" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl text-xs font-bold transition-all shadow-lg shadow-blue-500/20 flex items-center">
+                        <i class="fas fa-plus mr-2 text-[10px]"></i>
+                        Register Inspection
                     </a>
                 </div>
             </header>
 
             <!-- Scrollable Content Area -->
-            <main class="flex-1 overflow-y-auto p-8 bg-slate-50">
-                <!-- Filters Section -->
-                <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 mb-8">
+            <main class="flex-1 overflow-y-auto bg-[#f8fafc] p-10">
+                <div class="max-w-7xl mx-auto space-y-8">
+                    
+                    <!-- Page Intro -->
+                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                        <div>
+                            <h2 class="text-3xl font-black text-slate-900 tracking-tight">Inspection Ledger</h2>
+                            <p class="text-slate-500 mt-2 font-medium">Comprehensive record of safety protocols and institutional audit history.</p>
+                        </div>
+                    </div>
+
+                    <!-- Filters Section -->
+                    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 mb-8">
                     <form method="GET" class="grid grid-cols-1 md:grid-cols-4 gap-6 items-end">
                         <div>
                             <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Search Registry</label>
@@ -264,6 +281,7 @@ $inspections = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         </div>
                     <?php endif; ?>
                 </div>
+            </div>
             </main>
         </div>
     </div>
