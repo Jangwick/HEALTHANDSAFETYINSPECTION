@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 // Session already started by index.php
 if (!isset($_SESSION['user_id'])) {
     header('Location: /views/auth/login.php');
@@ -56,7 +56,7 @@ try {
             $year = date('Y');
             $stmt = $db->query("SELECT COUNT(*) FROM certificates WHERE YEAR(issue_date) = $year");
             $count = $stmt->fetchColumn() + 1;
-            $certificateNumber = 'CERT-' . $year . '-' . str_pad($count, 5, '0', STR_PAD_LEFT);
+            $certificateNumber = 'CERT-' . $year . '-' . str_pad((string)$count, 5, '0', STR_PAD_LEFT);
             
             // Calculate dates
             $issueDate = date('Y-m-d');
@@ -86,7 +86,7 @@ try {
             // Update establishment compliance status
             $db->prepare("UPDATE establishments SET compliance_status = 'compliant' WHERE establishment_id = ?")->execute([$inspection['establishment_id']]);
             
-            $_SESSION['success'] = 'Certificate issued successfully!';
+            $_SESSION['success'] = 'Registry updated: Certificate issued for ' . $certificateNumber;
             header('Location: /views/certificates/view.php?id=' . $certificateId);
             exit;
         }
@@ -94,7 +94,7 @@ try {
     
 } catch (PDOException $e) {
     error_log("Database error: " . $e->getMessage());
-    $error = "An error occurred while processing your request.";
+    $error = "Registry error: Protocol cannot be committed.";
 }
 ?>
 <!DOCTYPE html>
@@ -102,19 +102,20 @@ try {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Issue Certificate - Health & Safety Inspection System</title>
+    <title>Issue Certificate - Health & Safety Insight</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
     <style type="text/tailwindcss">
         @layer base {
-            html { font-size: 105%; }
-            body { @apply text-slate-900 font-medium; }
+            html { font-size: 100%; }
+            body { @apply text-slate-700 bg-slate-50; }
+            .card { @apply bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden; }
+            .form-input { @apply w-full px-4 py-3 bg-white border border-slate-200 rounded-lg text-sm text-slate-700 focus:ring-2 focus:ring-blue-700/10 focus:border-blue-700 outline-none transition-all shadow-sm; }
+            .form-label { @apply block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2 ml-1; }
         }
     </style>
 </head>
-<body class="bg-slate-50 font-sans antialiased">
+<body class="font-sans antialiased text-base overflow-hidden">
     <div class="flex h-screen overflow-hidden">
         <!-- Sidebar Navigation -->
         <?php 
@@ -123,128 +124,154 @@ try {
         ?>
 
         <!-- Main Content Area -->
-        <div class="flex-1 flex flex-col overflow-hidden">
-            <!-- Header -->
-            <header class="bg-white border-b border-slate-200 h-16 flex items-center justify-between px-8 shrink-0">
-                <h1 class="text-xl font-bold text-slate-800">Issue New Certificate</h1>
+        <div class="flex-1 flex flex-col min-w-0 overflow-hidden text-base">
+            <!-- Institutional Header -->
+            <header class="bg-white border-b border-slate-200 h-16 flex items-center justify-between px-8 shrink-0 z-10">
                 <div class="flex items-center space-x-4">
-                    <a href="/views/certificates/list.php" class="bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 px-4 py-2 rounded-lg text-sm font-bold flex items-center transition-all">
-                        <i class="fas fa-arrow-left mr-2"></i> Back to Certificates
+                    <a href="/certificates" class="text-slate-400 hover:text-slate-600 transition-colors">
+                        <i class="fas fa-arrow-left"></i>
                     </a>
+                    <h1 class="text-sm font-bold text-slate-800 tracking-tight uppercase">Certification Issuance</h1>
+                    <div class="h-4 w-px bg-slate-200"></div>
+                    <span class="text-[10px] font-bold text-blue-700 uppercase tracking-widest italic">Protocol Registry</span>
                 </div>
             </header>
 
             <!-- Scrollable Content -->
-            <main class="flex-1 overflow-y-auto p-8">
+            <main class="flex-1 overflow-y-auto p-8 bg-slate-50 text-base">
                 <div class="max-w-4xl mx-auto">
-                    <div class="card shadow-sm border-0 rounded-xl overflow-hidden">
-                        <div class="card-header bg-gradient-to-r from-blue-600 to-indigo-700 text-white p-4 border-b-0">
-                            <h4 class="mb-0 text-lg font-bold flex items-center"><i class="fas fa-certificate mr-3"></i> Certificate Issuance</h4>
+                    
+                    <?php if (isset($error)): ?>
+                        <div class="mb-8 p-4 bg-rose-50 border border-rose-100 rounded-xl flex items-center text-rose-700 text-xs font-bold uppercase tracking-wider">
+                            <i class="fas fa-exclamation-triangle mr-3"></i> <?= $error ?>
                         </div>
-                        <div class="card-body p-6">
-                        <?php if (isset($error)): ?>
-                        <div class="alert alert-danger">
-                            <i class="bi bi-exclamation-circle"></i> <?php echo  htmlspecialchars($error) ?>
+                    <?php endif; ?>
+
+                    <?php if (empty($inspections)): ?>
+                        <div class="card p-12 text-center">
+                            <div class="w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center mx-auto mb-6 text-slate-200">
+                                <i class="fas fa-clipboard-check text-2xl"></i>
+                            </div>
+                            <h3 class="text-sm font-black text-slate-800 uppercase tracking-widest italic mb-2">Registry Segment Null</h3>
+                            <p class="text-xs text-slate-400 font-bold uppercase tracking-widest mb-8">No completed audits await certification at this time.</p>
+                            <a href="/inspections" class="bg-blue-700 hover:bg-blue-800 text-white px-8 py-3 rounded-lg text-xs font-bold uppercase tracking-widest transition-all shadow-md inline-flex items-center">
+                                <i class="fas fa-search-dollar mr-2 text-[10px]"></i> Review Master Audit Registry
+                            </a>
                         </div>
-                        <?php endif; ?>
+                    <?php else: ?>
+                        <form method="POST" class="space-y-8 pb-12">
+                            <div class="card relative p-10">
+                                <div class="absolute top-0 left-0 w-full h-1 bg-blue-700"></div>
+                                
+                                <div class="mb-10 border-b border-slate-50 pb-6">
+                                    <h2 class="text-xs font-black text-slate-800 uppercase tracking-widest flex items-center">
+                                        <i class="fas fa-award mr-3 text-blue-700"></i> Protocol Parameters
+                                    </h2>
+                                    <p class="text-[9px] text-slate-300 font-bold uppercase tracking-widest italic mt-1">Institutional Deployment 2.0</p>
+                                </div>
 
-                        <?php if (empty($inspections)): ?>
-                        <div class="alert alert-info">
-                            <i class="bi bi-info-circle"></i> No completed inspections available for certificate issuance.
-                            <br>Please complete an inspection first.
-                        </div>
-                        <a href="/views/inspections/list.php" class="btn btn-primary">
-                            <i class="bi bi-clipboard-check"></i> Go to Inspections
-                        </a>
-                        <?php else: ?>
-                        <form method="POST">
-                            <!-- Inspection Selection -->
-                            <div class="mb-3">
-                                <label class="form-label">Select Completed Inspection <span class="text-danger">*</span></label>
-                                <select name="inspection_id" id="inspection_id" class="form-select" required onchange="updateInspectionInfo()">
-                                    <option value="">Choose an inspection...</option>
-                                    <?php foreach ($inspections as $insp): ?>
-                                    <option value="<?php echo  $insp['inspection_id'] ?>" 
-                                            data-type="<?php echo  $insp['inspection_type'] ?>"
-                                            data-establishment="<?php echo  htmlspecialchars($insp['establishment_name']) ?>"
-                                            data-date="<?php echo  date('M d, Y', strtotime($insp['actual_end_datetime'])) ?>"
-                                            data-reference="<?php echo  htmlspecialchars($insp['reference_number']) ?>">
-                                        <?php echo  htmlspecialchars($insp['reference_number']) ?> - 
-                                        <?php echo  htmlspecialchars($insp['establishment_name']) ?> 
-                                        (<?php echo  date('M d, Y', strtotime($insp['actual_end_datetime'])) ?>)
-                                    </option>
-                                    <?php endforeach; ?>
-                                </select>
+                                <div class="space-y-8">
+                                    <!-- Source Audit -->
+                                    <div>
+                                        <label class="form-label">Subject Audit Protocol <span class="text-rose-500">*</span></label>
+                                        <select name="inspection_id" id="inspection_id" class="form-input appearance-none bg-slate-50/50" required onchange="updateInspectionInfo()">
+                                            <option value="">Select Completed Audit Record</option>
+                                            <?php foreach ($inspections as $insp): ?>
+                                                <option value="<?= $insp['inspection_id'] ?>" 
+                                                        data-type="<?= $insp['inspection_type'] ?>"
+                                                        data-establishment="<?= htmlspecialchars($insp['establishment_name']) ?>"
+                                                        data-date="<?= date('M d, Y', strtotime($insp['actual_end_datetime'])) ?>"
+                                                        data-reference="<?= htmlspecialchars($insp['reference_number']) ?>">
+                                                    <?= htmlspecialchars($insp['reference_number']) ?> - <?= htmlspecialchars($insp['establishment_name']) ?>
+                                                </option>
+                                            <?php endforeach; ?>
+                                        </select>
+                                    </div>
+
+                                    <!-- Selected Audit Meta (Dynamic) -->
+                                    <div id="inspection-info" class="hidden grid grid-cols-2 md:grid-cols-4 gap-6 p-6 bg-slate-50 rounded-2xl border border-slate-100 animate-in fade-in duration-500">
+                                        <div class="col-span-2">
+                                            <p class="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-1 italic">Subject Entity</p>
+                                            <p id="info-establishment" class="text-xs font-black text-slate-700 italic uppercase"></p>
+                                        </div>
+                                        <div>
+                                            <p class="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-1 italic">Audit Type</p>
+                                            <p id="info-type" class="text-xs font-black text-slate-700 italic uppercase"></p>
+                                        </div>
+                                        <div>
+                                            <p class="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-1 italic">Closed Date</p>
+                                            <p id="info-date" class="text-xs font-black text-slate-700 italic uppercase"></p>
+                                        </div>
+                                    </div>
+
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                        <div>
+                                            <label class="form-label">Certification Classification <span class="text-rose-500">*</span></label>
+                                            <select name="certificate_type" id="certificate_type" class="form-input" required>
+                                                <option value="food_safety">Food Safety Protocol</option>
+                                                <option value="building_safety">Building Safety Protocol</option>
+                                                <option value="fire_safety">Fire Safety Protocol</option>
+                                                <option value="sanitation">Sanitation Protocol</option>
+                                                <option value="occupational_health">Occupational Health</option>
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label class="form-label">Validity Horizon <span class="text-rose-500">*</span></label>
+                                            <select name="validity_months" class="form-input" required id="validity_selector">
+                                                <option value="6">6 Months Segment</option>
+                                                <option value="12" selected>12 Months Segment (Default)</option>
+                                                <option value="24">24 Months Segment</option>
+                                                <option value="36">36 Months Segment</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <label class="form-label">Administrative Annotation</label>
+                                        <textarea name="remarks" class="form-input resize-none" rows="3" placeholder="Reference additional regulatory notes or specific conditions..."></textarea>
+                                    </div>
+
+                                    <!-- Pulse Preview -->
+                                    <div class="p-6 border-2 border-dashed border-slate-100 rounded-2xl bg-slate-50/30">
+                                        <div class="flex items-center justify-between mb-4">
+                                            <h4 class="text-[10px] font-black text-slate-800 uppercase tracking-[0.2em] italic">Commitment Preview</h4>
+                                            <div class="flex items-center space-x-2">
+                                                <div class="w-1.5 h-1.5 rounded-full bg-blue-700 animate-pulse"></div>
+                                                <span class="text-[8px] font-bold text-blue-700 uppercase tracking-widest">Real-Time Ledger Forecast</span>
+                                            </div>
+                                        </div>
+                                        <div class="grid grid-cols-2 gap-8">
+                                            <div>
+                                                <p class="text-[8px] font-bold text-slate-400 uppercase italic">Entry Sequence</p>
+                                                <p class="text-[11px] font-black text-slate-800 italic uppercase"><?= date('F d, Y') ?></p>
+                                            </div>
+                                            <div>
+                                                <p class="text-[8px] font-bold text-slate-400 uppercase italic">Scheduled De-Listing</p>
+                                                <p id="expiry-preview" class="text-[11px] font-black text-slate-800 italic uppercase"><?= date('F d, Y', strtotime('+12 months')) ?></p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
 
-                            <!-- Inspection Info Display -->
-                            <div id="inspection-info" class="alert alert-light d-none">
-                                <h6>Inspection Details:</h6>
-                                <p class="mb-1"><strong>Reference:</strong> <span id="info-reference"></span></p>
-                                <p class="mb-1"><strong>Establishment:</strong> <span id="info-establishment"></span></p>
-                                <p class="mb-1"><strong>Inspection Type:</strong> <span id="info-type"></span></p>
-                                <p class="mb-0"><strong>Completed:</strong> <span id="info-date"></span></p>
-                            </div>
-
-                            <!-- Certificate Type -->
-                            <div class="mb-3">
-                                <label class="form-label">Certificate Type <span class="text-danger">*</span></label>
-                                <select name="certificate_type" id="certificate_type" class="form-select" required>
-                                    <option value="">Select certificate type...</option>
-                                    <option value="food_safety">Food Safety Certificate</option>
-                                    <option value="building_safety">Building Safety Certificate</option>
-                                    <option value="fire_safety">Fire Safety Certificate</option>
-                                    <option value="sanitation">Sanitation Certificate</option>
-                                    <option value="occupational_health">Occupational Health Certificate</option>
-                                    <option value="general_compliance">General Compliance Certificate</option>
-                                </select>
-                            </div>
-
-                            <!-- Validity Period -->
-                            <div class="mb-3">
-                                <label class="form-label">Validity Period <span class="text-danger">*</span></label>
-                                <select name="validity_months" class="form-select" required>
-                                    <option value="6">6 Months</option>
-                                    <option value="12" selected>1 Year (12 Months)</option>
-                                    <option value="24">2 Years (24 Months)</option>
-                                    <option value="36">3 Years (36 Months)</option>
-                                </select>
-                                <small class="form-text text-muted">The certificate will be valid from today's date</small>
-                            </div>
-
-                            <!-- Remarks -->
-                            <div class="mb-3">
-                                <label class="form-label">Remarks/Notes</label>
-                                <textarea name="remarks" class="form-control" rows="3" placeholder="Enter any additional notes or conditions..."></textarea>
-                            </div>
-
-                            <!-- Preview Box -->
-                            <div class="alert alert-info">
-                                <h6><i class="bi bi-info-circle"></i> Certificate Preview</h6>
-                                <p class="mb-1"><strong>Issue Date:</strong> <?php echo  date('F d, Y') ?></p>
-                                <p class="mb-1"><strong>Expiry Date:</strong> <span id="expiry-preview"><?php echo  date('F d, Y', strtotime('+12 months')) ?></span></p>
-                                <p class="mb-0"><strong>Issued By:</strong> <?php echo  htmlspecialchars($_SESSION['first_name'] . ' ' . $_SESSION['last_name']) ?></p>
-                            </div>
-
-                            <!-- Submit Buttons -->
-                            <div class="d-grid gap-2">
-                                <button type="submit" class="btn btn-primary btn-lg">
-                                    <i class="bi bi-award"></i> Issue Certificate
-                                </button>
-                                <a href="/views/certificates/list.php" class="btn btn-outline-secondary">
-                                    Cancel
-                                </a>
+                            <div class="flex items-center justify-between pt-6">
+                                <div class="text-[9px] font-bold text-slate-400 italic uppercase tracking-widest">
+                                    Certificates are legally binding registry entries. Verify all parameters.
+                                </div>
+                                <div class="flex items-center space-x-4">
+                                    <a href="/certificates" class="text-xs font-bold text-slate-400 hover:text-slate-600 uppercase tracking-widest transition-colors">Abort Registry</a>
+                                    <button type="submit" class="bg-blue-700 hover:bg-blue-800 text-white px-10 py-3 rounded-lg text-xs font-bold uppercase tracking-widest transition-all shadow-md">
+                                        <i class="fas fa-check-circle mr-2"></i> Commit to Ledger
+                                    </button>
+                                </div>
                             </div>
                         </form>
-                        <?php endif; ?>
-                    </div>
+                    <?php endif; ?>
                 </div>
-            </div>
-        </main>
+            </main>
+        </div>
     </div>
-</div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         function updateInspectionInfo() {
             const select = document.getElementById('inspection_id');
@@ -252,31 +279,28 @@ try {
             const infoDiv = document.getElementById('inspection-info');
             
             if (selectedOption.value) {
-                document.getElementById('info-reference').textContent = selectedOption.dataset.reference;
                 document.getElementById('info-establishment').textContent = selectedOption.dataset.establishment;
                 document.getElementById('info-type').textContent = selectedOption.dataset.type.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
                 document.getElementById('info-date').textContent = selectedOption.dataset.date;
-                infoDiv.classList.remove('d-none');
+                infoDiv.classList.remove('hidden');
                 
-                // Auto-select certificate type based on inspection type
                 const inspectionType = selectedOption.dataset.type;
                 const certTypeSelect = document.getElementById('certificate_type');
                 if (inspectionType && certTypeSelect) {
                     certTypeSelect.value = inspectionType;
                 }
             } else {
-                infoDiv.classList.add('d-none');
+                infoDiv.classList.add('hidden');
             }
         }
         
-        // Update expiry date preview when validity changes
-        document.querySelector('[name="validity_months"]').addEventListener('change', function() {
+        document.getElementById('validity_selector').addEventListener('change', function() {
             const months = parseInt(this.value);
             const expiryDate = new Date();
             expiryDate.setMonth(expiryDate.getMonth() + months);
             
             const options = { year: 'numeric', month: 'long', day: 'numeric' };
-            document.getElementById('expiry-preview').textContent = expiryDate.toLocaleDateString('en-US', options);
+            document.getElementById('expiry-preview').textContent = expiryDate.toLocaleDateString('en-US', options).toUpperCase();
         });
     </script>
 </body>

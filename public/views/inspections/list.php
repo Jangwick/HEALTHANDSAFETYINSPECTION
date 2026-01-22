@@ -87,13 +87,13 @@ $inspections = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style type="text/tailwindcss">
         @layer base {
-            html { font-size: 105%; }
-            body { @apply text-slate-200; }
-            h1, h2, h3, h4, h5, h6 { @apply font-bold tracking-tight text-white; }
+            html { font-size: 100%; }
+            body { @apply text-slate-700; }
+            h1, h2, h3, h4, h5, h6 { @apply font-bold tracking-tight text-slate-900; }
         }
     </style>
 </head>
-<body class="bg-[#0b0c10] font-sans antialiased text-base overflow-hidden">
+<body class="bg-slate-50 font-sans antialiased text-base overflow-hidden">
     <div class="flex h-screen">
         <!-- Sidebar Navigation -->
         <?php 
@@ -102,124 +102,128 @@ $inspections = $stmt->fetchAll(PDO::FETCH_ASSOC);
         ?>
 
         <!-- Main Content -->
-        <div class="flex-1 flex flex-col min-w-0">
+        <div class="flex-1 flex flex-col min-w-0 overflow-hidden">
             <!-- Top Navbar -->
-            <header class="bg-[#0f1115] border-b border-white/5 h-20 flex items-center justify-between px-8 shrink-0">
-                <h1 class="text-2xl font-bold text-white tracking-tight">Inspections</h1>
-                <div class="flex items-center space-x-4">
+            <header class="bg-white border-b border-slate-200 h-16 flex items-center justify-between px-8 z-10 shrink-0">
+                <h1 class="text-sm font-bold text-slate-700 tracking-tight">Inspection Management</h1>
+                <div class="flex items-center space-x-3">
                     <button id="aiPrioritizeBtn"
-                       class="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white px-5 py-2.5 rounded-xl text-sm font-bold flex items-center shadow-lg shadow-purple-900/20 transition-all active:scale-95 group">
-                        <i class="fas fa-robot mr-2 group-hover:animate-bounce"></i> AI Prioritize
+                       class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 px-4 py-2 rounded-lg text-xs font-bold flex items-center border border-indigo-200 transition-all active:scale-95 group">
+                        <i class="fas fa-microchip mr-2"></i> AI Insights
                     </button>
-                    <a href="/inspections/create" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl text-sm font-bold flex items-center shadow-lg shadow-blue-900/20 transition-all active:scale-95 group">
-                        <i class="fas fa-plus mr-2 group-hover:rotate-90 transition-transform"></i> New Inspection
+                    <a href="/inspections/create" class="bg-blue-700 hover:bg-blue-800 text-white px-4 py-2 rounded-lg text-xs font-bold flex items-center shadow-sm transition-all active:scale-95">
+                        <i class="fas fa-plus mr-2"></i> Register Inspection
                     </a>
                 </div>
             </header>
 
             <!-- Scrollable Content Area -->
-            <main class="flex-1 overflow-y-auto p-8 bg-[#0b0c10]">
+            <main class="flex-1 overflow-y-auto p-8 bg-slate-50">
                 <!-- Filters Section -->
-                <div class="bg-[#15181e] rounded-2xl shadow-xl border border-white/5 p-6 mb-8">
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 mb-8">
                     <form method="GET" class="grid grid-cols-1 md:grid-cols-4 gap-6 items-end">
                         <div>
-                            <label class="block text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-2.5">Search</label>
+                            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Search Registry</label>
                             <div class="relative group">
-                                <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-slate-500 group-focus-within:text-blue-500 transition-colors">
-                                    <i class="fas fa-search"></i>
+                                <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400">
+                                    <i class="fas fa-search text-xs"></i>
                                 </span>
-                                <input type="text" name="search" value="<?php echo  htmlspecialchars($search) ?>" placeholder="Establishment name..." 
-                                    class="w-full pl-11 pr-4 py-3 bg-[#0b0c10] border border-white/10 rounded-xl text-sm text-slate-200 focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 highlight-none outline-none transition-all">
+                                <input type="text" name="search" value="<?php echo  htmlspecialchars($search) ?>" placeholder="Ref ID or Establishment..." 
+                                    class="w-full pl-9 pr-3 py-2 bg-white border border-slate-200 rounded-lg text-sm text-slate-700 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all">
                             </div>
                         </div>
                         <div>
-                            <label class="block text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-2.5">Status</label>
-                            <select name="status" class="w-full bg-[#0b0c10] border border-white/10 rounded-xl py-3 px-4 text-sm text-slate-300 focus:ring-2 focus:ring-blue-500/50 outline-none transition-all appearance-none cursor-pointer">
-                                <option value="">All Statuses</option>
-                                <option value="pending" <?php echo  $status === 'pending' ? 'selected' : '' ?>>Pending</option>
-                                <option value="in_progress" <?php echo  $status === 'in_progress' ? 'selected' : '' ?>>In Progress</option>
-                                <option value="completed" <?php echo  $status === 'completed' ? 'selected' : '' ?>>Completed</option>
+                            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Operational Status</label>
+                            <select name="status" class="w-full bg-white border border-slate-200 rounded-lg py-2 px-3 text-sm text-slate-600 focus:ring-1 focus:ring-blue-500 outline-none transition-all appearance-none cursor-pointer">
+                                <option value="">All Logs</option>
+                                <option value="pending" <?php echo  $status === 'pending' ? 'selected' : '' ?>>Scheduled</option>
+                                <option value="in_progress" <?php echo  $status === 'in_progress' ? 'selected' : '' ?>>In Field</option>
+                                <option value="completed" <?php echo  $status === 'completed' ? 'selected' : '' ?>>Finalized</option>
                             </select>
                         </div>
                         <div>
-                            <label class="block text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-2.5">Type</label>
-                            <select name="type" class="w-full bg-[#0b0c10] border border-white/10 rounded-xl py-3 px-4 text-sm text-slate-300 focus:ring-2 focus:ring-blue-500/50 outline-none transition-all appearance-none cursor-pointer">
-                                <option value="">All Types</option>
-                                <option value="food_safety" <?php echo  $type === 'food_safety' ? 'selected' : '' ?>>Food Safety</option>
-                                <option value="building_safety" <?php echo  $type === 'building_safety' ? 'selected' : '' ?>>Building Safety</option>
-                                <option value="fire_safety" <?php echo  $type === 'fire_safety' ? 'selected' : '' ?>>Fire Safety</option>
+                            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Primary Category</label>
+                            <select name="type" class="w-full bg-white border border-slate-200 rounded-lg py-2 px-3 text-sm text-slate-600 focus:ring-1 focus:ring-blue-500 outline-none transition-all appearance-none cursor-pointer">
+                                <option value="">All Categories</option>
+                                <option value="food_safety" <?php echo  $type === 'food_safety' ? 'selected' : '' ?>>Food Services</option>
+                                <option value="building_safety" <?php echo  $type === 'building_safety' ? 'selected' : '' ?>>Structural Registry</option>
+                                <option value="fire_safety" <?php echo  $type === 'fire_safety' ? 'selected' : '' ?>>Fire Mitigation</option>
                                 <option value="sanitation" <?php echo  $type === 'sanitation' ? 'selected' : '' ?>>Sanitation</option>
                             </select>
                         </div>
-                        <button type="submit" class="bg-[#1e232b] hover:bg-[#252b35] text-white font-bold py-3 px-6 rounded-xl text-sm transition-all flex items-center justify-center border border-white/10 shadow-lg">
-                            <i class="fas fa-filter mr-2 text-blue-500"></i> Apply Filters
-                        </button>
+                        <div class="flex space-x-2">
+                            <button type="submit" class="flex-1 bg-slate-800 hover:bg-slate-900 text-white py-2 rounded-lg text-xs font-bold transition-all shadow-sm">
+                                Apply Filter
+                            </button>
+                            <a href="/inspections" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-lg text-xs font-bold transition-all border border-slate-200 shadow-sm flex items-center justify-center">
+                                <i class="fas fa-undo"></i>
+                            </a>
+                        </div>
                     </form>
                 </div>
 
-                <!-- Results Table -->
-                <div class="bg-[#15181e] rounded-2xl shadow-2xl border border-white/5 overflow-hidden">
-                    <?php if (count($inspections) > 0): ?>
+                <!-- Inspections Table -->
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                    <?php if ($inspections): ?>
                         <div class="overflow-x-auto">
-                            <table class="w-full text-left border-collapse">
-                                <thead>
-                                    <tr class="bg-[#1a1d23] border-b border-white/5 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">
-                                        <th class="px-8 py-5">Establishment / ID</th>
-                                        <th class="px-8 py-5">Type</th>
-                                        <th class="px-8 py-5">Inspector</th>
-                                        <th class="px-8 py-5">Status</th>
-                                        <th class="px-8 py-5 text-right">Actions</th>
+                            <table class="w-full text-left">
+                                <thead class="bg-slate-50 border-b border-slate-100 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                                    <tr>
+                                        <th class="px-6 py-4">Ref. ID</th>
+                                        <th class="px-6 py-4">Establishment</th>
+                                        <th class="px-6 py-4">Inspector</th>
+                                        <th class="px-6 py-4">Status</th>
+                                        <th class="px-6 py-4 text-right">Administrative</th>
                                     </tr>
                                 </thead>
-                                <tbody class="divide-y divide-white/5">
+                                <tbody class="divide-y divide-slate-100">
                                     <?php foreach ($inspections as $inspection): ?>
-                                        <tr class="hover:bg-white/[0.02] transition-colors cursor-pointer group" onclick="window.location='/inspections/view?id=<?php echo  $inspection['inspection_id'] ?>'">
-                                            <td class="px-8 py-6">
-                                                <div class="flex flex-col">
-                                                    <span class="text-[10px] font-black text-blue-500 uppercase tracking-widest mb-1">#<?php echo  $inspection['inspection_id'] ?></span>
-                                                    <span class="text-sm font-bold text-white group-hover:text-blue-400 transition-colors"><?php echo  htmlspecialchars($inspection['establishment_name']) ?></span>
-                                                </div>
+                                        <tr class="hover:bg-slate-50/50 transition-colors cursor-pointer" onclick="window.location='/inspections/view?id=<?php echo  $inspection['inspection_id'] ?>'">
+                                            <td class="px-6 py-4 text-xs font-bold text-blue-700">HSI-<?php echo  str_pad((string)$inspection['inspection_id'], 5, '0', STR_PAD_LEFT) ?></td>
+                                            <td class="px-6 py-4">
+                                                <p class="text-xs font-bold text-slate-900 leading-tight"><?php echo  htmlspecialchars($inspection['establishment_name']) ?></p>
+                                                <p class="text-[10px] text-slate-500 font-medium uppercase mt-0.5 tracking-tighter"><?php echo  ucwords(str_replace('_', ' ', (string)$inspection['inspection_type'])) ?></p>
                                             </td>
-                                            <td class="px-8 py-6">
-                                                <span class="text-xs font-semibold text-slate-400 italic font-mono uppercase tracking-tighter"><?php echo  ucwords(str_replace('_', ' ', $inspection['inspection_type'])) ?></span>
-                                            </td>
-                                            <td class="px-8 py-6">
+                                            <td class="px-6 py-4">
                                                 <div class="flex items-center">
-                                                    <div class="h-7 w-7 rounded-lg bg-blue-500/10 border border-blue-500/20 flex items-center justify-center mr-3">
-                                                        <i class="fas fa-user-shield text-[10px] text-blue-400"></i>
-                                                    </div>
-                                                    <span class="text-sm font-medium text-slate-300"><?php echo  htmlspecialchars($inspection['inspector_name'] ?? 'Unassigned') ?></span>
+                                                    <span class="text-xs font-semibold text-slate-600"><?php echo  htmlspecialchars($inspection['inspector_name'] ?? 'Unassigned') ?></span>
                                                 </div>
                                             </td>
-                                            <td class="px-8 py-6">
+                                            <td class="px-6 py-4">
                                                 <?php
                                                     $statusStyles = [
-                                                        'pending' => 'bg-amber-500/5 text-amber-500 border-amber-500/20',
-                                                        'in_progress' => 'bg-blue-500/5 text-blue-500 border-blue-500/20',
-                                                        'completed' => 'bg-emerald-500/5 text-emerald-500 border-emerald-500/20',
-                                                        'failed' => 'bg-rose-500/5 text-rose-500 border-rose-500/20',
-                                                        'cancelled' => 'bg-slate-500/5 text-slate-500 border-slate-500/20'
+                                                        'pending' => 'bg-slate-100 text-slate-600 border-slate-200',
+                                                        'in_progress' => 'bg-blue-50 text-blue-700 border-blue-100',
+                                                        'completed' => 'bg-green-50 text-green-700 border-green-100',
+                                                        'failed' => 'bg-rose-50 text-rose-700 border-rose-100',
+                                                        'cancelled' => 'bg-slate-100 text-slate-400 border-slate-200'
                                                     ];
-                                                    $style = $statusStyles[$inspection['status']] ?? $statusStyles['pending'];
+                                                    $label = [
+                                                        'pending' => 'Scheduled',
+                                                        'in_progress' => 'In Field',
+                                                        'completed' => 'Finalized',
+                                                        'failed' => 'Non-Compliant',
+                                                        'cancelled' => 'Cancelled'
+                                                    ];
+                                                    $style = $statusStyles[$inspection['status']] ?? 'bg-slate-50 text-slate-500 border-slate-200';
+                                                    $statusLabel = $label[$inspection['status']] ?? ucfirst((string)$inspection['status']);
                                                 ?>
-                                                <span class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-[0.15em] border <?php echo  $style ?>">
-                                                    <?php echo  str_replace('_', ' ', $inspection['status']) ?>
+                                                <span class="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border <?php echo  $style ?>">
+                                                    <?php echo  $statusLabel ?>
                                                 </span>
                                             </td>
-                                            <td class="px-8 py-6 text-right" onclick="event.stopPropagation()">
+                                            <td class="px-6 py-4 text-right">
                                                 <div class="flex justify-end space-x-2">
-                                                    <a href="/inspections/view?id=<?php echo  $inspection['inspection_id'] ?>" 
-                                                       class="p-2.5 bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white rounded-lg transition-all" title="View Details">
-                                                        <i class="fas fa-eye text-sm"></i>
+                                                    <a href="/inspections/view?id=<?php echo  $inspection['inspection_id'] ?>" class="p-2 text-slate-400 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition-all" title="View Records">
+                                                        <i class="fas fa-file-alt"></i>
                                                     </a>
                                                     <button onclick="showActionDetails(<?php echo $inspection['inspection_id'] ?>)"
-                                                       class="p-2.5 bg-purple-600/10 hover:bg-purple-600 text-purple-400 hover:text-white rounded-lg transition-all" title="AI Action Details">
-                                                        <i class="fas fa-robot text-sm"></i>
+                                                       class="p-2 text-slate-400 hover:text-purple-700 hover:bg-purple-50 rounded-lg transition-all" title="AI Action Details">
+                                                        <i class="fas fa-robot"></i>
                                                     </button>
                                                     <?php if ($inspection['status'] === 'pending'): ?>
-                                                        <a href="/inspections/conduct?id=<?php echo  $inspection['inspection_id'] ?>" 
-                                                           class="p-2.5 bg-blue-600/10 hover:bg-blue-600 text-blue-500 hover:text-white rounded-lg transition-all" title="Start Inspection">
-                                                            <i class="fas fa-play text-sm"></i>
+                                                        <a href="/inspections/conduct?id=<?php echo  $inspection['inspection_id'] ?>" class="p-2 text-slate-400 hover:text-green-700 hover:bg-green-50 rounded-lg transition-all" title="Execute Inspection">
+                                                            <i class="fas fa-clipboard-check"></i>
                                                         </a>
                                                     <?php endif; ?>
                                                 </div>
@@ -232,14 +236,14 @@ $inspections = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
                         <!-- Pagination -->
                         <?php if ($totalPages > 1): ?>
-                            <div class="mt-8 flex items-center justify-between bg-[#1a1d23] p-6 border-t border-white/5">
-                                <div class="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] italic">
-                                    Showing <?php echo  count($inspections) ?> of <?php echo  $totalInspections ?> inspections
+                            <div class="px-6 py-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between">
+                                <div class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                                    Displaying <?php echo  count($inspections) ?> of <?php echo  $totalInspections ?> records
                                 </div>
                                 <div class="flex space-x-1">
                                     <?php for ($i = 1; $i <= $totalPages; $i++): ?>
                                         <a href="?page=<?php echo  $i ?>&status=<?php echo  $status ?>&type=<?php echo  $type ?>&search=<?php echo  urlencode($search) ?>" 
-                                           class="px-4 py-2 rounded-lg text-xs font-black transition-all <?php echo  $i == $page ? 'bg-blue-600 text-white shadow-lg shadow-blue-900/40' : 'bg-[#0b0c10] text-slate-400 hover:bg-white/5 border border-white/5' ?>">
+                                           class="px-3 py-1 rounded text-[10px] font-bold transition-all <?php echo  $i == $page ? 'bg-blue-700 text-white shadow-sm' : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50' ?>">
                                             <?php echo  $i ?>
                                         </a>
                                     <?php endfor; ?>
@@ -250,13 +254,13 @@ $inspections = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     <?php else: ?>
                         <!-- Empty State -->
                         <div class="p-20 text-center">
-                            <div class="w-20 h-20 bg-white/5 rounded-3xl flex items-center justify-center mx-auto mb-6 border border-white/5 rotation-slow">
-                                <i class="fas fa-clipboard-list text-3xl text-slate-600"></i>
+                            <div class="w-20 h-20 bg-slate-50 rounded-2xl flex items-center justify-center mx-auto mb-6 border border-slate-100">
+                                <i class="fas fa-clipboard-list text-2xl text-slate-300"></i>
                             </div>
-                            <h3 class="text-xl font-bold text-white mb-2">No inspections found</h3>
-                            <p class="text-slate-500 mb-8 max-w-xs mx-auto">Try adjusting your filters or record a new inspection to get started.</p>
-                            <a href="/views/inspections/create.php" class="inline-flex items-center px-6 py-3 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 transition-all shadow-lg shadow-blue-900/20 active:scale-95">
-                                <i class="fas fa-plus mr-2 text-xs"></i> Create First Inspection
+                            <h3 class="text-sm font-bold text-slate-900 mb-1">No inspections found</h3>
+                            <p class="text-xs text-slate-400 mb-6 max-w-xs mx-auto">Access the registry or adjust filters to view operational logs.</p>
+                            <a href="/inspections/create" class="inline-flex items-center px-6 py-2 bg-blue-700 text-white text-xs font-bold rounded-lg hover:bg-blue-800 transition-all shadow-sm">
+                                <i class="fas fa-plus mr-2"></i> Register New Inspection
                             </a>
                         </div>
                     <?php endif; ?>

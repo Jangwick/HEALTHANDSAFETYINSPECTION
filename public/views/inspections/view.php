@@ -1,7 +1,7 @@
-<?php
+﻿<?php
 // Session already started by index.php
 if (!isset($_SESSION['user_id'])) {
-    header('Location: /login');
+    header('Location: /views/auth/login.php');
     exit;
 }
 
@@ -17,32 +17,16 @@ if (!$inspectionId) {
 try {
     $db = Database::getConnection();
     
-    // Ensure session has first_name and last_name
-    if (!isset($_SESSION['first_name']) || !isset($_SESSION['last_name'])) {
-        $userStmt = $db->prepare("SELECT first_name, last_name FROM users WHERE user_id = ?");
-        $userStmt->execute([$_SESSION['user_id']]);
-        $userData = $userStmt->fetch(PDO::FETCH_ASSOC);
-        if ($userData) {
-            $_SESSION['first_name'] = $userData['first_name'];
-            $_SESSION['last_name'] = $userData['last_name'];
-        }
-    }
-    
     // Get inspection details with establishment and inspector info
     $stmt = $db->prepare("
         SELECT 
             i.*,
             e.name AS establishment_name,
             e.type AS establishment_type,
-            e.address_street,
-            e.address_barangay,
-            e.address_city,
-            e.owner_name AS contact_person,
-            e.owner_contact AS contact_number,
-            e.owner_email AS establishment_email,
+            e.address_street, e.address_barangay, e.address_city,
+            e.owner_name, e.owner_phone, e.owner_email,
             u.first_name AS inspector_first_name,
-            u.last_name AS inspector_last_name,
-            u.email AS inspector_email
+            u.last_name AS inspector_last_name
         FROM inspections i
         LEFT JOIN establishments e ON i.establishment_id = e.establishment_id
         LEFT JOIN users u ON i.inspector_id = u.user_id
@@ -56,13 +40,9 @@ try {
         exit;
     }
     
-    // Get checklist responses for this inspection
+    // Get checklist responses
     $stmt = $db->prepare("
-        SELECT 
-            cr.*,
-            ci.requirement_text,
-            ci.category,
-            ci.points_possible
+        SELECT cr.*, ci.requirement_text, ci.category, ci.points_possible
         FROM inspection_checklist_responses cr
         JOIN checklist_items ci ON cr.checklist_item_id = ci.item_id
         WHERE cr.inspection_id = ?
@@ -71,92 +51,27 @@ try {
     $stmt->execute([$inspectionId]);
     $checklistResponses = $stmt->fetchAll(PDO::FETCH_ASSOC);
     
-    // Group checklist responses by category
     $checklistByCategory = [];
     foreach ($checklistResponses as $response) {
-        $category = $response['category'] ?? 'General';
-        if (!isset($checklistByCategory[$category])) {
-            $checklistByCategory[$category] = [];
-        }
-        $checklistByCategory[$category][] = $response;
+        $checklistByCategory[$response['category'] ?? 'General'][] = $response;
     }
     
-    // Get violations for this inspection
-    $stmt = $db->prepare("
-        SELECT * FROM violations
-        WHERE inspection_id = ?
-        ORDER BY severity DESC, created_at DESC
-    ");
+    // Get violations
+    $stmt = $db->prepare("SELECT * FROM violations WHERE inspection_id = ? ORDER BY severity DESC");
     $stmt->execute([$inspectionId]);
-    $violations = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $violationsList = $stmt->fetchAll(PDO::FETCH_ASSOC);
     
-    // Get documents/photos for this inspection
-    $stmt = $db->prepare("
-        SELECT * FROM documents
-        WHERE entity_type = 'inspection' AND entity_id = ?
-        ORDER BY created_at DESC
-    ");
-    $stmt->execute([$inspectionId]);
-    $documents = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    
-    // Calculate checklist score if responses exist
-    $totalPoints = 0;
-    $earnedPoints = 0;
-    foreach ($checklistResponses as $response) {
-        $totalPoints += (int)$response['points_possible'];
-        if ($response['response'] === 'pass') {
-            $earnedPoints += (int)$response['points_possible'];
-        }
+    // Score calculation
+    $totalPoints = 0; $earnedPoints = 0;
+    foreach ($checklistResponses as $res) {
+        $totalPoints += (int)$res['points_possible'];
+        if ($res['response'] === 'pass') $earnedPoints += (int)$res['points_possible'];
     }
-    $score = $totalPoints > 0 ? round(($earnedPoints / $totalPoints) * 100, 2) : 0;
-    
-    // Safety Culture AI (Gemini) Integration
-    try {
-        require_once __DIR__ . '/../../../src/Services/AIService.php';
-        require_once __DIR__ . '/../../../src/Utils/Logger.php';
-        $logger = new \HealthSafety\Utils\Logger();
-        $aiService = new \HealthSafety\Services\AIService($db, $logger);
-        $aiRiskParams = [
-            'risk' => $aiService->calculateEstablishmentRisk((int)$inspection['establishment_id']),
-            'audit' => $aiService->auditInspectionNotes($inspectionId)
-        ];
-    } catch (\Exception $aiEx) {
-        $aiRiskParams = null; // AI failure should not block the view
-    }
-    
+    $complianceScore = $totalPoints > 0 ? round(($earnedPoints / $totalPoints) * 100, 1) : 0;
+
 } catch (PDOException $e) {
-    error_log("Database error: " . $e->getMessage());
-    die("An error occurred while loading the inspection.");
-}
-
-function getStatusBadge($status) {
-    $badges = [
-        'pending' => '<span class="badge bg-warning">Pending</span>',
-        'scheduled' => '<span class="badge bg-info">Scheduled</span>',
-        'in_progress' => '<span class="badge bg-primary">In Progress</span>',
-        'completed' => '<span class="badge bg-success">Completed</span>',
-        'cancelled' => '<span class="badge bg-danger">Cancelled</span>'
-    ];
-    return $badges[$status] ?? '<span class="badge bg-secondary">Unknown</span>';
-}
-
-function getSeverityBadge($severity) {
-    $badges = [
-        'minor' => '<span class="badge bg-warning">Minor</span>',
-        'major' => '<span class="badge bg-danger">Major</span>',
-        'critical' => '<span class="badge bg-dark">Critical</span>'
-    ];
-    return $badges[$severity] ?? '<span class="badge bg-secondary">Unknown</span>';
-}
-
-function getPriorityBadge($priority) {
-    $badges = [
-        'low' => '<span class="badge bg-secondary">Low</span>',
-        'medium' => '<span class="badge bg-info">Medium</span>',
-        'high' => '<span class="badge bg-warning">High</span>',
-        'urgent' => '<span class="badge bg-danger">Urgent</span>'
-    ];
-    return $badges[$priority] ?? '<span class="badge bg-secondary">Unknown</span>';
+    error_log($e->getMessage());
+    die("Institutional Record Retrieval Failure");
 }
 ?>
 <!DOCTYPE html>
@@ -164,80 +79,20 @@ function getPriorityBadge($priority) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inspection #<?php echo  $inspection['inspection_id'] ?> - Health & Safety Inspection</title>
+    <title>Audit Dossier #<?= $inspection['inspection_id'] ?> - Health & Safety Insight</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
     <style type="text/tailwindcss">
         @layer base {
-            html { font-size: 105%; }
-            body { @apply text-slate-900 font-medium; }
-        }
-        .badge {
-            font-size: 0.9rem;
-            font-weight: 800;
-            padding: 0.5em 0.8em;
-        }
-        .action-buttons {
-            position: sticky;
-            top: 0;
-            background: white;
-            padding: 1.5rem 0;
-            z-index: 1000;
-            border-bottom: 2px solid #dee2e6;
-            margin-bottom: 1.5rem;
-        }
-        .info-card {
-            border-left: 6px solid #0d6efd;
-        }
-        .score-circle {
-            width: 140px;
-            height: 140px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 2.5rem;
-            font-weight: 900;
-            margin: 0 auto;
-        }
-        .score-excellent { background: #d4edda; color: #155724; border: 4px solid #c3e6cb; }
-        .score-good { background: #d1ecf1; color: #0c5460; border: 4px solid #bee5eb; }
-        .score-fair { background: #fff3cd; color: #856404; border: 4px solid #ffeeba; }
-        .score-poor { background: #f8d7da; color: #721c24; border: 4px solid #f5c6cb; }
-        .photo-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-            gap: 1rem;
-        }
-        .card-title {
-            font-size: 1.25rem;
-            margin-bottom: 1.25rem;
-        }
-        .table {
-            font-size: 1.05rem;
-        }
-        .table th {
-            font-weight: 800;
-            text-transform: uppercase;
-            font-size: 0.85rem;
-            letter-spacing: 0.05em;
-        }
-        .photo-item img {
-            width: 100%;
-            height: 150px;
-            object-fit: cover;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: transform 0.2s;
-        }
-        .photo-item img:hover {
-            transform: scale(1.05);
+            html { font-size: 100%; }
+            body { @apply text-slate-700 bg-slate-50; }
+            h1, h2, h3 { @apply font-bold tracking-tight text-slate-900; }
+            .card { @apply bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden; }
+            .status-tag { @apply px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-widest border; }
         }
     </style>
 </head>
-<body class="bg-gray-50 font-sans antialiased">
+<body class="font-sans antialiased text-base overflow-hidden">
     <div class="flex h-screen overflow-hidden">
         <!-- Sidebar Navigation -->
         <?php 
@@ -246,431 +101,190 @@ function getPriorityBadge($priority) {
         ?>
 
         <!-- Main Content Area -->
-        <div class="flex-1 flex flex-col min-w-0 overflow-hidden">
-            <!-- Header -->
-            <header class="bg-white border-b border-slate-200 h-20 flex items-center justify-between px-8 shrink-0">
-                <h1 class="text-xl font-bold text-slate-800">Inspection Details</h1>
-                <div class="flex items-center space-x-3">
-                    <a href="/inspections" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2 rounded-lg text-sm font-bold flex items-center transition-all">
-                        <i class="fas fa-arrow-left mr-2"></i> Back to list
+        <div class="flex-1 flex flex-col min-w-0 overflow-hidden text-base">
+            <!-- Institutional Header -->
+            <header class="bg-white border-b border-slate-200 h-16 flex items-center justify-between px-8 shrink-0 z-10">
+                <div class="flex items-center space-x-4">
+                    <a href="/inspections" class="text-slate-400 hover:text-slate-600 transition-colors">
+                        <i class="fas fa-arrow-left"></i>
                     </a>
+                    <h1 class="text-sm font-bold text-slate-800 tracking-tight uppercase">Audit Dossier</h1>
+                    <div class="h-4 w-px bg-slate-200"></div>
+                    <span class="text-[10px] font-bold text-blue-700 uppercase tracking-widest italic">Reference #<?= htmlspecialchars($inspection['reference_number']) ?></span>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <?php if ($inspection['status'] === 'completed'): ?>
+                        <button class="bg-blue-700 hover:bg-blue-800 text-white px-4 py-2 rounded-lg text-xs font-bold transition-all shadow-sm">
+                            <i class="fas fa-print mr-2 opacity-70"></i> Official Report
+                        </button>
+                    <?php endif; ?>
                 </div>
             </header>
 
             <!-- Scrollable Content -->
-            <main class="flex-1 overflow-y-auto p-8 text-base">
-                <div class="container-fluid mt-4">
-                    <!-- Action Buttons -->
-                    <div class="action-buttons">
-                        <div class="row">
-                            <div class="col-md-6">
-                                <h2>
-                                    <i class="bi bi-clipboard-check"></i> Inspection #<?php echo  $inspection['id'] ?>
-                                    <?php echo  getStatusBadge($inspection['status']) ?>
-                                    <?php echo  getPriorityBadge($inspection['priority']) ?>
-                                </h2>
-                            </div>
-                            <div class="col-md-6 text-end">
-                                <a href="/inspections" class="btn btn-secondary">
-                                    <i class="bi bi-arrow-left"></i> Back to List
-                                </a>
+            <main class="flex-1 overflow-y-auto p-8 bg-slate-50">
+                <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+                    <!-- Column 1: Core Audit Parameters -->
+                    <div class="lg:col-span-3 space-y-8">
+                        <!-- Audit Status Banner -->
+                        <div class="card p-8 bg-white relative">
+                            <div class="absolute top-0 left-0 w-full h-1 bg-blue-700"></div>
+                            <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                                <div>
+                                    <div class="flex items-center space-x-3 mb-4">
+                                        <?php
+                                            $stateStyles = [
+                                                'completed' => 'bg-emerald-50 text-emerald-700 border-emerald-100',
+                                                'in_progress' => 'bg-amber-50 text-amber-700 border-amber-100',
+                                                'scheduled' => 'bg-blue-50 text-blue-700 border-blue-100',
+                                                'cancelled' => 'bg-slate-100 text-slate-500 border-slate-200'
+                                            ];
+                                            $s = $stateStyles[$inspection['status']] ?? 'bg-slate-50 text-slate-400 border-slate-100';
+                                        ?>
+                                        <span class="status-tag <?= $s ?> italic">
+                                            <i class="fas fa-circle mr-1 text-[6px]"></i> <?= str_replace('_', ' ', $inspection['status']) ?>
+                                        </span>
+                                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest font-mono">
+                                            <?= htmlspecialchars($inspection['reference_number']) ?>
+                                        </span>
+                                    </div>
+                                    <h2 class="text-2xl font-black text-slate-900 mb-2 uppercase tracking-tight">
+                                        <?= htmlspecialchars($inspection['establishment_name']) ?>
+                                    </h2>
+                                    <div class="flex items-center space-x-4 text-[11px] font-medium text-slate-500 italic">
+                                        <span><i class="far fa-calendar-alt mr-2 text-blue-700"></i> Scheduled: <?= date('M d, Y', strtotime($inspection['scheduled_date'])) ?></span>
+                                        <?php if($inspection['completion_date']): ?>
+                                            <span><i class="far fa-check-circle mr-2 text-emerald-600"></i> Finalized: <?= date('M d, Y', strtotime($inspection['completion_date'])) ?></span>
+                                        <?php endif; ?>
+                                    </div>
+                                </div>
                                 
-                                <?php if ($inspection['status'] === 'pending' || $inspection['status'] === 'scheduled'): ?>
-                                    <a href="/inspections/conduct?id=<?php echo  $inspection['id'] ?>" class="btn btn-success">
-                                        <i class="bi bi-play-circle"></i> Start Inspection
-                                    </a>
-                                <?php elseif ($inspection['status'] === 'in_progress'): ?>
-                                    <a href="/inspections/conduct?id=<?php echo  $inspection['id'] ?>" class="btn btn-primary">
-                                        <i class="bi bi-arrow-right-circle"></i> Continue Inspection
-                                    </a>
-                                <?php elseif ($inspection['status'] === 'completed'): ?>
-                                    <a href="/inspections/report?id=<?php echo  $inspection['id'] ?>" class="btn btn-info" target="_blank">
-                                        <i class="bi bi-file-earmark-pdf"></i> View Report
-                                    </a>
-                                    <a href="/inspections/report?id=<?php echo  $inspection['id'] ?>&download=1" class="btn btn-success">
-                                        <i class="bi bi-download"></i> Download PDF
-                                    </a>
-                                <?php endif; ?>
-                                
-                                <?php if ($inspection['status'] !== 'completed' && $inspection['status'] !== 'cancelled'): ?>
-                                    <button class="btn btn-warning" onclick="editInspection()">
-                                        <i class="bi bi-pencil"></i> Edit
-                                    </button>
-                                    <button class="btn btn-danger" onclick="cancelInspection()">
-                                        <i class="bi bi-x-circle"></i> Cancel
-                                    </button>
-                                <?php endif; ?>
+                                <div class="bg-slate-50 border border-slate-100 rounded-2xl p-6 flex flex-col items-center justify-center min-w-[140px]">
+                                    <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Compliance Score</span>
+                                    <span class="text-3xl font-black <?= $complianceScore >= 80 ? 'text-emerald-600' : ($complianceScore >= 60 ? 'text-amber-500' : 'text-rose-600') ?>">
+                                        <?= $complianceScore ?>%
+                                    </span>
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    <div class="row">
-                        <!-- Left Column: Main Information -->
-                        <div class="col-md-8">
-                            <!-- Establishment Details -->
-                            <div class="card mb-3 info-card">
-                                <div class="card-header bg-light">
-                                    <h5 class="mb-0"><i class="bi bi-building"></i> Establishment Details</h5>
-                                </div>
-                                <div class="card-body">
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <p><strong>Name:</strong> <?php echo  htmlspecialchars($inspection['establishment_name']) ?></p>
-                                            <p><strong>Type:</strong> <?php echo  htmlspecialchars(ucwords(str_replace('_', ' ', $inspection['establishment_type']))) ?></p>
-                                            <p><strong>Contact Person:</strong> <?php echo  htmlspecialchars($inspection['contact_person']) ?></p>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <p><strong>Address:</strong> <?php echo  htmlspecialchars($inspection['address_street'] . ', ' . $inspection['address_barangay'] . ', ' . $inspection['address_city']) ?></p>
-                                            <p><strong>Phone:</strong> <?php echo  htmlspecialchars($inspection['contact_number']) ?></p>
-                                            <p><strong>Email:</strong> <?php echo  htmlspecialchars($inspection['establishment_email']) ?></p>
-                                        </div>
+                        <!-- Checklist Dossier -->
+                        <div class="space-y-6">
+                            <h3 class="text-xs font-black text-slate-400 uppercase tracking-[0.2em] flex items-center px-2">
+                                <i class="fas fa-tasks mr-3 text-blue-700"></i> Operational Audit Checklist
+                            </h3>
+                            
+                            <?php foreach ($checklistByCategory as $cat => $items): ?>
+                                <div class="card overflow-hidden">
+                                    <div class="px-6 py-4 bg-slate-50 border-b border-slate-100 flex justify-between items-center">
+                                        <h4 class="text-[10px] font-black text-slate-800 uppercase tracking-wider italic"><?= htmlspecialchars($cat) ?></h4>
+                                        <span class="text-[9px] font-bold text-slate-400 uppercase"><?= count($items) ?> Parameters</span>
                                     </div>
-                                </div>
-                            </div>
-
-                            <!-- Inspection Details -->
-                            <div class="card mb-3">
-                                <div class="card-header bg-light">
-                                    <h5 class="mb-0"><i class="bi bi-info-circle"></i> Inspection Information</h5>
-                                </div>
-                                <div class="card-body">
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <p><strong>Type:</strong> <?php echo  htmlspecialchars(str_replace('_', ' ', ucwords($inspection['inspection_type'], '_'))) ?></p>
-                                            <p><strong>Inspector:</strong> 
-                                                <a href="/inspectors" class="text-blue-600 hover:underline">
-                                                    <?php echo  htmlspecialchars($inspection['inspector_first_name'] . ' ' . $inspection['inspector_last_name']) ?>
-                                                </a>
-                                            </p>
-                                            <p><strong>Scheduled Date:</strong> <?php echo  date('F d, Y', strtotime($inspection['scheduled_date'])) ?></p>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <p><strong>Started:</strong> <?php echo  $inspection['started_at'] ? date('F d, Y h:i A', strtotime($inspection['started_at'])) : 'Not started' ?></p>
-                                            <p><strong>Completed:</strong> <?php echo  $inspection['completed_at'] ? date('F d, Y h:i A', strtotime($inspection['completed_at'])) : 'Not completed' ?></p>
-                                            <p><strong>Created:</strong> <?php echo  date('F d, Y h:i A', strtotime($inspection['created_at'])) ?></p>
-                                        </div>
-                                    </div>
-                                    <?php if ($inspection['notes']): ?>
-                                        <hr>
-                                        <p><strong>Notes:</strong></p>
-                                        <p><?php echo  nl2br(htmlspecialchars($inspection['notes'])) ?></p>
-                                    <?php endif; ?>
-                                </div>
-                            </div>
-
-                            <!-- Checklist Results -->
-                            <?php if (!empty($checklistResponses)): ?>
-                            <div class="card mb-3">
-                                <div class="card-header bg-light">
-                                    <h5 class="mb-0"><i class="bi bi-list-check"></i> Checklist Results</h5>
-                                </div>
-                                <div class="card-body">
-                                    <?php foreach ($checklistByCategory as $category => $responses): ?>
-                                        <h6 class="text-primary mt-3"><?php echo  htmlspecialchars($category) ?></h6>
-                                        <div class="table-responsive">
-                                            <table class="table table-sm">
-                                                <thead>
-                                                    <tr>
-                                                        <th>Item</th>
-                                                        <th style="width: 100px;">Status</th>
-                                                        <th style="width: 80px;">Points</th>
-                                                        <th>Notes</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    <?php foreach ($responses as $response): ?>
-                                                    <tr>
-                                                        <td><?php echo  htmlspecialchars($response['requirement_text']) ?></td>
-                                                        <td>
-                                                            <?php if ($response['response'] === 'pass'): ?>
-                                                                <span class="badge bg-success">Pass</span>
-                                                            <?php elseif ($response['response'] === 'fail'): ?>
-                                                                <span class="badge bg-danger">Fail</span>
-                                                            <?php else: ?>
-                                                                <span class="badge bg-warning">N/A</span>
-                                                            <?php endif; ?>
-                                                        </td>
-                                                        <td><?php echo  $response['response'] === 'pass' ? $response['points_possible'] : 0 ?> / <?php echo  $response['points_possible'] ?></td>
-                                                        <td><?php echo  htmlspecialchars($response['notes'] ?? '') ?></td>
-                                                    </tr>
-                                                    <?php endforeach; ?>
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    <?php endforeach; ?>
-                                </div>
-                            </div>
-                            <?php endif; ?>
-
-                            <!-- Violations -->
-                            <?php if (!empty($violations)): ?>
-                            <div class="card mb-3">
-                                <div class="card-header bg-light">
-                                    <h5 class="mb-0"><i class="bi bi-exclamation-triangle"></i> Violations Found (<?php echo  count($violations) ?>)</h5>
-                                </div>
-                                <div class="card-body">
-                                    <?php foreach ($violations as $violation): ?>
-                                    <div class="alert alert-<?php echo  $violation['severity'] === 'critical' ? 'danger' : ($violation['severity'] === 'major' ? 'warning' : 'info') ?> mb-3">
-                                        <div class="d-flex justify-content-between align-items-start">
-                                            <div class="flex-grow-1">
-                                                <h6>
-                                                    <?php echo  getSeverityBadge($violation['severity']) ?>
-                                                    <?php echo  htmlspecialchars($violation['description']) ?>
-                                                </h6>
-                                                <p class="mb-1"><strong>Category:</strong> <?php echo  htmlspecialchars($violation['violation_type']) ?></p>
-                                                <?php if ($violation['corrective_action']): ?>
-                                                    <p class="mb-1"><strong>Corrective Action:</strong> <?php echo  htmlspecialchars($violation['corrective_action']) ?></p>
-                                                <?php endif; ?>
-                                                <?php if ($violation['deadline']): ?>
-                                                    <p class="mb-0"><strong>Deadline:</strong> <?php echo  date('F d, Y', strtotime($violation['deadline'])) ?></p>
-                                                <?php endif; ?>
+                                    <div class="divide-y divide-slate-50">
+                                        <?php foreach ($items as $item): ?>
+                                            <div class="p-6 flex items-start space-x-4 hover:bg-slate-50/50 transition-colors">
+                                                <div class="shrink-0 mt-1">
+                                                    <?php if ($item['response'] === 'pass'): ?>
+                                                        <i class="fas fa-check-circle text-emerald-500 text-lg"></i>
+                                                    <?php elseif ($item['response'] === 'fail'): ?>
+                                                        <i class="fas fa-times-circle text-rose-500 text-lg"></i>
+                                                    <?php else: ?>
+                                                        <i class="fas fa-minus-circle text-slate-300 text-lg"></i>
+                                                    <?php endif; ?>
+                                                </div>
+                                                <div class="flex-1">
+                                                    <p class="text-[13px] font-bold text-slate-800 leading-relaxed mb-1"><?= htmlspecialchars($item['requirement_text']) ?></p>
+                                                    <?php if ($item['comments']): ?>
+                                                        <p class="text-[11px] text-slate-500 italic bg-blue-50/50 p-2 rounded-lg border-l-2 border-blue-200 mt-2">
+                                                            "<?= htmlspecialchars($item['comments']) ?>"
+                                                        </p>
+                                                    <?php endif; ?>
+                                                </div>
+                                                <div class="shrink-0 text-right">
+                                                    <span class="text-[10px] font-mono font-bold text-slate-400"><?= $item['response'] === 'pass' ? $item['points_possible'] : 0 ?>/<?= $item['points_possible'] ?></span>
+                                                </div>
                                             </div>
-                                            <div>
-                                                <?php
-                                                $statusClass = [
-                                                    'open' => 'danger',
-                                                    'in_progress' => 'warning',
-                                                    'resolved' => 'success'
-                                                ];
-                                                ?>
-                                                <span class="badge bg-<?php echo  $statusClass[$violation['status']] ?? 'secondary' ?>">
-                                                    <?php echo  ucfirst($violation['status']) ?>
-                                                </span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <?php endforeach; ?>
-                                </div>
-                            </div>
-                            <?php endif; ?>
-
-                            <!-- Photos/Documents -->
-                            <?php if (!empty($documents)): ?>
-                            <div class="card mb-3">
-                                <div class="card-header bg-light">
-                                    <h5 class="mb-0"><i class="bi bi-images"></i> Photos & Documents (<?php echo  count($documents) ?>)</h5>
-                                </div>
-                                <div class="card-body">
-                                    <div class="photo-grid">
-                                        <?php foreach ($documents as $doc): ?>
-                                        <div class="photo-item">
-                                            <?php if (in_array(strtolower(pathinfo($doc['file_path'], PATHINFO_EXTENSION)), ['jpg', 'jpeg', 'png', 'gif'])): ?>
-                                                <img src="/<?php echo  htmlspecialchars($doc['file_path']) ?>" 
-                                                     alt="<?php echo  htmlspecialchars($doc['title']) ?>"
-                                                     onclick="viewImage('<?php echo  htmlspecialchars($doc['file_path']) ?>')">
-                                                <small class="d-block mt-1"><?php echo  htmlspecialchars($doc['title']) ?></small>
-                                            <?php else: ?>
-                                                <a href="/<?php echo  htmlspecialchars($doc['file_path']) ?>" target="_blank" class="btn btn-sm btn-outline-primary">
-                                                    <i class="bi bi-file-earmark"></i> <?php echo  htmlspecialchars($doc['title']) ?>
-                                                </a>
-                                            <?php endif; ?>
-                                        </div>
                                         <?php endforeach; ?>
                                     </div>
                                 </div>
+                            <?php endforeach; ?>
+                        </div>
+                    </div>
+
+                    <!-- Column 2: Audit Personnel & Metadata -->
+                    <div class="space-y-8">
+                        <!-- Audit Personnel -->
+                        <div class="card p-6 bg-slate-800 text-white shadow-lg shadow-slate-200/50">
+                            <h3 class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-4">Personnel Assigned</h3>
+                            <div class="flex items-center space-x-4">
+                                <div class="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center font-black text-xs">
+                                    <?= substr($inspection['inspector_first_name'], 0, 1) ?><?= substr($inspection['inspector_last_name'], 0, 1) ?>
+                                </div>
+                                <div>
+                                    <p class="text-sm font-black italic"><?= htmlspecialchars($inspection['inspector_first_name'] . ' ' . $inspection['inspector_last_name']) ?></p>
+                                    <p class="text-[9px] text-slate-400 uppercase tracking-tighter">Authorized Inspector</p>
+                                </div>
                             </div>
-                            <?php endif; ?>
                         </div>
 
-                        <!-- Right Column: Summary -->
-                        <div class="col-md-4">
-                            <!-- Safety Culture AI (Gemini) Card -->
-                            <?php if ($aiRiskParams): ?>
-                            <div class="card mb-3 border-purple-500 shadow-sm">
-                                <div class="card-header bg-gradient-to-r from-purple-600 to-indigo-600 text-white">
-                                    <h5 class="mb-0"><i class="bi bi-robot"></i> Safety Culture AI Analytics</h5>
-                                </div>
-                                <div class="card-body">
-                                    <div class="d-flex align-items-center mb-3">
-                                        <div class="flex-shrink-0">
-                                            <span class="badge rounded-pill bg-<?php echo $aiRiskParams['risk']['risk_category'] === 'high' ? 'danger' : ($aiRiskParams['risk']['risk_category'] === 'medium' ? 'warning' : 'success'); ?> p-2 px-3">
-                                                <?php echo strtoupper($aiRiskParams['risk']['risk_category']); ?> RISK
-                                            </span>
-                                        </div>
-                                        <div class="ms-3">
-                                            <div class="small text-muted">Predictive Risk Score</div>
-                                            <div class="fw-bold"><?php echo round($aiRiskParams['risk']['risk_score'] * 100, 1); ?>%</div>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="alert alert-dark border-purple-500 py-2 mb-3 bg-purple-50 px-3">
-                                        <div class="small fw-bold text-purple-700 mb-1"><i class="bi bi-stars"></i> AI Recommendation</div>
-                                        <div class="small text-dark"><?php echo $aiRiskParams['risk']['recommendation']; ?></div>
-                                    </div>
-
-                                    <div class="mb-0">
-                                        <div class="small fw-bold text-muted mb-1">Inspector Note Audit</div>
-                                        <div class="d-flex align-items-center">
-                                            <i class="bi bi-shield-check text-success me-2"></i>
-                                            <span class="small"><?php echo $aiRiskParams['audit']['ai_summary']; ?></span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="card-footer bg-light py-1 text-center">
-                                    <small class="text-muted italic">Powered by Gemini for LGU 4 Health & Safety</small>
-                                </div>
+                        <!-- Non-Compliance Ledger -->
+                        <div class="card">
+                            <div class="px-6 py-4 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
+                                <h3 class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Found Violations</h3>
+                                <span class="px-2 py-0.5 bg-rose-50 text-rose-600 border border-rose-100 rounded text-[9px] font-black italic"><?= count($violationsList) ?></span>
                             </div>
-                            <?php endif; ?>
+                            <div class="p-4 space-y-3">
+                                <?php if (!empty($violationsList)): ?>
+                                    <?php foreach ($violationsList as $v): ?>
+                                        <div class="p-4 border border-rose-100 bg-rose-50/20 rounded-xl relative overflow-hidden group">
+                                            <div class="absolute top-0 right-0 p-2 opacity-10 group-hover:opacity-30 transition-opacity">
+                                                <i class="fas fa-exclamation-triangle text-rose-500"></i>
+                                            </div>
+                                            <div class="text-[10px] font-black text-rose-700 uppercase tracking-tighter mb-1"><?= $v['severity'] ?> Severity</div>
+                                            <p class="text-[11px] font-bold text-slate-800 leading-tight mb-2 italic">"<?= htmlspecialchars($v['description']) ?>"</p>
+                                            <div class="flex items-center justify-between text-[9px] font-bold text-rose-400 uppercase">
+                                                <span>Status: <?= $v['status'] ?></span>
+                                            </div>
+                                        </div>
+                                    <?php endforeach; ?>
+                                <?php else: ?>
+                                    <p class="text-center py-6 text-[10px] text-slate-400 italic uppercase">Zero violations logged.</p>
+                                <?php endif; ?>
+                            </div>
+                        </div>
 
-                            <!-- Score Card -->
-                            <?php if (!empty($checklistResponses)): ?>
-                            <div class="card mb-3">
-                                <div class="card-header bg-light">
-                                    <h5 class="mb-0"><i class="bi bi-graph-up"></i> Overall Score</h5>
+                        <!-- Institutional Reference Card -->
+                        <div class="card p-6 border-l-4 border-l-blue-700">
+                            <h3 class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-4">Entity Information</h3>
+                            <div class="space-y-4">
+                                <div>
+                                    <p class="text-[8px] font-black text-slate-400 uppercase mb-1">Registered Principal</p>
+                                    <p class="text-xs font-bold text-slate-800"><?= htmlspecialchars($inspection['owner_name']) ?></p>
                                 </div>
-                                <div class="card-body text-center">
-                                    <div class="score-circle <?php echo  $score >= 90 ? 'score-excellent' : ($score >= 75 ? 'score-good' : ($score >= 60 ? 'score-fair' : 'score-poor')) ?>">
-                                        <?php echo  $score ?>%
-                                    </div>
-                                    <p class="mt-3 mb-0">
-                                        <?php echo  $earnedPoints ?> / <?php echo  $totalPoints ?> points
-                                    </p>
-                                    <p class="text-muted small">
-                                        <?php
-                                        if ($score >= 90) echo 'Excellent compliance';
-                                        elseif ($score >= 75) echo 'Good compliance';
-                                        elseif ($score >= 60) echo 'Fair compliance';
-                                        else echo 'Needs improvement';
-                                        ?>
+                                <div>
+                                    <p class="text-[8px] font-black text-slate-400 uppercase mb-1">Official Hotlines</p>
+                                    <p class="text-xs font-mono font-bold text-blue-700"><?= htmlspecialchars($inspection['owner_phone']) ?></p>
+                                </div>
+                                <div>
+                                    <p class="text-[8px] font-black text-slate-400 uppercase mb-1">Jurisdiction</p>
+                                    <p class="text-[10px] font-medium text-slate-600 italic">
+                                        <?= htmlspecialchars($inspection['address_barangay']) ?>, <?= htmlspecialchars($inspection['address_city']) ?>
                                     </p>
                                 </div>
                             </div>
-                            <?php endif; ?>
+                        </div>
 
-                            <!-- Summary Card -->
-                            <div class="card mb-3">
-                                <div class="card-header bg-light">
-                                    <h5 class="mb-0"><i class="bi bi-bar-chart"></i> Summary</h5>
-                                </div>
-                                <div class="card-body">
-                                    <div class="d-flex justify-content-between mb-2">
-                                        <span>Checklist Items:</span>
-                                        <strong><?php echo  count($checklistResponses) ?></strong>
-                                    </div>
-                                    <div class="d-flex justify-content-between mb-2">
-                                        <span>Violations:</span>
-                                        <strong class="text-danger"><?php echo  count($violations) ?></strong>
-                                    </div>
-                                    <div class="d-flex justify-content-between mb-2">
-                                        <span>Photos/Documents:</span>
-                                        <strong><?php echo  count($documents) ?></strong>
-                                    </div>
-                                    <hr>
-                                    <?php
-                                    $passCount = count(array_filter($checklistResponses, fn($r) => $r['response'] === 'pass'));
-                                    $failCount = count(array_filter($checklistResponses, fn($r) => $r['response'] === 'fail'));
-                                    ?>
-                                    <div class="d-flex justify-content-between mb-2">
-                                        <span><i class="bi bi-check-circle text-success"></i> Passed:</span>
-                                        <strong class="text-success"><?php echo  $passCount ?></strong>
-                                    </div>
-                                    <div class="d-flex justify-content-between">
-                                        <span><i class="bi bi-x-circle text-danger"></i> Failed:</span>
-                                        <strong class="text-danger"><?php echo  $failCount ?></strong>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Timeline -->
-                            <div class="card">
-                                <div class="card-header bg-light">
-                                    <h5 class="mb-0"><i class="bi bi-clock-history"></i> Timeline</h5>
-                                </div>
-                                <div class="card-body">
-                                    <ul class="list-unstyled">
-                                        <li class="mb-2">
-                                            <i class="bi bi-circle-fill text-primary"></i>
-                                            <small class="text-muted">Created</small><br>
-                                            <small><?php echo  date('M d, Y h:i A', strtotime($inspection['created_at'])) ?></small>
-                                        </li>
-                                        <?php if ($inspection['started_at']): ?>
-                                        <li class="mb-2">
-                                            <i class="bi bi-circle-fill text-info"></i>
-                                            <small class="text-muted">Started</small><br>
-                                            <small><?php echo  date('M d, Y h:i A', strtotime($inspection['started_at'])) ?></small>
-                                        </li>
-                                        <?php endif; ?>
-                                        <?php if ($inspection['completed_at']): ?>
-                                        <li class="mb-2">
-                                            <i class="bi bi-circle-fill text-success"></i>
-                                            <small class="text-muted">Completed</small><br>
-                                            <small><?php echo  date('M d, Y h:i A', strtotime($inspection['completed_at'])) ?></small>
-                                        </li>
-                                        <?php endif; ?>
-                                    </ul>
-                                </div>
-                            </div>
+                        <!-- Formal Audit Metadata -->
+                        <div class="p-6 bg-blue-50 rounded-xl border border-blue-100">
+                            <h4 class="text-[9px] font-black text-blue-700 uppercase tracking-widest mb-2">Audit Traceability</h4>
+                            <p class="text-[10px] text-blue-600 italic leading-relaxed">
+                                This dossier represents a formal regulatory audit. Digital signatures and timestamps are hard-linked to the departmental database.
+                            </p>
                         </div>
                     </div>
                 </div>
-
-                <!-- Image Modal -->
-                <div class="modal fade" id="imageModal" tabindex="-1">
-                    <div class="modal-dialog modal-lg modal-dialog-centered">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title">Image</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                            </div>
-                            <div class="modal-body text-center">
-                                <img id="modalImage" src="" alt="" class="img-fluid">
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Photo Modal -->
-    <div class="modal fade" id="photoModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-body p-0">
-                    <img id="modalPhoto" src="" class="img-fluid w-100" alt="Full size photo">
-                </div>
-            </div>
+            </main>
         </div>
     </div>
-
-</main>
-</div>
-</div>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        function viewImage(imagePath) {
-            document.getElementById('modalImage').src = '/' + imagePath;
-            new bootstrap.Modal(document.getElementById('imageModal')).show();
-        }
-
-        function editInspection() {
-            if (confirm('Edit this inspection?')) {
-                window.location.href = '/views/inspections/edit.php?id=<?php echo  $inspection['id'] ?>';
-            }
-        }
-
-        function cancelInspection() {
-            if (confirm('Are you sure you want to cancel this inspection? This action cannot be undone.')) {
-                // Send AJAX request to update status
-                fetch('/views/inspections/update_status.php', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        inspection_id: <?php echo  $inspection['id'] ?>,
-                        status: 'cancelled'
-                    })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        alert('Inspection cancelled successfully');
-                        location.reload();
-                    } else {
-                        alert('Error: ' + data.message);
-                    }
-                });
-            }
-        }
-    </script>
 </body>
 </html>

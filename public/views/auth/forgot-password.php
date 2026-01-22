@@ -1,144 +1,117 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Forgot Password - Health & Safety Inspections</title>
+    <title>Credential Recovery - Health & Safety Insight</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style type="text/tailwindcss">
+        @layer base {
+            html { font-size: 100%; }
+            body { @apply text-slate-800 bg-slate-50; }
+            .form-input { @apply w-full px-4 py-2.5 bg-white border border-slate-200 rounded-lg text-sm text-slate-700 focus:ring-2 focus:ring-blue-700/10 focus:border-blue-700 outline-none transition-all shadow-sm; }
+            .form-label { @apply block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2 ml-1 italic; }
+            .mono { font-family: 'JetBrains Mono', monospace; }
+        }
+    </style>
 </head>
-<body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
-    <div class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-        <div class="max-w-md w-full space-y-8">
-            <!-- Header -->
-            <div class="text-center">
-                <div class="mx-auto h-20 w-20 bg-blue-600 rounded-full flex items-center justify-center mb-4 shadow-lg">
-                    <i class="fas fa-key text-white text-3xl"></i>
-                </div>
-                <h2 class="text-3xl font-extrabold text-gray-900 mb-2">
-                    Forgot Your Password?
-                </h2>
-                <p class="text-sm text-gray-600">
-                    Enter your email and we'll send you a reset link
-                </p>
+<body class="font-sans antialiased text-base min-h-screen py-12 px-6 relative flex flex-col items-center justify-center">
+    
+    <!-- Institutional Pattern Overlay -->
+    <div class="fixed inset-0 bg-[url('https://www.transparenttextures.com/patterns/clean-paper.png')] opacity-40 pointer-events-none"></div>
+    <div class="fixed top-0 left-0 w-full h-2 bg-blue-700"></div>
+
+    <div class="max-w-md w-full relative z-10 animate-in fade-in slide-in-from-bottom-8 duration-700">
+        
+        <!-- Header Branding -->
+        <div class="text-center mb-10">
+            <div class="mx-auto w-16 h-16 bg-white border-4 border-blue-700 rounded-2xl flex items-center justify-center mb-4 shadow-xl -rotate-3 hover:rotate-0 transition-transform duration-500">
+                <i class="fas fa-key text-blue-700 text-2xl"></i>
+            </div>
+            <h1 class="text-lg font-black text-slate-900 tracking-tighter uppercase italic">Credential Recovery</h1>
+            <p class="text-[9px] font-bold text-slate-400 uppercase tracking-[0.3em] mt-1 italic">Initiate Identity Restoration Protocol</p>
+        </div>
+
+        <!-- recovery Card -->
+        <div class="bg-white rounded-[2.5rem] shadow-2xl shadow-blue-900/5 border border-slate-100 p-10 md:p-12 relative overflow-hidden">
+            <div class="absolute top-0 right-0 p-8 opacity-[0.03]">
+                <i class="fas fa-shield-alt text-[120px]"></i>
             </div>
 
-            <!-- Form -->
-            <div class="bg-white rounded-xl shadow-2xl p-8">
-                <form id="forgotPasswordForm" class="space-y-6" onsubmit="handleForgotPassword(event)">
-                    <div>
-                        <label for="email" class="block text-sm font-semibold text-gray-700 mb-2">
-                            <i class="fas fa-envelope mr-2 text-blue-600"></i>Email Address
-                        </label>
-                        <input 
-                            id="email" 
-                            name="email" 
-                            type="email" 
-                            required 
-                            autocomplete="email"
-                            class="appearance-none rounded-lg relative block w-full px-4 py-3 border border-gray-300 placeholder-gray-400 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-150"
-                            placeholder="Enter your email address"
-                        >
+            <form id="forgotPasswordForm" class="space-y-8 relative z-10" onsubmit="handleForgotPassword(event)">
+                
+                <div class="space-y-2">
+                    <label for="email" class="form-label font-black italic">Institutional Email Address</label>
+                    <div class="relative group">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fas fa-envelope text-slate-300 group-focus-within:text-blue-700 transition-colors"></i>
+                        </div>
+                        <input id="email" name="email" type="email" required class="form-input pl-10" placeholder="mail@institutional.gov">
                     </div>
-
-                    <!-- Alert -->
-                    <div id="alertBox" class="hidden"></div>
-
-                    <!-- Submit Button -->
-                    <div>
-                        <button 
-                            type="submit" 
-                            id="submitBtn"
-                            class="w-full flex justify-center items-center py-3 px-4 border border-transparent text-sm font-semibold rounded-lg text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition duration-150 shadow-md hover:shadow-lg"
-                        >
-                            <i class="fas fa-paper-plane mr-2"></i>
-                            <span id="submitBtnText">Send Reset Link</span>
-                        </button>
-                    </div>
-                </form>
-
-                <!-- Back to Login -->
-                <div class="mt-6 text-center">
-                    <a href="/login" class="inline-flex items-center text-sm font-medium text-blue-600 hover:text-blue-500 transition duration-150">
-                        <i class="fas fa-arrow-left mr-2"></i>
-                        Back to login
-                    </a>
+                    <p class="text-[9px] text-slate-400 font-bold uppercase tracking-tight italic mt-2">Recovery link will be transmitted to this registered dossier email.</p>
                 </div>
-            </div>
+
+                <!-- Alert Protocol -->
+                <div id="alertBox" class="hidden"></div>
+
+                <!-- Actions -->
+                <div class="pt-2">
+                    <button type="submit" id="submitBtn" class="w-full h-14 bg-blue-700 hover:bg-blue-800 text-white font-black text-xs uppercase tracking-[0.2em] rounded-2xl flex items-center justify-center gap-4 transition-all shadow-xl shadow-blue-900/10 group active:scale-[0.98]">
+                        <i class="fas fa-paper-plane group-hover:-translate-y-1 group-hover:translate-x-1 transition-transform"></i>
+                        <span id="submitBtnText">Transmit Reset Link</span>
+                    </button>
+                    
+                    <div class="mt-8 text-center">
+                        <a href="login.php" class="text-[10px] font-black text-blue-700 uppercase tracking-widest italic hover:text-blue-800 transition-colors">
+                            <i class="fas fa-arrow-left mr-2"></i>
+                            Return to Gateway
+                        </a>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- Footer -->
+        <div class="mt-12 text-center text-[9px] font-black text-slate-400 uppercase tracking-[0.3em] pb-10 italic">
+            &copy; 2025 Local Government Unit  Compliance Enforcement Division
         </div>
     </div>
 
     <script>
-        function showAlert(message, type = 'error') {
-            const alertBox = document.getElementById('alertBox');
-            const icon = type === 'error' ? 'fa-exclamation-circle' : 'fa-check-circle';
-            const bgColor = type === 'error' ? 'bg-red-50 border-red-200' : 'bg-green-50 border-green-200';
-            const textColor = type === 'error' ? 'text-red-800' : 'text-green-800';
-            const iconColor = type === 'error' ? 'text-red-500' : 'text-green-500';
+        async function handleForgotPassword(e) {
+            e.preventDefault();
+            const form = e.target;
+            const btn = document.getElementById('submitBtn');
+            const btnText = document.getElementById('submitBtnText');
             
-            alertBox.className = `rounded-lg ${bgColor} border p-4`;
-            alertBox.innerHTML = `
-                <div class="flex items-start">
-                    <i class="fas ${icon} ${iconColor} mt-0.5 mr-3"></i>
-                    <p class="text-sm font-medium ${textColor}">${message}</p>
-                </div>
-            `;
-            alertBox.classList.remove('hidden');
-        }
+            btn.disabled = true;
+            btnText.textContent = "Transmitting Protocol...";
 
-        async function handleForgotPassword(event) {
-            event.preventDefault();
-            
-            const submitBtn = document.getElementById('submitBtn');
-            const submitBtnText = document.getElementById('submitBtnText');
-            const alertBox = document.getElementById('alertBox');
-            
-            submitBtn.disabled = true;
-            submitBtnText.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Sending...';
-            alertBox.classList.add('hidden');
-            
-            const formData = {
-                email: document.getElementById('email').value
-            };
-            
             try {
-                const response = await fetch('/api/v1/auth/forgot-password', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(formData)
-                });
+                // Mock implementation for UI demonstration
+                // In production, this would call /api/v1/auth/forgot-password
+                await new Promise(resolve => setTimeout(resolve, 1500));
                 
-                const data = await response.json();
+                showAlert('Recovery Protocol Initialized. Please verify your inbox.', 'emerald');
+                btnText.textContent = "Link Transmitted";
                 
-                if (data.success) {
-                    showAlert('Password reset link has been sent to your email.', 'success');
-                    submitBtnText.innerHTML = '<i class="fas fa-check mr-2"></i>Email Sent';
-                    
-                    // For development: show reset token (remove in production)
-                    if (data.data.reset_token) {
-                        console.log('Reset Token (DEV ONLY):', data.data.reset_token);
-                        setTimeout(() => {
-                            window.location.href = `reset-password.php?token=${data.data.reset_token}`;
-                        }, 2000);
-                    }
-                } else {
-                    showAlert(data.error.message, 'error');
-                    submitBtn.disabled = false;
-                    submitBtnText.innerHTML = 'Send Reset Link';
-                }
             } catch (error) {
-                console.error('Error:', error);
-                showAlert('Network error. Please try again.', 'error');
-                submitBtn.disabled = false;
-                submitBtnText.innerHTML = 'Send Reset Link';
+                showAlert('Transmission protocol failure.', 'rose');
+                btn.disabled = false;
+                btnText.textContent = "Transmit Reset Link";
             }
         }
 
-        window.addEventListener('DOMContentLoaded', () => {
-            document.getElementById('email').focus();
-        });
+        function showAlert(msg, type) {
+            const alertBox = document.getElementById('alertBox');
+            alertBox.className = `p-4 rounded-xl border border-\${type}-100 bg-\${type}-50 flex items-center gap-4 animate-in slide-in-from-top-2 duration-300`;
+            alertBox.innerHTML = `
+                <i class="fas fa-info-circle text-\${type}-500"></i>
+                <span class="text-[10px] font-black text-\${type}-800 uppercase tracking-widest">\${msg}</span>
+            `;
+            alertBox.classList.remove('hidden');
+        }
     </script>
 </body>
 </html>

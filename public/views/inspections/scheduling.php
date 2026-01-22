@@ -1,7 +1,7 @@
-<?php
+﻿<?php
 /**
  * Health & Safety Inspection System
- * Inspection Scheduling Dashboard
+ * Inspection Scheduling Registry
  */
 
 declare(strict_types=1);
@@ -30,7 +30,7 @@ $stats = [
 $upcomingSql = "
     SELECT i.*, 
            e.name as establishment_name, 
-           CONCAT(u.first_name, ' ', u.last_name) as inspector_name
+           CONCAT(u.first_name, ' ', u.last_name) as inspector_full_name
     FROM inspections i
     LEFT JOIN establishments e ON i.establishment_id = e.establishment_id
     LEFT JOIN users u ON i.inspector_id = u.user_id
@@ -46,7 +46,7 @@ $upcomingInspections = $stmt->fetchAll(PDO::FETCH_ASSOC);
 $overdueSql = "
     SELECT i.*, 
            e.name as establishment_name, 
-           CONCAT(u.first_name, ' ', u.last_name) as inspector_name
+           CONCAT(u.first_name, ' ', u.last_name) as inspector_full_name
     FROM inspections i
     LEFT JOIN establishments e ON i.establishment_id = e.establishment_id
     LEFT JOIN users u ON i.inspector_id = u.user_id
@@ -63,19 +63,21 @@ $overdueInspections = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Scheduling - Health & Safety System</title>
+    <title>Protocol Scheduling - Health & Safety Insight</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style type="text/tailwindcss">
         @layer base {
-            html { font-size: 105%; }
-            body { @apply text-slate-200; }
-            h1, h2, h3, h4, h5, h6 { @apply font-bold tracking-tight text-white; }
+            html { font-size: 100%; }
+            body { @apply text-slate-700 bg-slate-50; }
+            .registry-table th { @apply px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 bg-slate-50/50; }
+            .registry-table td { @apply px-6 py-4 text-sm border-b border-slate-50; }
+            .card { @apply bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden; }
         }
     </style>
 </head>
-<body class="bg-[#0b0c10] font-sans antialiased text-base overflow-hidden">
-    <div class="flex h-screen">
+<body class="font-sans antialiased text-base overflow-hidden">
+    <div class="flex h-screen overflow-hidden">
         <!-- Sidebar Navigation -->
         <?php 
             $activePage = 'scheduling';
@@ -83,147 +85,148 @@ $overdueInspections = $stmt->fetchAll(PDO::FETCH_ASSOC);
         ?>
 
         <!-- Main Content -->
-        <div class="flex-1 flex flex-col min-w-0 overflow-hidden">
-            <!-- Top Navbar -->
-            <header class="bg-[#0f1115] border-b border-white/5 h-20 flex items-center justify-between px-8 shrink-0">
-                <div class="flex flex-col">
-                    <h1 class="text-xl font-bold text-white tracking-tight">Inspection Scheduling</h1>
-                    <p class="text-xs text-slate-400">Manage and monitor field assignments</p>
-                </div>
+        <div class="flex-1 flex flex-col min-w-0 overflow-hidden text-base">
+            <!-- Institutional Header -->
+            <header class="bg-white border-b border-slate-200 h-16 flex items-center justify-between px-8 shrink-0 z-10">
                 <div class="flex items-center space-x-4">
-                    <a href="/inspections/create" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl text-sm font-bold flex items-center shadow-lg shadow-blue-900/20 transition-all active:scale-95 group">
-                        <i class="fas fa-calendar-plus mr-2 group-hover:rotate-12 transition-transform"></i> Schedule Inspection
+                    <h1 class="text-sm font-bold text-slate-800 tracking-tight uppercase">Deployment & Scheduling</h1>
+                    <div class="h-4 w-px bg-slate-200"></div>
+                    <span class="text-[10px] font-bold text-blue-700 uppercase tracking-widest italic">Institutional Registry</span>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <a href="/inspections/create" class="bg-blue-700 hover:bg-blue-800 text-white px-5 py-2 rounded-lg text-xs font-bold uppercase tracking-widest flex items-center shadow-md transition-all active:scale-95">
+                        <i class="fas fa-calendar-plus mr-2 text-[10px]"></i> Create Assignment
                     </a>
                 </div>
             </header>
 
-            <!-- Scrollable Content Area -->
-                        <!-- Main Scrollable Content -->
-            <main class="flex-1 overflow-y-auto p-4 md:p-8 text-base">
-                <!-- Stats Overview -->
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-                    <div class="bg-[#15181e] p-6 rounded-2xl border border-white/5 shadow-sm transition-hover">
-                        <div class="flex items-center justify-between mb-4">
-                            <div class="p-3 bg-blue-500/10 rounded-xl text-blue-500">
-                                <i class="fas fa-calendar-day text-xl"></i>
-                            </div>
-                        </div>
-                        <div class="text-3xl font-black text-white"><?php echo  $stats['today'] ?></div>
-                        <div class="text-sm text-slate-400 font-medium tracking-wide">Scheduled Today</div>
-                    </div>
+            <!-- Main Scrollable Area -->
+            <main class="flex-1 overflow-y-auto p-8">
+                <div class="max-w-7xl mx-auto space-y-8">
                     
-                    <div class="bg-[#15181e] p-6 rounded-2xl border border-white/5 shadow-sm transition-hover">
-                        <div class="flex items-center justify-between mb-4">
-                            <div class="p-3 bg-emerald-500/10 rounded-xl text-emerald-500">
-                                <i class="fas fa-calendar-week text-xl"></i>
-                            </div>
+                    <!-- Performance & Assignment Matrix -->
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                        <div class="card relative p-6">
+                            <div class="absolute top-0 left-0 w-1 h-full bg-blue-700"></div>
+                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Active Today</p>
+                            <p class="text-3xl font-black text-slate-800 italic"><?= $stats['today'] ?></p>
+                            <p class="text-[9px] text-slate-400 mt-2 uppercase font-medium">Pending Protocol Deployments</p>
                         </div>
-                        <div class="text-3xl font-black text-white"><?php echo  $stats['this_week'] ?></div>
-                        <div class="text-sm text-slate-400 font-medium tracking-wide">Coming Up (7 Days)</div>
+                        <div class="card p-6">
+                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Weekly Forecast</p>
+                            <p class="text-3xl font-black text-slate-800 italic"><?= $stats['this_week'] ?></p>
+                            <p class="text-[9px] text-slate-400 mt-2 uppercase font-medium">Scheduled next 7 days</p>
+                        </div>
+                        <div class="card p-6 border-rose-100">
+                            <p class="text-[10px] font-bold text-rose-400 uppercase tracking-widest mb-1">Protocol Delays</p>
+                            <p class="text-3xl font-black text-rose-600 italic"><?= $stats['overdue'] ?></p>
+                            <p class="text-[9px] text-rose-400 mt-2 uppercase font-medium italic">Action Required Immediate</p>
+                        </div>
+                        <div class="card p-6">
+                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Master Ledger</p>
+                            <p class="text-3xl font-black text-slate-800 italic"><?= $stats['total_pending'] ?></p>
+                            <p class="text-[9px] text-slate-400 mt-2 uppercase font-medium">Total Pending Assignments</p>
+                        </div>
                     </div>
 
-                    <div class="bg-[#15181e] p-6 rounded-2xl border border-white/5 shadow-sm transition-hover">
-                        <div class="flex items-center justify-between mb-4">
-                            <div class="p-3 bg-rose-500/10 rounded-xl text-rose-500">
-                                <i class="fas fa-clock text-xl"></i>
-                            </div>
-                        </div>
-                        <div class="text-3xl font-black text-white"><?php echo  $stats['overdue'] ?></div>
-                        <div class="text-sm text-rose-400 font-medium tracking-wide">Overdue Inspections</div>
-                    </div>
-
-                    <div class="bg-[#15181e] p-6 rounded-2xl border border-white/5 shadow-sm transition-hover">
-                        <div class="flex items-center justify-between mb-4">
-                            <div class="p-3 bg-amber-500/10 rounded-xl text-amber-600">
-                                <i class="fas fa-hourglass-half text-xl"></i>
-                            </div>
-                        </div>
-                        <div class="text-3xl font-black text-white"><?php echo  $stats['total_pending'] ?></div>
-                        <div class="text-sm text-slate-400 font-medium tracking-wide">Total Pending</div>
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-1 gap-8">
-                    <!-- Upcoming List -->
-                    <div class="space-y-8">
-                        <section>
-                            <div class="flex items-center justify-between mb-4">
-                                <h2 class="text-sm font-bold text-slate-400 uppercase tracking-widest flex items-center">
-                                    <i class="fas fa-calendar-alt mr-2 text-blue-500"></i>
-                                    Upcoming Inspections
+                    <!-- Critical Alert Section (Overdue) -->
+                    <?php if (!empty($overdueInspections)): ?>
+                        <div class="card border-rose-200">
+                            <div class="px-6 py-4 bg-rose-50/50 border-b border-rose-100 flex items-center justify-between">
+                                <h2 class="text-xs font-black text-rose-700 uppercase tracking-widest flex items-center italic">
+                                    <i class="fas fa-clock mr-2"></i> Outstanding Audit Protocol Delays
                                 </h2>
                             </div>
-                            
-                            <div class="bg-[#15181e] rounded-2xl border border-white/5 shadow-xl overflow-hidden">
-                                <?php if (empty($upcomingInspections)): ?>
-                                    <div class="p-12 text-center text-slate-500 italic">No upcoming inspections scheduled.</div>
-                                <?php else: ?>
-                                    <table class="w-full text-left border-collapse">
-                                        <thead>
-                                            <tr class="bg-black/20 border-b border-white/5">
-                                                <th class="px-6 py-4 text-[10px] font-black text-slate-500 uppercase tracking-widest">Date</th>
-                                                <th class="px-6 py-4 text-[10px] font-black text-slate-500 uppercase tracking-widest">Establishment</th>
-                                                <th class="px-6 py-4 text-[10px] font-black text-slate-500 uppercase tracking-widest">Inspector</th>
-                                                <th class="px-6 py-4 text-[10px] font-black text-slate-500 uppercase tracking-widest text-right">Action</th>
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-left registry-table">
+                                    <tbody>
+                                        <?php foreach ($overdueInspections as $insp): ?>
+                                            <tr class="hover:bg-rose-50/30 transition-colors">
+                                                <td class="w-1/4">
+                                                    <div class="text-[11px] font-black text-rose-600 uppercase tracking-tighter italic">Delayed Since <?= date('M d, Y', strtotime($insp['scheduled_date'])) ?></div>
+                                                </td>
+                                                <td>
+                                                    <div class="text-xs font-bold text-slate-800 uppercase"><?= htmlspecialchars($insp['establishment_name']) ?></div>
+                                                    <div class="text-[9px] text-slate-400 font-bold uppercase tracking-widest mt-0.5">Assigned: <?= htmlspecialchars($insp['inspector_full_name'] ?: 'Unassigned') ?></div>
+                                                </td>
+                                                <td class="text-right">
+                                                    <a href="/inspections/conduct?id=<?= $insp['inspection_id'] ?>" class="bg-rose-600 hover:bg-rose-700 text-white text-[10px] font-bold px-4 py-2 rounded shadow-sm uppercase tracking-widest italic transition-all">
+                                                        Deploy Personnel
+                                                    </a>
+                                                </td>
                                             </tr>
-                                        </thead>
-                                        <tbody class="divide-y divide-white/5">
-                                            <?php foreach ($upcomingInspections as $insp): ?>
-                                                <?php 
-                                                    $isToday = $insp['scheduled_date'] == $today;
-                                                    $priorityClass = [
-                                                        'urgent' => 'bg-rose-500/10 text-rose-500',
-                                                        'high' => 'bg-amber-500/10 text-amber-500',
-                                                        'medium' => 'bg-blue-500/10 text-blue-500',
-                                                        'low' => 'bg-slate-500/10 text-slate-500'
-                                                    ][$insp['priority']] ?? 'bg-slate-500/10 text-slate-500';
-                                                ?>
-                                                <tr class="hover:bg-white/[0.02] transition-colors group">
-                                                    <td class="px-6 py-4">
-                                                        <div class="text-sm <?= $isToday ? 'text-blue-400 font-bold' : 'text-slate-300' ?>">
-                                                            <?= date('M d', strtotime($insp['scheduled_date'])) ?>
-                                                        </div>
-                                                        <div class="text-[10px] text-slate-500 uppercase"><?= date('D', strtotime($insp['scheduled_date'])) ?></div>
-                                                    </td>
-                                                    <td class="px-6 py-4">
-                                                        <div class="font-bold text-white group-hover:text-blue-400 transition-colors"><?= htmlspecialchars($insp['establishment_name']) ?></div>
-                                                        <div class="flex items-center space-x-2 mt-1">
-                                                            <span class="text-[10px] px-1.5 py-0.5 rounded <?= $priorityClass ?> font-bold uppercase tracking-tighter">
-                                                                <?= $insp['priority'] ?>
-                                                            </span>
-                                                            <span class="text-[10px] text-slate-500"><?= ucwords(str_replace('_', ' ', $insp['inspection_type'])) ?></span>
-                                                        </div>
-                                                    </td>
-                                                    <td class="px-6 py-4">
-                                                        <div class="flex items-center">
-                                                            <div class="w-8 h-8 rounded-lg bg-blue-500/10 border border-blue-500/20 flex items-center justify-center mr-3 text-[10px] font-black text-blue-400 uppercase">
-                                                                <?= substr($insp['inspector_name'] ?: 'UN', 0, 2) ?>
-                                                            </div>
-                                                            <div class="text-sm text-slate-300"><?= htmlspecialchars($insp['inspector_name'] ?: 'Unassigned') ?></div>
-                                                        </div>
-                                                    </td>
-                                                    <td class="px-6 py-4 text-right">
-                                                        <a href="/inspections/view?id=<?= $insp['inspection_id'] ?>" class="p-2 hover:bg-blue-500/20 text-blue-400 rounded-lg transition-colors inline-block">
-                                                            <i class="fas fa-chevron-right"></i>
-                                                        </a>
-                                                    </td>
-                                                </tr>
-                                            <?php endforeach; ?>
-                                        </tbody>
-                                    </table>
-                                <?php endif; ?>
+                                        <?php endforeach; ?>
+                                    </tbody>
+                                </table>
                             </div>
-                        </section>
+                        </div>
+                    <?php endif; ?>
+
+                    <!-- Primary Scheduling Ledger -->
+                    <div class="card">
+                        <div class="px-8 py-5 border-b border-slate-100 flex items-center justify-between bg-white">
+                            <h2 class="text-[10px] font-black text-slate-800 uppercase tracking-widest flex items-center italic">
+                                <i class="fas fa-list-check mr-3 text-blue-700"></i> Deployment Registry Forecast
+                            </h2>
+                            <span class="text-[9px] font-bold text-slate-300 uppercase italic">Limited to next 20 entries</span>
+                        </div>
+                        
+                        <?php if (empty($upcomingInspections)): ?>
+                            <div class="p-16 text-center">
+                                <div class="bg-slate-50 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4 text-slate-200">
+                                    <i class="fas fa-calendar-times"></i>
+                                </div>
+                                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">No Protocol Assignments Found</p>
+                            </div>
+                        <?php else: ?>
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-left registry-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Deployment Date</th>
+                                            <th>Subject Entity</th>
+                                            <th>Operation Type</th>
+                                            <th>Personnel</th>
+                                            <th class="text-right">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-slate-50">
+                                        <?php foreach ($upcomingInspections as $insp): ?>
+                                            <tr class="hover:bg-slate-50/50 transition-colors group">
+                                                <td>
+                                                    <div class="text-xs font-black text-slate-800"><?= date('M d, Y', strtotime($insp['scheduled_date'])) ?></div>
+                                                    <div class="text-[9px] text-slate-400 font-bold uppercase italic"><?= date('l', strtotime($insp['scheduled_date'])) ?></div>
+                                                </td>
+                                                <td>
+                                                    <div class="text-xs font-bold text-slate-800 group-hover:text-blue-700 transition-colors uppercase"><?= htmlspecialchars($insp['establishment_name']) ?></div>
+                                                    <div class="text-[9px] text-slate-300 font-medium italic">Ref: <?= $insp['reference_number'] ?></div>
+                                                </td>
+                                                <td>
+                                                    <span class="inline-block px-2 py-1 bg-slate-100 text-[9px] font-black text-slate-500 rounded uppercase tracking-tighter">
+                                                        <?= str_replace('_', ' ', $insp['inspection_type']) ?>
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <div class="flex items-center space-x-2">
+                                                        <div class="w-6 h-6 rounded bg-blue-50 flex items-center justify-center text-[10px] text-blue-700 font-bold">
+                                                            <?= strtoupper(substr($insp['inspector_full_name'] ?: 'U', 0, 1)) ?>
+                                                        </div>
+                                                        <span class="text-xs font-semibold text-slate-600"><?= htmlspecialchars($insp['inspector_full_name'] ?: 'Not Assigned') ?></span>
+                                                    </div>
+                                                </td>
+                                                <td class="text-right">
+                                                    <a href="/inspections/view?id=<?= $insp['inspection_id'] ?>" class="text-[10px] font-black text-slate-300 hover:text-blue-700 uppercase tracking-widest transition-colors italic">View Protocol</a>
+                                                </td>
+                                            </tr>
+                                        <?php endforeach; ?>
+                                    </tbody>
+                                </table>
+                            </div>
+                        <?php endif; ?>
                     </div>
                 </div>
             </main>
         </div>
     </div>
-    <style>
-        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.05); border-radius: 10px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.1); }
-    </style>
 </body>
 </html>

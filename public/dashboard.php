@@ -9,13 +9,13 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style type="text/tailwindcss">
         @layer base {
-            html { font-size: 105%; }
-            body { @apply text-slate-200; }
-            h1, h2, h3, h4, h5, h6 { @apply font-bold tracking-tight text-white; }
+            html { font-size: 100%; }
+            body { @apply text-slate-700; }
+            h1, h2, h3, h4, h5, h6 { @apply font-bold tracking-tight text-slate-900; }
         }
     </style>
 </head>
-<body class="bg-[#0b0c10] font-sans antialiased text-base overflow-hidden">
+<body class="bg-slate-50 font-sans antialiased text-base overflow-hidden">
     <div class="flex h-screen">
         <!-- Sidebar -->
         <?php 
@@ -26,48 +26,48 @@
         <!-- Main Content Area -->
         <div class="flex-1 flex flex-col min-w-0 overflow-hidden">
             <!-- Header -->
-            <header class="bg-[#0f1115] border-b border-white/5 h-20 flex items-center justify-between px-8 z-10 shrink-0">
+            <header class="bg-white border-b border-slate-200 h-16 flex items-center justify-between px-8 z-10 shrink-0">
                 <div class="flex items-center">
-                    <button class="md:hidden p-2 rounded-md text-gray-400 hover:text-white hover:bg-white/5 focus:outline-none">
+                    <button class="md:hidden p-2 rounded-md text-slate-400 hover:text-slate-600 hover:bg-slate-50 focus:outline-none">
                         <i class="fas fa-bars"></i>
                     </button>
-                    <h2 class="text-xl font-bold text-white ml-2 md:ml-0 tracking-tight flex items-center">
-                        <span class="w-1.5 h-6 bg-blue-600 rounded-full mr-3"></span>
-                        System Overview
+                    <h2 class="text-sm font-bold text-slate-700 ml-2 md:ml-0 tracking-tight flex items-center">
+                        <span class="w-1 h-4 bg-blue-700 rounded-full mr-2"></span>
+                        Management Dashboard
                     </h2>
                 </div>
                 
-                <div class="flex items-center space-x-6">
-                    <button class="p-2.5 rounded-xl text-slate-400 hover:text-white hover:bg-white/5 transition-all relative">
-                        <i class="fas fa-bell text-lg"></i>
-                        <span class="absolute top-2.5 right-2.5 h-2 w-2 bg-red-500 rounded-full border-2 border-[#0f1115]"></span>
+                <div class="flex items-center space-x-4">
+                    <button class="p-2 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-50 transition-all relative border border-transparent hover:border-slate-200">
+                        <i class="fas fa-bell"></i>
+                        <span class="absolute top-1.5 right-1.5 h-2 w-2 bg-rose-500 rounded-full border-2 border-white"></span>
                     </button>
                     
                     <div class="relative">
-                        <button onclick="toggleUserMenu()" class="flex items-center space-x-3 focus:outline-none p-1.5 rounded-xl hover:bg-white/5 transition-all group">
-                            <img id="userAvatar" class="h-9 w-9 rounded-xl border border-white/10 shadow-inner" src="https://ui-avatars.com/api/?name=User&background=3B82F6&color=fff" alt="">
-                            <div class="hidden sm:block text-left">
-                                <p id="userName" class="text-xs font-black text-white uppercase tracking-tight leading-none mb-1">Loading...</p>
-                                <p id="userRole" class="text-[9px] text-blue-400 font-bold uppercase tracking-widest leading-none">Access Level</p>
+                        <button onclick="toggleUserMenu()" class="flex items-center space-x-2 focus:outline-none p-1 rounded-lg hover:bg-slate-50 transition-all border border-transparent hover:border-slate-200">
+                            <img id="userAvatar" class="h-8 w-8 rounded border border-slate-200" src="https://ui-avatars.com/api/?name=User&background=1e40af&color=fff" alt="">
+                            <div class="hidden sm:block text-left mr-1">
+                                <p id="userName" class="text-xs font-bold text-slate-800 leading-none mb-0.5">Officer</p>
+                                <p id="userRole" class="text-[10px] text-slate-500 font-medium uppercase tracking-tight leading-none">Access Level</p>
                             </div>
-                            <i class="fas fa-chevron-down text-[10px] text-slate-500 group-hover:text-white transition-colors"></i>
+                            <i class="fas fa-chevron-down text-[10px] text-slate-400"></i>
                         </button>
                         
-                        <div id="userMenu" class="hidden absolute right-0 mt-3 w-56 rounded-2xl shadow-2xl bg-[#15181e] border border-white/5 py-2 z-50 overflow-hidden">
-                            <div class="px-4 py-3 border-b border-white/5 mb-1 bg-white/[0.02]">
-                                <p class="text-[10px] text-slate-500 font-black uppercase tracking-widest mb-1">Logged In As</p>
-                                <p class="text-xs font-bold text-white truncate"><?php echo htmlspecialchars($_SESSION['email'] ?? 'user@system.lgu'); ?></p>
+                        <div id="userMenu" class="hidden absolute right-0 mt-2 w-52 rounded-xl shadow-lg bg-white border border-slate-200 py-1 z-50 overflow-hidden">
+                            <div class="px-4 py-2.5 border-b border-slate-100 mb-1 bg-slate-50/50">
+                                <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-0.5">Account Identity</p>
+                                <p class="text-xs font-bold text-slate-700 truncate"><?php echo htmlspecialchars($_SESSION['email'] ?? 'user@gov.ph'); ?></p>
                             </div>
-                            <a href="/profile" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                                <i class="fas fa-user mr-2 text-gray-400"></i>Profile
+                            <a href="/profile" class="block px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-50 hover:text-blue-700 transition-colors">
+                                <i class="fas fa-user-circle mr-2 opacity-50"></i>My Profile
                             </a>
-                            <a href="/settings" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                                <i class="fas fa-cog mr-2 text-gray-400"></i>Settings
+                            <a href="/settings" class="block px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-50 hover:text-blue-700 transition-colors">
+                                <i class="fas fa-sliders-h mr-2 opacity-50"></i>Preferences
                             </a>
-                            <hr class="my-1 border-gray-100">
-                            <button onclick="handleLogout()" class="w-full flex items-center space-x-3 px-4 py-2.5 text-xs font-black text-rose-400 hover:bg-rose-600 hover:text-white transition-all">
-                                <i class="fas fa-sign-out-alt text-base w-5"></i>
-                                <span>SIGNOUT SYSTEM</span>
+                            <div class="border-t border-slate-100 my-1"></div>
+                            <button onclick="handleLogout()" class="w-full flex items-center space-x-2 px-4 py-2.5 text-xs font-bold text-rose-600 hover:bg-rose-50 transition-colors">
+                                <i class="fas fa-sign-out-alt opacity-50"></i>
+                                <span>Logout Session</span>
                             </button>
                         </div>
                     </div>
@@ -75,127 +75,134 @@
             </header>
 
             <!-- Scrollable Content -->
-            <main class="flex-1 overflow-y-auto p-8 custom-scrollbar bg-[#0b0c10]">
+            <main class="flex-1 overflow-y-auto p-8 bg-slate-50">
                 <div class="max-w-7xl mx-auto">
-                    <!-- Welcome Banner -->
-                    <div class="bg-gradient-to-br from-blue-700 via-indigo-800 to-indigo-950 rounded-3xl shadow-2xl p-10 mb-10 text-white relative overflow-hidden border border-white/5">
-                        <div class="absolute top-0 right-0 w-96 h-96 bg-white/5 rounded-full -mr-32 -mt-32 blur-3xl"></div>
-                        <div class="relative z-10">
-                            <span class="inline-block px-3 py-1 bg-white/10 rounded-lg text-[10px] font-black uppercase tracking-[0.2em] mb-4 border border-white/10 italic">LGU Safety Intelligence</span>
-                            <h1 class="text-4xl font-black mb-3 tracking-tighter italic">Welcome back, <span id="welcomeName" class="text-blue-300">Hub Manager</span>!</h1>
-                            <p class="text-blue-100/70 text-lg font-medium max-w-xl leading-relaxed">System diagnostics show that inspection throughput is up <span class="text-emerald-400 font-bold">12.4%</span> since last week. Here's your operational snapshot.</p>
+                    <!-- Statistics Header -->
+                    <div class="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                        <div>
+                            <h1 class="text-2xl font-bold text-slate-900 tracking-tight">System Operational Status</h1>
+                            <p class="text-sm text-slate-500 font-medium mt-1">Personnel and inspection metrics for the current fiscal period.</p>
                         </div>
-                        <i class="fas fa-shield-alt absolute -right-8 -bottom-8 text-[12rem] text-white/5 rotate-12"></i>
+                        <div class="flex items-center bg-white border border-slate-200 rounded-lg p-1 shadow-sm">
+                            <span class="px-4 py-1.5 text-xs font-bold text-blue-700 bg-blue-50 rounded-md">Live Statistics</span>
+                            <span class="px-4 py-1.5 text-xs font-semibold text-slate-500">Last Sync: Just Now</span>
+                        </div>
                     </div>
 
                     <!-- Stats Grid -->
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-10">
-                        <div class="bg-[#15181e] p-7 rounded-3xl border border-white/5 shadow-xl group hover:border-blue-500/30 transition-all duration-500">
-                            <div class="flex items-center justify-between mb-6">
-                                <div class="p-3.5 bg-blue-500/10 rounded-2xl text-blue-400 group-hover:scale-110 transition-transform">
-                                    <i class="fas fa-clipboard-check text-2xl"></i>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                        <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm transition-hover">
+                            <div class="flex items-center justify-between mb-4">
+                                <div class="p-2 bg-blue-50 rounded-lg text-blue-700">
+                                    <i class="fas fa-clipboard-list text-xl"></i>
                                 </div>
-                                <span class="text-[10px] font-black text-emerald-400 bg-emerald-400/10 px-2 py-1 rounded-lg">+12%</span>
+                                <span class="text-[10px] font-bold text-green-600 bg-green-50 px-2 py-1 rounded border border-green-100">+12%</span>
                             </div>
-                            <h3 class="text-xs font-black text-slate-500 uppercase tracking-widest mb-1">Total Inspections</h3>
-                            <p class="text-3xl font-black text-white tracking-tighter">247</p>
+                            <h3 class="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1">Total Logs</h3>
+                            <p class="text-2xl font-bold text-slate-900">247</p>
                         </div>
 
-                        <div class="bg-[#15181e] p-7 rounded-3xl border border-white/5 shadow-xl group hover:border-amber-500/30 transition-all duration-500">
-                            <div class="flex items-center justify-between mb-6">
-                                <div class="p-3.5 bg-amber-500/10 rounded-2xl text-amber-400 group-hover:scale-110 transition-transform">
-                                    <i class="fas fa-clock text-2xl"></i>
+                        <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm transition-hover">
+                            <div class="flex items-center justify-between mb-4">
+                                <div class="p-2 bg-amber-50 rounded-lg text-amber-700">
+                                    <i class="fas fa-hourglass-half text-xl"></i>
                                 </div>
-                                <span class="text-[10px] font-black text-amber-400 bg-amber-400/10 px-2 py-1 rounded-lg">Due Soon</span>
+                                <span class="text-[10px] font-bold text-amber-600 bg-amber-50 px-2 py-1 rounded border border-amber-100">Review</span>
                             </div>
-                            <h3 class="text-xs font-black text-slate-500 uppercase tracking-widest mb-1">Pending</h3>
-                            <p class="text-3xl font-black text-white tracking-tighter">18</p>
+                            <h3 class="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1">Pending Assignments</h3>
+                            <p class="text-2xl font-bold text-slate-900">18</p>
                         </div>
 
-                        <div class="bg-[#15181e] p-7 rounded-3xl border border-white/5 shadow-xl group hover:border-rose-500/30 transition-all duration-500">
-                            <div class="flex items-center justify-between mb-6">
-                                <div class="p-3.5 bg-rose-500/10 rounded-2xl text-rose-400 group-hover:scale-110 transition-transform">
-                                    <i class="fas fa-exclamation-triangle text-2xl"></i>
+                        <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm transition-hover">
+                            <div class="flex items-center justify-between mb-4">
+                                <div class="p-2 bg-rose-50 rounded-lg text-rose-700">
+                                    <i class="fas fa-shield-virus text-xl"></i>
                                 </div>
-                                <span class="text-[10px] font-black text-rose-400 bg-rose-400/10 px-2 py-1 rounded-lg">5 Active</span>
+                                <span class="text-[10px] font-bold text-rose-600 bg-rose-50 px-2 py-1 rounded border border-rose-100">Action Required</span>
                             </div>
-                            <h3 class="text-xs font-black text-slate-500 uppercase tracking-widest mb-1">Critical Violations</h3>
-                            <p class="text-3xl font-black text-white tracking-tighter">2</p>
+                            <h3 class="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1">Safety Violations</h3>
+                            <p class="text-2xl font-bold text-slate-900">2</p>
                         </div>
 
-                        <div class="bg-[#15181e] p-7 rounded-3xl border border-white/5 shadow-xl group hover:border-emerald-500/30 transition-all duration-500">
-                            <div class="flex items-center justify-between mb-6">
-                                <div class="p-3.5 bg-emerald-500/10 rounded-2xl text-emerald-400 group-hover:scale-110 transition-transform">
-                                    <i class="fas fa-certificate text-2xl"></i>
+                        <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm transition-hover">
+                            <div class="flex items-center justify-between mb-4">
+                                <div class="p-2 bg-indigo-50 rounded-lg text-indigo-700">
+                                    <i class="fas fa-certificate text-xl"></i>
                                 </div>
-                                <span class="text-[10px] font-black text-emerald-400 bg-emerald-400/10 px-2 py-1 rounded-lg">Valid</span>
+                                <span class="text-[10px] font-bold text-slate-500 bg-slate-50 px-2 py-1 rounded border border-slate-100 text-slate-500">Valid</span>
                             </div>
-                            <h3 class="text-xs font-black text-slate-500 uppercase tracking-widest mb-1">Certificates</h3>
-                            <p class="text-3xl font-black text-white tracking-tighter">89</p>
+                            <h3 class="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1">Issued Certificates</h3>
+                            <p class="text-2xl font-bold text-slate-900">89</p>
                         </div>
                     </div>
 
                     <!-- Charts Row -->
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-10">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
                         <!-- Inspection Trends -->
-                        <div class="bg-[#15181e] p-7 rounded-3xl border border-white/5 shadow-xl">
-                            <h3 class="text-xs font-black text-slate-500 uppercase tracking-widest mb-4">Inspection Trends</h3>
-                            <div class="h-[300px] relative">
+                        <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                            <div class="flex items-center justify-between mb-6">
+                                <h3 class="text-sm font-bold text-slate-800">Inspection Volume (6 Mo)</h3>
+                                <button class="text-slate-400 hover:text-slate-600"><i class="fas fa-ellipsis-v text-xs"></i></button>
+                            </div>
+                            <div class="h-[280px] relative">
                                 <canvas id="inspectionTrendsChart"></canvas>
                             </div>
                         </div>
 
                         <!-- Violation Categories -->
-                        <div class="bg-[#15181e] p-7 rounded-3xl border border-white/5 shadow-xl">
-                            <h3 class="text-xs font-black text-slate-500 uppercase tracking-widest mb-4">Violation Categories</h3>
-                            <div class="h-[300px] relative">
+                        <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                            <div class="flex items-center justify-between mb-6">
+                                <h3 class="text-sm font-bold text-slate-800">Violation Distribution</h3>
+                                <button class="text-slate-400 hover:text-slate-600"><i class="fas fa-ellipsis-v text-xs"></i></button>
+                            </div>
+                            <div class="h-[280px] relative">
                                 <canvas id="violationCategoriesChart"></canvas>
                             </div>
                         </div>
                     </div>
 
                     <!-- Recent Inspections -->
-                    <div class="bg-[#15181e] rounded-3xl border border-white/5 shadow-xl overflow-hidden mt-8">
-                        <div class="px-8 py-6 border-b border-white/5 bg-white/[0.02] flex justify-between items-center">
+                    <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+                        <div class="px-6 py-4 border-b border-slate-100 bg-slate-50/30 flex justify-between items-center">
                             <div>
-                                <h3 class="text-lg font-black text-white tracking-tight italic">Recent Operational Activity</h3>
-                                <p class="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-0.5">Real-time inspection sync</p>
+                                <h3 class="text-sm font-bold text-slate-900">Recent Service Records</h3>
+                                <p class="text-[11px] text-slate-500 font-medium mt-0.5">Most recent administrative and field observations.</p>
                             </div>
-                            <a href="/inspections" class="text-[10px] font-black text-blue-400 hover:text-white uppercase tracking-widest transition-colors flex items-center bg-white/5 px-4 py-2 rounded-xl">
-                                View Full Log <i class="fas fa-arrow-right ml-2 text-[8px]"></i>
+                            <a href="/inspections" class="text-[11px] font-bold text-blue-700 hover:text-blue-800 uppercase tracking-wider transition-colors flex items-center border border-slate-200 px-3 py-1.5 rounded-lg bg-white shadow-sm hover:bg-slate-50">
+                                Detailed Log <i class="fas fa-chevron-right ml-1.5 text-[8px]"></i>
                             </a>
                         </div>
                         <div class="overflow-x-auto">
                             <table class="w-full text-left">
-                                <thead class="bg-black/20 text-[10px] font-black text-slate-500 uppercase tracking-widest">
+                                <thead class="bg-slate-50/50 text-[10px] font-bold text-slate-400 uppercase tracking-widest border-b border-slate-100">
                                     <tr>
-                                        <th class="px-8 py-5">Reference</th>
-                                        <th class="px-8 py-5">Establishment</th>
-                                        <th class="px-8 py-5">Type / Category</th>
-                                        <th class="px-8 py-5">Field Officer</th>
-                                        <th class="px-8 py-5">Timestamp</th>
-                                        <th class="px-8 py-5 text-center">Outcome</th>
-                                        <th class="px-8 py-5 text-right">Actions</th>
+                                        <th class="px-6 py-4">Ref ID</th>
+                                        <th class="px-6 py-4">Establishment Name</th>
+                                        <th class="px-6 py-4">Service Category</th>
+                                        <th class="px-6 py-4">Officer in Charge</th>
+                                        <th class="px-6 py-4">Record Date</th>
+                                        <th class="px-6 py-4 text-center">Status</th>
+                                        <th class="px-6 py-4 text-right">Records</th>
                                     </tr>
                                 </thead>
-                                <tbody class="divide-y divide-white/5">
-                                    <tr class="hover:bg-white/[0.02] transition-all group">
-                                        <td class="px-8 py-5 text-xs font-black text-blue-400 tracking-tighter">HSI-2025-00045</td>
-                                        <td class="px-8 py-5">
-                                            <p class="text-sm font-bold text-white tracking-tight">ABC Restaurant</p>
+                                <tbody class="divide-y divide-slate-100">
+                                    <tr class="hover:bg-slate-50/50 transition-colors">
+                                        <td class="px-6 py-4 text-xs font-bold text-blue-700">HSI-25-00045</td>
+                                        <td class="px-6 py-4">
+                                            <p class="text-xs font-bold text-slate-900 tracking-tight">ABC Restaurant & Catering</p>
                                         </td>
-                                        <td class="px-8 py-5">
-                                            <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest px-2 py-1 bg-white/5 rounded-md">Food Safety</span>
+                                        <td class="px-6 py-4">
+                                            <span class="text-[10px] font-bold text-slate-500 bg-slate-100 px-2 py-1 rounded">FOOD SERVICES</span>
                                         </td>
-                                        <td class="px-8 py-5 text-xs font-bold text-slate-300">J. Dela Cruz</td>
-                                        <td class="px-8 py-5 text-xs font-bold text-slate-300">Nov 21, 2025</td>
-                                        <td class="px-8 py-5 text-center">
-                                            <span class="px-4 py-1.5 bg-emerald-500/10 text-emerald-400 border border-emerald-500/10 rounded-full text-[10px] font-black uppercase tracking-widest italic">
-                                                Completed
+                                        <td class="px-6 py-4 text-xs font-semibold text-slate-600">J. Dela Cruz</td>
+                                        <td class="px-6 py-4 text-xs font-medium text-slate-500">Nov 21, 2025</td>
+                                        <td class="px-6 py-4 text-center">
+                                            <span class="px-3 py-1 bg-green-50 text-green-700 border border-green-100 rounded-full text-[10px] font-bold uppercase tracking-wider">
+                                                Finalized
                                             </span>
                                         </td>
-                                        <td class="px-8 py-5 text-right">
-                                            <button class="text-[10px] font-black text-slate-500 hover:text-white uppercase tracking-widest transition-all">Details</button>
+                                        <td class="px-6 py-4 text-right">
+                                            <button class="text-[10px] font-bold text-slate-400 hover:text-blue-700 uppercase tracking-wider transition-colors">View File</button>
                                         </td>
                                     </tr>
                                 </tbody>
@@ -210,9 +217,9 @@
     <script>
         // Initialize charts with theme awareness
         function initCharts() {
-            Chart.defaults.color = '#94a3b8';
+            Chart.defaults.color = '#64748b';
             Chart.defaults.font.family = "'Inter', 'sans-serif'";
-            Chart.defaults.font.weight = '600';
+            Chart.defaults.font.weight = '500';
 
             const trendsCtx = document.getElementById('inspectionTrendsChart');
             if (trendsCtx) {
@@ -221,16 +228,16 @@
                     data: {
                         labels: ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN'],
                         datasets: [{
-                            label: 'Inspections',
+                            label: 'Services Rendered',
                             data: [45, 52, 58, 62, 68, 75],
-                            borderColor: '#3b82f6',
-                            backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                            borderWidth: 3,
+                            borderColor: '#1e40af',
+                            backgroundColor: 'rgba(30, 64, 175, 0.05)',
+                            borderWidth: 2,
                             fill: true,
-                            tension: 0.4,
-                            pointRadius: 4,
-                            pointBackgroundColor: '#3b82f6',
-                            pointBorderColor: '#0b0c10',
+                            tension: 0.3,
+                            pointRadius: 3,
+                            pointBackgroundColor: '#fff',
+                            pointBorderColor: '#1e40af',
                             pointBorderWidth: 2
                         }]
                     },
@@ -240,14 +247,14 @@
                         plugins: { legend: { display: false } },
                         scales: {
                             y: {
-                                grid: { color: 'rgba(255, 255, 255, 0.05)' },
+                                grid: { color: '#f1f5f9' },
                                 border: { display: false },
-                                ticks: { font: { size: 10, weight: '900' } }
+                                ticks: { font: { size: 10, weight: '600' } }
                             },
                             x: {
                                 grid: { display: false },
                                 border: { display: false },
-                                ticks: { font: { size: 10, weight: '900' } }
+                                ticks: { font: { size: 10, weight: '600' } }
                             }
                         }
                     }
@@ -262,28 +269,24 @@
                         labels: ['Food Safety', 'Sanitation', 'Fire Safety', 'Other'],
                         datasets: [{
                             data: [35, 25, 15, 25],
-                            backgroundColor: ['#3b82f6', '#10b981', '#f43f5e', '#64748b'],
-                            borderWidth: 0,
-                            hoverOffset: 20
+                            backgroundColor: ['#1e40af', '#059669', '#dc2626', '#475569'],
+                            borderWidth: 2,
+                            borderColor: '#fff',
+                            hoverOffset: 15
                         }]
                     },
                     options: {
                         responsive: true,
                         maintainAspectRatio: false,
-                        cutout: '75%',
+                        cutout: '70%',
                         plugins: {
                             legend: {
                                 position: 'bottom',
                                 labels: {
                                     padding: 20,
                                     usePointStyle: true,
-                                    pointStyle: 'circle',
-                                    font: { size: 10, weight: '900' },
-                                    generateLabels: function(chart) {
-                                        const original = Chart.defaults.plugins.legend.labels.generateLabels;
-                                        const labels = original.call(this, chart);
-                                        return labels.map(label => ({ ...label, text: label.text.toUpperCase() }));
-                                    }
+                                    pointStyle: 'rectRounded',
+                                    font: { size: 10, weight: '600' }
                                 }
                             }
                         }
@@ -294,5 +297,3 @@
 
         window.addEventListener('DOMContentLoaded', initCharts);
     </script>
-</body>
-</html>

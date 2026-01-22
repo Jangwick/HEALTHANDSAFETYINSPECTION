@@ -1,387 +1,216 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Register - Health & Safety Inspections System</title>
+    <title>Account Request - Health & Safety Insight</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style type="text/tailwindcss">
+        @layer base {
+            html { font-size: 100%; }
+            body { @apply text-slate-800 bg-slate-50; }
+            .form-input { @apply w-full px-4 py-2.5 bg-white border border-slate-200 rounded-lg text-sm text-slate-700 focus:ring-2 focus:ring-blue-700/10 focus:border-blue-700 outline-none transition-all shadow-sm; }
+            .form-label { @apply block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2 ml-1 italic; }
+            .mono { font-family: 'JetBrains Mono', monospace; }
+        }
+    </style>
 </head>
-<body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
-    <div class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-        <div class="max-w-2xl w-full space-y-8">
-            <!-- Header -->
-            <div class="text-center">
-                <div class="mx-auto h-20 w-20 bg-blue-600 rounded-full flex items-center justify-center mb-4 shadow-lg">
-                    <i class="fas fa-user-plus text-white text-3xl"></i>
-                </div>
-                <h2 class="text-3xl font-extrabold text-gray-900 mb-2">
-                    Create Your Account
-                </h2>
-                <p class="text-sm text-gray-600">
-                    Register for Health & Safety Inspections System
-                </p>
+<body class="font-sans antialiased text-base min-h-screen py-12 px-6 relative flex flex-col items-center">
+    
+    <!-- Institutional Pattern Overlay -->
+    <div class="fixed inset-0 bg-[url('https://www.transparenttextures.com/patterns/clean-paper.png')] opacity-40 pointer-events-none"></div>
+    <div class="fixed top-0 left-0 w-full h-2 bg-blue-700"></div>
+
+    <div class="max-w-2xl w-full relative z-10 animate-in fade-in slide-in-from-bottom-8 duration-700">
+        
+        <!-- Header Branding -->
+        <div class="text-center mb-10">
+            <div class="mx-auto w-16 h-16 bg-white border-4 border-blue-700 rounded-2xl flex items-center justify-center mb-4 shadow-xl -rotate-3 hover:rotate-0 transition-transform duration-500">
+                <i class="fas fa-id-card text-blue-700 text-2xl"></i>
+            </div>
+            <h1 class="text-lg font-black text-slate-900 tracking-tighter uppercase italic">Enrollment Pipeline</h1>
+            <p class="text-[9px] font-bold text-slate-400 uppercase tracking-[0.3em] mt-1 italic">Initialize Individual Registry Dossier</p>
+        </div>
+
+        <!-- Registration Card -->
+        <div class="bg-white rounded-[2.5rem] shadow-2xl shadow-blue-900/5 border border-slate-100 p-10 md:p-12 relative overflow-hidden">
+            <div class="absolute top-0 right-0 p-8 opacity-[0.03]">
+                <i class="fas fa-users-cog text-[120px]"></i>
             </div>
 
-            <!-- Registration Form -->
-            <div class="bg-white rounded-xl shadow-2xl p-8">
-                <form id="registerForm" class="space-y-6" onsubmit="handleRegister(event)">
-                    <!-- Account Type Selection -->
-                    <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-3">
-                            <i class="fas fa-user-tag mr-2 text-blue-600"></i>Account Type
-                        </label>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <label class="relative flex cursor-pointer rounded-lg border border-gray-300 bg-white p-4 hover:border-blue-500 transition">
-                                <input type="radio" name="role" value="establishment_owner" checked class="sr-only peer">
-                                <div class="flex items-center w-full">
-                                    <div class="text-sm flex-1">
-                                        <p class="font-semibold text-gray-900">Establishment Owner</p>
-                                        <p class="text-gray-500 text-xs mt-1">Business/Facility Owner</p>
-                                    </div>
-                                    <i class="fas fa-store text-blue-600 text-2xl"></i>
-                                </div>
-                                <div class="absolute -inset-px rounded-lg border-2 border-blue-600 opacity-0 peer-checked:opacity-100"></div>
-                            </label>
-                            <label class="relative flex cursor-pointer rounded-lg border border-gray-300 bg-white p-4 hover:border-blue-500 transition">
-                                <input type="radio" name="role" value="public" class="sr-only peer">
-                                <div class="flex items-center w-full">
-                                    <div class="text-sm flex-1">
-                                        <p class="font-semibold text-gray-900">Public User</p>
-                                        <p class="text-gray-500 text-xs mt-1">General Access</p>
-                                    </div>
-                                    <i class="fas fa-users text-blue-600 text-2xl"></i>
-                                </div>
-                                <div class="absolute -inset-px rounded-lg border-2 border-blue-600 opacity-0 peer-checked:opacity-100"></div>
-                            </label>
-                        </div>
-                    </div>
-
-                    <!-- Personal Information -->
-                    <div class="border-t pt-6">
-                        <h3 class="text-lg font-semibold text-gray-900 mb-4">Personal Information</h3>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <label for="first_name" class="block text-sm font-medium text-gray-700 mb-2">
-                                    First Name *
-                                </label>
-                                <input 
-                                    id="first_name" 
-                                    name="first_name" 
-                                    type="text" 
-                                    required 
-                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                    placeholder="Juan"
-                                >
-                            </div>
-                            <div>
-                                <label for="last_name" class="block text-sm font-medium text-gray-700 mb-2">
-                                    Last Name *
-                                </label>
-                                <input 
-                                    id="last_name" 
-                                    name="last_name" 
-                                    type="text" 
-                                    required 
-                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                    placeholder="Dela Cruz"
-                                >
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Contact Information -->
+            <form id="registerForm" class="space-y-10 relative z-10" onsubmit="handleRegister(event)">
+                
+                <!-- Account Type Selection Tier -->
+                <div class="space-y-4">
+                    <label class="form-label">Deployment Classification</label>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label for="email" class="block text-sm font-medium text-gray-700 mb-2">
-                                Email Address *
-                            </label>
-                            <input 
-                                id="email" 
-                                name="email" 
-                                type="email" 
-                                required 
-                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                placeholder="juan@example.com"
-                            >
-                        </div>
-                        <div>
-                            <label for="phone" class="block text-sm font-medium text-gray-700 mb-2">
-                                Phone Number
-                            </label>
-                            <input 
-                                id="phone" 
-                                name="phone" 
-                                type="tel" 
-                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                placeholder="+63 912 345 6789"
-                            >
-                        </div>
-                    </div>
-
-                    <!-- Account Credentials -->
-                    <div class="border-t pt-6">
-                        <h3 class="text-lg font-semibold text-gray-900 mb-4">Account Credentials</h3>
-                        <div class="space-y-4">
-                            <div>
-                                <label for="username" class="block text-sm font-medium text-gray-700 mb-2">
-                                    Username *
-                                </label>
-                                <input 
-                                    id="username" 
-                                    name="username" 
-                                    type="text" 
-                                    required 
-                                    minlength="3"
-                                    maxlength="50"
-                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                    placeholder="juan.delacruz"
-                                >
-                                <p class="mt-1 text-xs text-gray-500">3-50 characters, alphanumeric and underscores only</p>
-                            </div>
-                            <div>
-                                <label for="password" class="block text-sm font-medium text-gray-700 mb-2">
-                                    Password *
-                                </label>
-                                <div class="relative">
-                                    <input 
-                                        id="password" 
-                                        name="password" 
-                                        type="password" 
-                                        required 
-                                        minlength="8"
-                                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                        placeholder="Enter password"
-                                        oninput="checkPasswordStrength()"
-                                    >
-                                    <button 
-                                        type="button" 
-                                        onclick="togglePassword('password')"
-                                        class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
-                                    >
-                                        <i id="toggleIcon1" class="fas fa-eye"></i>
-                                    </button>
-                                </div>
-                                <div id="passwordStrength" class="mt-2 hidden">
-                                    <div class="flex gap-1">
-                                        <div id="strength1" class="h-1 flex-1 bg-gray-300 rounded"></div>
-                                        <div id="strength2" class="h-1 flex-1 bg-gray-300 rounded"></div>
-                                        <div id="strength3" class="h-1 flex-1 bg-gray-300 rounded"></div>
-                                        <div id="strength4" class="h-1 flex-1 bg-gray-300 rounded"></div>
+                        <label class="relative flex cursor-pointer group">
+                            <input type="radio" name="role" value="establishment_owner" checked class="sr-only peer">
+                            <div class="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl p-5 group-hover:bg-white group-hover:border-blue-100 transition-all peer-checked:border-blue-700 peer-checked:bg-blue-50/30">
+                                <div class="flex items-center space-x-4">
+                                    <div class="w-10 h-10 rounded-xl bg-white border border-slate-200 flex items-center justify-center text-slate-400 peer-checked:text-blue-700 transition-colors shadow-sm">
+                                        <i class="fas fa-landmark text-lg"></i>
                                     </div>
-                                    <p id="strengthText" class="text-xs mt-1"></p>
+                                    <div class="flex-1">
+                                        <p class="text-xs font-black text-slate-800 uppercase italic">Entity Manager</p>
+                                        <p class="text-[9px] text-slate-400 font-bold uppercase tracking-tight mt-0.5 italic">Proprietor / Representative</p>
+                                    </div>
                                 </div>
                             </div>
-                            <div>
-                                <label for="confirm_password" class="block text-sm font-medium text-gray-700 mb-2">
-                                    Confirm Password *
-                                </label>
-                                <div class="relative">
-                                    <input 
-                                        id="confirm_password" 
-                                        name="confirm_password" 
-                                        type="password" 
-                                        required 
-                                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                        placeholder="Confirm password"
-                                    >
-                                    <button 
-                                        type="button" 
-                                        onclick="togglePassword('confirm_password')"
-                                        class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
-                                    >
-                                        <i id="toggleIcon2" class="fas fa-eye"></i>
-                                    </button>
+                        </label>
+                        <label class="relative flex cursor-pointer group">
+                            <input type="radio" name="role" value="public" class="sr-only peer">
+                            <div class="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl p-5 group-hover:bg-white group-hover:border-blue-100 transition-all peer-checked:border-blue-700 peer-checked:bg-blue-50/30">
+                                <div class="flex items-center space-x-4">
+                                    <div class="w-10 h-10 rounded-xl bg-white border border-slate-200 flex items-center justify-center text-slate-400 peer-checked:text-blue-700 transition-colors shadow-sm">
+                                        <i class="fas fa-globe-asia text-lg"></i>
+                                    </div>
+                                    <div class="flex-1">
+                                        <p class="text-xs font-black text-slate-800 uppercase italic">Public Observer</p>
+                                        <p class="text-[9px] text-slate-400 font-bold uppercase tracking-tight mt-0.5 italic">General Registry Access</p>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    </div>
-
-                    <!-- Terms and Conditions -->
-                    <div class="flex items-start">
-                        <input 
-                            id="terms" 
-                            name="terms" 
-                            type="checkbox" 
-                            required
-                            class="h-4 w-4 mt-1 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                        >
-                        <label for="terms" class="ml-2 block text-sm text-gray-700">
-                            I agree to the <a href="#" class="text-blue-600 hover:text-blue-500">Terms of Service</a> and 
-                            <a href="#" class="text-blue-600 hover:text-blue-500">Privacy Policy</a>
                         </label>
                     </div>
-
-                    <!-- Error/Success Alert -->
-                    <div id="alertBox" class="hidden"></div>
-
-                    <!-- Submit Button -->
-                    <div>
-                        <button 
-                            type="submit" 
-                            id="registerBtn"
-                            class="w-full flex justify-center items-center py-3 px-4 border border-transparent text-sm font-semibold rounded-lg text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition duration-150 shadow-md hover:shadow-lg"
-                        >
-                            <i class="fas fa-user-plus mr-2"></i>
-                            <span id="registerBtnText">Create Account</span>
-                        </button>
-                    </div>
-                </form>
-
-                <!-- Login Link -->
-                <div class="mt-6 text-center">
-                    <p class="text-sm text-gray-600">
-                        Already have an account? 
-                        <a href="login.php" class="font-medium text-blue-600 hover:text-blue-500">
-                            Sign in here
-                        </a>
-                    </p>
                 </div>
-            </div>
+
+                <!-- Section: Identity Dossier -->
+                <div class="space-y-6 pt-6 border-t border-slate-50">
+                    <div class="flex items-center space-x-3 mb-2">
+                        <div class="h-px flex-1 bg-slate-50"></div>
+                        <h3 class="text-[10px] font-black text-slate-300 uppercase tracking-widest italic leading-none">Identity Dossier</h3>
+                        <div class="h-px flex-1 bg-slate-50"></div>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="space-y-2">
+                            <label for="first_name" class="form-label">Forename(s)</label>
+                            <input id="first_name" name="first_name" type="text" required class="form-input italic" placeholder="e.g. JUAN">
+                        </div>
+                        <div class="space-y-2">
+                            <label for="last_name" class="form-label">Surname</label>
+                            <input id="last_name" name="last_name" type="text" required class="form-input italic" placeholder="e.g. DELA CRUZ">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="space-y-2">
+                            <label for="email" class="form-label">Registered Electronic Mail</label>
+                            <input id="email" name="email" type="email" required class="form-input" placeholder="mail@institutional.gov">
+                        </div>
+                        <div class="space-y-2">
+                            <label for="phone" class="form-label">Contact Link (Mobile)</label>
+                            <input id="phone" name="phone" type="tel" class="form-input" placeholder="+63 000 000 0000">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section: Secure Credentials -->
+                <div class="space-y-6 pt-6 border-t border-slate-50">
+                    <div class="flex items-center space-x-3 mb-2">
+                        <div class="h-px flex-1 bg-slate-50"></div>
+                        <h3 class="text-[10px] font-black text-slate-300 uppercase tracking-widest italic leading-none">Security Credentials</h3>
+                        <div class="h-px flex-1 bg-slate-50"></div>
+                    </div>
+
+                    <div class="space-y-2">
+                        <label for="username" class="form-label">Institutional Username</label>
+                        <input id="username" name="username" type="text" required minlength="3" class="form-input mono" placeholder="operator_identity">
+                        <p class="text-[8px] text-slate-400 font-bold uppercase tracking-widest italic">3-50 characters | Alpha-numeric protocol only</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="space-y-2">
+                            <label for="password" class="form-label">Integrity Key (Password)</label>
+                            <input id="password" name="password" type="password" required minlength="8" class="form-input" placeholder="********">
+                        </div>
+                        <div class="space-y-2">
+                            <label for="confirm_password" class="form-label">Confirm Integrity Key</label>
+                            <input id="confirm_password" name="confirm_password" type="password" required class="form-input" placeholder="********">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Alert Protocol -->
+                <div id="alertBox" class="hidden"></div>
+
+                <!-- Actions -->
+                <div class="pt-6">
+                    <button type="submit" id="registerBtn" class="w-full h-14 bg-blue-700 hover:bg-blue-800 text-white font-black text-xs uppercase tracking-[0.2em] rounded-2xl flex items-center justify-center gap-4 transition-all shadow-xl shadow-blue-900/10 group active:scale-[0.98]">
+                        <i class="fas fa-id-badge group-hover:scale-125 transition-transform"></i>
+                        <span id="registerBtnText">Submit Enrollment Request</span>
+                    </button>
+                    
+                    <div class="mt-8 text-center">
+                        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest italic">
+                            Already possess credentials? 
+                            <a href="login.php" class="text-blue-700 hover:text-blue-800 underline decoration-blue-100 decoration-2 transition-all">Execute Login Protocol</a>
+                        </p>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- Footer -->
+        <div class="mt-12 text-center text-[9px] font-black text-slate-400 uppercase tracking-[0.3em] pb-10 italic">
+            &copy; 2025 Local Government Unit  Compliance Enforcement Division
         </div>
     </div>
 
     <script>
-        function togglePassword(fieldId) {
-            const passwordInput = document.getElementById(fieldId);
-            const toggleIcon = document.getElementById(fieldId === 'password' ? 'toggleIcon1' : 'toggleIcon2');
-            
-            if (passwordInput.type === 'password') {
-                passwordInput.type = 'text';
-                toggleIcon.classList.remove('fa-eye');
-                toggleIcon.classList.add('fa-eye-slash');
-            } else {
-                passwordInput.type = 'password';
-                toggleIcon.classList.remove('fa-eye-slash');
-                toggleIcon.classList.add('fa-eye');
-            }
-        }
-
-        function checkPasswordStrength() {
-            const password = document.getElementById('password').value;
-            const strengthDiv = document.getElementById('passwordStrength');
-            const strengthText = document.getElementById('strengthText');
-            
-            if (password.length === 0) {
-                strengthDiv.classList.add('hidden');
-                return;
-            }
-            
-            strengthDiv.classList.remove('hidden');
-            
-            let strength = 0;
-            if (password.length >= 8) strength++;
-            if (password.match(/[a-z]/)) strength++;
-            if (password.match(/[A-Z]/)) strength++;
-            if (password.match(/[0-9]/)) strength++;
-            if (password.match(/[^a-zA-Z0-9]/)) strength++;
-            
-            const strengthBars = ['strength1', 'strength2', 'strength3', 'strength4'];
-            strengthBars.forEach(bar => {
-                document.getElementById(bar).className = 'h-1 flex-1 bg-gray-300 rounded';
-            });
-            
-            if (strength <= 2) {
-                strengthText.textContent = 'Weak password';
-                strengthText.className = 'text-xs mt-1 text-red-600';
-                document.getElementById('strength1').classList.add('bg-red-500');
-            } else if (strength === 3) {
-                strengthText.textContent = 'Fair password';
-                strengthText.className = 'text-xs mt-1 text-yellow-600';
-                document.getElementById('strength1').classList.add('bg-yellow-500');
-                document.getElementById('strength2').classList.add('bg-yellow-500');
-            } else if (strength === 4) {
-                strengthText.textContent = 'Good password';
-                strengthText.className = 'text-xs mt-1 text-green-600';
-                document.getElementById('strength1').classList.add('bg-green-500');
-                document.getElementById('strength2').classList.add('bg-green-500');
-                document.getElementById('strength3').classList.add('bg-green-500');
-            } else {
-                strengthText.textContent = 'Strong password';
-                strengthText.className = 'text-xs mt-1 text-green-600';
-                strengthBars.forEach(bar => {
-                    document.getElementById(bar).classList.add('bg-green-500');
-                });
-            }
-        }
-
-        function showAlert(message, type = 'error') {
+        async function handleRegister(e) {
+            e.preventDefault();
+            const form = e.target;
+            const btn = document.getElementById('registerBtn');
             const alertBox = document.getElementById('alertBox');
-            const icon = type === 'error' ? 'fa-exclamation-circle' : 'fa-check-circle';
-            const bgColor = type === 'error' ? 'bg-red-50 border-red-200' : 'bg-green-50 border-green-200';
-            const textColor = type === 'error' ? 'text-red-800' : 'text-green-800';
-            const iconColor = type === 'error' ? 'text-red-500' : 'text-green-500';
             
-            alertBox.className = `rounded-lg ${bgColor} border p-4`;
-            alertBox.innerHTML = `
-                <div class="flex items-start">
-                    <i class="fas ${icon} ${iconColor} mt-0.5 mr-3"></i>
-                    <p class="text-sm font-medium ${textColor}">${message}</p>
-                </div>
-            `;
-            alertBox.classList.remove('hidden');
-        }
-
-        async function handleRegister(event) {
-            event.preventDefault();
-            
-            const registerBtn = document.getElementById('registerBtn');
-            const registerBtnText = document.getElementById('registerBtnText');
-            
-            // Validate password match
-            const password = document.getElementById('password').value;
-            const confirmPassword = document.getElementById('confirm_password').value;
-            
-            if (password !== confirmPassword) {
-                showAlert('Passwords do not match', 'error');
+            // Password match check
+            if (form.password.value !== form.confirm_password.value) {
+                showAlert('Integrity Key mismatch detected.', 'rose');
                 return;
             }
-            
-            // Disable button
-            registerBtn.disabled = true;
-            registerBtnText.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Creating account...';
-            
-            // Get form data
-            const formData = {
-                username: document.getElementById('username').value,
-                email: document.getElementById('email').value,
-                password: password,
-                first_name: document.getElementById('first_name').value,
-                last_name: document.getElementById('last_name').value,
-                phone: document.getElementById('phone').value,
-                role: document.querySelector('input[name="role"]:checked').value
-            };
-            
+
+            btn.disabled = true;
+            document.getElementById('registerBtnText').textContent = "Enrollment Processing...";
+
             try {
+                const formData = new FormData(form);
+                const data = Object.fromEntries(formData.entries());
+                
+                // Assuming an API endpoint exists, otherwise we'd need to write the PHP logic
                 const response = await fetch('/api/v1/auth/register', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(formData)
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
                 });
                 
-                const data = await response.json();
+                const result = await response.json();
                 
-                if (data.success) {
-                    showAlert('Account created successfully! Please wait for activation.', 'success');
-                    registerBtnText.innerHTML = '<i class="fas fa-check mr-2"></i>Success!';
-                    
-                    // Redirect to login after 2 seconds
-                    setTimeout(() => {
-                        window.location.href = '/login';
-                    }, 2000);
+                if (result.status === 'success') {
+                    showAlert('Enrollment Initialized. Redirecting to Gateway...', 'emerald');
+                    setTimeout(() => window.location.href = 'login.php', 2000);
                 } else {
-                    showAlert(data.error.message, 'error');
-                    registerBtn.disabled = false;
-                    registerBtnText.innerHTML = 'Create Account';
+                    showAlert(result.message || 'Enrollment protocol failed.', 'rose');
+                    btn.disabled = false;
+                    document.getElementById('registerBtnText').textContent = "Submit Enrollment Request";
                 }
             } catch (error) {
-                console.error('Registration error:', error);
-                showAlert('Network error. Please try again.', 'error');
-                registerBtn.disabled = false;
-                registerBtnText.innerHTML = 'Create Account';
+                showAlert('Network connectivity protocol failure.', 'rose');
+                btn.disabled = false;
+                document.getElementById('registerBtnText').textContent = "Submit Enrollment Request";
             }
+        }
+
+        function showAlert(msg, type) {
+            const alertBox = document.getElementById('alertBox');
+            alertBox.className = `p-4 rounded-xl border border-\${type}-100 bg-\${type}-50 flex items-center gap-4 animate-in slide-in-from-top-2 duration-300`;
+            alertBox.innerHTML = `
+                <i class="fas fa-info-circle text-\${type}-500"></i>
+                <span class="text-[10px] font-black text-\${type}-800 uppercase tracking-widest">\${msg}</span>
+            `;
+            alertBox.classList.remove('hidden');
         }
     </script>
 </body>

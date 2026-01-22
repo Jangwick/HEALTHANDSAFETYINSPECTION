@@ -1,7 +1,7 @@
-<?php
+﻿<?php
 // Session already started by index.php
 if (!isset($_SESSION['user_id'])) {
-    header('Location: /login');
+    header('Location: /views/auth/login.php');
     exit;
 }
 
@@ -19,7 +19,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $required = ['name', 'type', 'owner_name', 'owner_phone', 'address_street', 'address_barangay', 'address_city'];
         foreach ($required as $field) {
             if (empty($_POST[$field])) {
-                throw new Exception("Field '$field' is required");
+                throw new Exception("Field '$field' is required for the Institutional Registry");
             }
         }
         
@@ -67,7 +67,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
     } catch (Exception $e) {
         $error = $e->getMessage();
-        error_log("Establishment creation error: " . $e->getMessage());
+        error_log("Establishment registration error: " . $e->getMessage());
     }
 }
 ?>
@@ -76,177 +76,182 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Add Establishment - Health & Safety System</title>
+    <title>Institutional Registration - Health & Safety Insight</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style type="text/tailwindcss">
+        @layer base {
+            html { font-size: 100%; }
+            body { @apply text-slate-700 bg-slate-50; }
+            h1, h2, h3 { @apply font-bold tracking-tight text-slate-900; }
+            .form-input { 
+                @apply w-full px-4 py-3 bg-white border border-slate-200 rounded-lg text-sm text-slate-700 
+                placeholder:text-slate-400 focus:ring-2 focus:ring-blue-700/10 focus:border-blue-700 
+                outline-none transition-all shadow-sm;
+            }
+            .form-label { @apply block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2 ml-1; }
+            .card { @apply bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden; }
+        }
+    </style>
 </head>
-<body class="bg-[#0b0c10] font-sans antialiased text-slate-200 overflow-hidden">
-    <div class="flex h-screen">
+<body class="font-sans antialiased text-base overflow-hidden">
+    <div class="flex h-screen overflow-hidden">
         <!-- Sidebar Navigation -->
         <?php 
             $activePage = 'establishments';
             include __DIR__ . '/../partials/sidebar.php'; 
         ?>
 
-        <!-- Main Content -->
-        <div class="flex-1 flex flex-col min-w-0">
-            <!-- Top Navbar -->
-            <header class="bg-[#0f1115] border-b border-white/5 h-20 flex items-center justify-between px-8 shrink-0">
+        <!-- Main Content Area -->
+        <div class="flex-1 flex flex-col min-w-0 overflow-hidden text-base">
+            <!-- Institutional Header -->
+            <header class="bg-white border-b border-slate-200 h-16 flex items-center justify-between px-8 shrink-0 z-10">
                 <div class="flex items-center space-x-4">
-                    <a href="/establishments" class="text-slate-500 hover:text-white transition-colors">
+                    <a href="/establishments" class="text-slate-400 hover:text-slate-600 transition-colors">
                         <i class="fas fa-arrow-left"></i>
                     </a>
-                    <h1 class="text-2xl font-bold text-white tracking-tight">Register New Establishment</h1>
+                    <h1 class="text-sm font-bold text-slate-800 tracking-tight uppercase">Institutional Registry</h1>
+                    <div class="h-4 w-px bg-slate-200"></div>
+                    <span class="text-[10px] font-bold text-blue-700 uppercase tracking-widest italic">New Entity Registration</span>
                 </div>
-                <div class="flex items-center space-x-4">
-                    <span class="text-xs font-black text-slate-500 uppercase tracking-widest hidden md:block">
-                        <i class="fas fa-user-circle mr-2"></i> <?php echo  htmlspecialchars($_SESSION['first_name'] ?? '') ?>
-                    </span>
+                <div class="flex items-center space-x-3 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                    <i class="fas fa-calendar-alt mr-2"></i> <?= date('M d, Y') ?>
                 </div>
             </header>
 
-            <!-- Scrollable Content Area -->
-            <main class="flex-1 overflow-y-auto p-8 bg-[#0b0c10] text-base">
+            <!-- Scrollable Content -->
+            <main class="flex-1 overflow-y-auto p-8 bg-slate-50">
                 <div class="max-w-4xl mx-auto">
                     <?php if (!empty($error)): ?>
-                        <div class="mb-8 p-4 bg-rose-500/10 border border-rose-500/20 rounded-xl flex items-center text-rose-500 animate-pulse">
-                            <i class="fas fa-exclamation-circle mr-3"></i>
-                            <span class="text-sm font-bold uppercase tracking-wider"><?php echo  htmlspecialchars($error) ?></span>
+                        <div class="mb-8 p-4 bg-rose-50 border border-rose-100 rounded-xl flex items-center text-rose-700 text-xs font-bold uppercase tracking-wider">
+                            <i class="fas fa-exclamation-circle mr-3"></i> <?= htmlspecialchars($error) ?>
                         </div>
                     <?php endif; ?>
 
                     <form method="POST" class="space-y-8 pb-12">
-                        <!-- Basic Information Section -->
-                        <div class="bg-[#15181e] rounded-3xl shadow-2xl border border-white/5 overflow-hidden">
-                            <div class="px-8 py-6 bg-white/[0.02] border-b border-white/5 flex justify-between items-center">
-                                <h2 class="text-xs font-black text-blue-500 uppercase tracking-[0.2em] flex items-center">
-                                    <i class="fas fa-info-circle mr-2 text-sm"></i> Basic Information
+                        <!-- Entity Core Details -->
+                        <div class="card relative p-8">
+                            <div class="absolute top-0 left-0 w-full h-1 bg-blue-700"></div>
+                            <div class="mb-8 flex justify-between items-center border-b border-slate-50 pb-4">
+                                <h2 class="text-[11px] font-black text-slate-800 uppercase tracking-widest flex items-center">
+                                    <i class="fas fa-building mr-2 text-blue-700"></i> Core Institutional Parameters
                                 </h2>
-                                <span class="text-[9px] font-black text-slate-500 uppercase tracking-widest">General Details</span>
+                                <span class="text-[9px] font-bold text-slate-300 italic">Registry Section 1.0</span>
                             </div>
-                            <div class="p-8 grid grid-cols-1 md:grid-cols-2 gap-8">
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div class="md:col-span-2">
-                                    <label class="block text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-2.5 ml-1">Establishment Name <span class="text-rose-500">*</span></label>
-                                    <input type="text" name="name" required placeholder="e.g. Grand Central Hotel"
-                                        class="w-full px-5 py-4 bg-[#0b0c10] border border-white/10 rounded-2xl text-white placeholder:text-slate-600 focus:ring-2 focus:ring-blue-500/50 outline-none transition-all group hover:border-white/20">
+                                    <label class="form-label">Name of Institution / Business <span class="text-rose-500">*</span></label>
+                                    <input type="text" name="name" required placeholder="Official Registered Name" class="form-input">
                                 </div>
                                 
                                 <div>
-                                    <label class="block text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-2.5 ml-1">Business Type <span class="text-rose-500">*</span></label>
-                                    <div class="relative group">
-                                        <select name="type" required
-                                            class="w-full px-5 py-4 bg-[#0b0c10] border border-white/10 rounded-2xl text-white appearance-none cursor-pointer focus:ring-2 focus:ring-blue-500/50 outline-none transition-all hover:border-white/20">
-                                            <option value="">Select Type</option>
-                                            <option value="restaurant">Restaurant</option>
-                                            <option value="school">School</option>
-                                            <option value="hospital">Hospital / Clinic</option>
-                                            <option value="hotel">Hotel / Resort</option>
-                                            <option value="market">Public Market</option>
-                                            <option value="office">Office Building</option>
-                                            <option value="factory">Factory</option>
-                                            <option value="other">Other</option>
-                                        </select>
-                                        <div class="absolute inset-y-0 right-0 pr-5 flex items-center pointer-events-none text-slate-500 group-hover:text-white transition-colors">
-                                            <i class="fas fa-chevron-down text-xs"></i>
-                                        </div>
-                                    </div>
+                                    <label class="form-label">Establishment Classification <span class="text-rose-500">*</span></label>
+                                    <select name="type" required class="form-input appearance-none">
+                                        <option value="">Select Category</option>
+                                        <option value="restaurant">Restaurant / Culinary</option>
+                                        <option value="school">Educational Institution</option>
+                                        <option value="hospital">Medical Facility</option>
+                                        <option value="hotel">Hospitality / Resort</option>
+                                        <option value="market">Public Commerce Sector</option>
+                                        <option value="office">Corporate / Administration</option>
+                                        <option value="factory">Industrial / Manufacturing</option>
+                                        <option value="other">General Commercial</option>
+                                    </select>
                                 </div>
 
                                 <div>
-                                    <label class="block text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-2.5 ml-1">Business Permit Number</label>
-                                    <input type="text" name="business_permit_number" placeholder="BP-2023-XXXX"
-                                        class="w-full px-5 py-4 bg-[#0b0c10] border border-white/10 rounded-2xl text-white placeholder:text-slate-600 focus:ring-2 focus:ring-blue-500/50 outline-none transition-all font-mono hover:border-white/20">
+                                    <label class="form-label">Permit Identifier (BP No.)</label>
+                                    <input type="text" name="business_permit_number" placeholder="BP-202X-XXXX" class="form-input font-mono">
                                 </div>
 
                                 <div>
-                                    <label class="block text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-2.5 ml-1">Capacity (Persons)</label>
-                                    <input type="number" name="capacity" placeholder="e.g. 50"
-                                        class="w-full px-5 py-4 bg-[#0b0c10] border border-white/10 rounded-2xl text-white placeholder:text-slate-600 focus:ring-2 focus:ring-blue-500/50 outline-none transition-all hover:border-white/20">
+                                    <label class="form-label">Occupancy Capacity</label>
+                                    <input type="number" name="capacity" placeholder="Maximum Persons" class="form-input">
                                 </div>
 
                                 <div>
-                                    <label class="block text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-2.5 ml-1">Operating Hours</label>
-                                    <input type="text" name="operating_hours" placeholder="e.g. 8:00 AM - 10:00 PM"
-                                        class="w-full px-5 py-4 bg-[#0b0c10] border border-white/10 rounded-2xl text-white placeholder:text-slate-600 focus:ring-2 focus:ring-blue-500/50 outline-none transition-all hover:border-white/20">
+                                    <label class="form-label">Operational Hours</label>
+                                    <input type="text" name="operating_hours" placeholder="e.g. 08:00 - 17:00" class="form-input">
                                 </div>
 
                                 <div class="md:col-span-2">
-                                    <label class="block text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-2.5 ml-1">Description / Notes</label>
-                                    <textarea name="description" rows="3" placeholder="Additional details about the establishment..."
-                                        class="w-full px-5 py-4 bg-[#0b0c10] border border-white/10 rounded-2xl text-white placeholder:text-slate-600 focus:ring-2 focus:ring-blue-500/50 outline-none transition-all resize-none hover:border-white/20"></textarea>
+                                    <label class="form-label">Operational Scope / Dossier Notes</label>
+                                    <textarea name="description" rows="3" placeholder="Brief overview of institutional functions..." class="form-input resize-none"></textarea>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Owner Information Section -->
-                        <div class="bg-[#15181e] rounded-3xl shadow-2xl border border-white/5 overflow-hidden">
-                            <div class="px-8 py-6 bg-white/[0.02] border-b border-white/5 flex justify-between items-center">
-                                <h2 class="text-xs font-black text-emerald-500 uppercase tracking-[0.2em] flex items-center">
-                                    <i class="fas fa-user-tie mr-2 text-sm"></i> Owner Details
+                        <!-- Ownership Structure -->
+                        <div class="card p-8">
+                            <div class="mb-8 flex justify-between items-center border-b border-slate-50 pb-4">
+                                <h2 class="text-[11px] font-black text-slate-800 uppercase tracking-widest flex items-center">
+                                    <i class="fas fa-user-tie mr-2 text-emerald-600"></i> Legal Representation
                                 </h2>
-                                <span class="text-[9px] font-black text-slate-500 uppercase tracking-widest">Contact Person</span>
+                                <span class="text-[9px] font-bold text-slate-300 italic">Registry Section 2.0</span>
                             </div>
-                            <div class="p-8 grid grid-cols-1 md:grid-cols-2 gap-8">
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
-                                    <label class="block text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-2.5 ml-1">Owner Name <span class="text-rose-500">*</span></label>
-                                    <input type="text" name="owner_name" required placeholder="Full Legal Name"
-                                        class="w-full px-5 py-4 bg-[#0b0c10] border border-white/10 rounded-2xl text-white placeholder:text-slate-600 focus:ring-2 focus:ring-blue-500/50 outline-none transition-all hover:border-white/20">
+                                    <label class="form-label">Registered Principal <span class="text-rose-500">*</span></label>
+                                    <input type="text" name="owner_name" required placeholder="Full Legal Name" class="form-input">
                                 </div>
                                 
                                 <div>
-                                    <label class="block text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-2.5 ml-1">Contact Number <span class="text-rose-500">*</span></label>
-                                    <input type="tel" name="owner_phone" required placeholder="0917-XXX-XXXX"
-                                        class="w-full px-5 py-4 bg-[#0b0c10] border border-white/10 rounded-2xl text-white placeholder:text-slate-600 focus:ring-2 focus:ring-blue-500/50 outline-none transition-all hover:border-white/20">
+                                    <label class="form-label">Direct Contact Number <span class="text-rose-500">*</span></label>
+                                    <input type="tel" name="owner_phone" required placeholder="Official Phone" class="form-input font-mono text-blue-700">
                                 </div>
 
                                 <div class="md:col-span-2">
-                                    <label class="block text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-2.5 ml-1">Email Address</label>
-                                    <input type="email" name="owner_email" placeholder="owner@example.com"
-                                        class="w-full px-5 py-4 bg-[#0b0c10] border border-white/10 rounded-2xl text-white placeholder:text-slate-600 focus:ring-2 focus:ring-blue-500/50 outline-none transition-all hover:border-white/20">
+                                    <label class="form-label">Formal Correspondence Email</label>
+                                    <input type="email" name="owner_email" placeholder="official@domain.com" class="form-input">
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Address Information Section -->
-                        <div class="bg-[#15181e] rounded-3xl shadow-2xl border border-white/5 overflow-hidden">
-                            <div class="px-8 py-6 bg-white/[0.02] border-b border-white/5 flex justify-between items-center">
-                                <h2 class="text-xs font-black text-amber-500 uppercase tracking-[0.2em] flex items-center">
-                                    <i class="fas fa-map-marker-alt mr-2 text-sm"></i> Location Details
+                        <!-- Geospatial Positioning -->
+                        <div class="card p-8">
+                            <div class="mb-8 flex justify-between items-center border-b border-slate-50 pb-4">
+                                <h2 class="text-[11px] font-black text-slate-800 uppercase tracking-widest flex items-center">
+                                    <i class="fas fa-map-marker-alt mr-2 text-amber-600"></i> Physical Location
                                 </h2>
-                                <span class="text-[9px] font-black text-slate-500 uppercase tracking-widest">Physical Address</span>
+                                <span class="text-[9px] font-bold text-slate-300 italic">Registry Section 3.0</span>
                             </div>
-                            <div class="p-8 grid grid-cols-1 md:grid-cols-2 gap-8">
-                                <div class="md:col-span-2">
-                                    <label class="block text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-2.5 ml-1">Street Address <span class="text-rose-500">*</span></label>
-                                    <input type="text" name="address_street" required placeholder="House No., Building, Street Name"
-                                        class="w-full px-5 py-4 bg-[#0b0c10] border border-white/10 rounded-2xl text-white placeholder:text-slate-600 focus:ring-2 focus:ring-blue-500/50 outline-none transition-all hover:border-white/20">
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                <div class="md:col-span-3">
+                                    <label class="form-label">Street / Site Address <span class="text-rose-500">*</span></label>
+                                    <input type="text" name="address_street" required placeholder="Building No. / Street" class="form-input">
                                 </div>
 
                                 <div>
-                                    <label class="block text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-2.5 ml-1">Barangay <span class="text-rose-500">*</span></label>
-                                    <input type="text" name="address_barangay" required placeholder="Barangay Name"
-                                        class="w-full px-5 py-4 bg-[#0b0c10] border border-white/10 rounded-2xl text-white placeholder:text-slate-600 focus:ring-2 focus:ring-blue-500/50 outline-none transition-all hover:border-white/20">
+                                    <label class="form-label">Barangay <span class="text-rose-500">*</span></label>
+                                    <input type="text" name="address_barangay" required placeholder="District" class="form-input">
                                 </div>
 
                                 <div>
-                                    <label class="block text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-2.5 ml-1">City / Municipality <span class="text-rose-500">*</span></label>
-                                    <input type="text" name="address_city" required placeholder="Legazpi City"
-                                        class="w-full px-5 py-4 bg-[#0b0c10] border border-white/10 rounded-2xl text-white placeholder:text-slate-600 focus:ring-2 focus:ring-blue-500/50 outline-none transition-all hover:border-white/20">
+                                    <label class="form-label">City / Municipality <span class="text-rose-500">*</span></label>
+                                    <input type="text" name="address_city" required placeholder="LGU Jurisdiction" class="form-input">
+                                </div>
+
+                                <div>
+                                    <label class="form-label">Province</label>
+                                    <input type="text" name="address_province" placeholder="State/Region" class="form-input">
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Submit Buttons -->
-                        <div class="flex items-center justify-between pt-4">
-                            <div class="text-[9px] font-black text-slate-600 uppercase tracking-[0.2em] italic">
-                                * fields are strictly required for registration
+                        <!-- Submission Interface -->
+                        <div class="flex items-center justify-between pt-6 border-t border-slate-200">
+                            <div class="text-[9px] font-bold text-slate-400 italic">
+                                Registry logs are permanent. Ensure all institutional data is verified.
                             </div>
-                            <div class="flex space-x-4">
-                                <a href="/establishments" class="px-8 py-4 text-sm font-black text-slate-500 uppercase tracking-widest hover:text-white transition-colors">
-                                    Cancel
+                            <div class="flex items-center space-x-6">
+                                <a href="/establishments" class="text-xs font-bold text-slate-400 hover:text-slate-600 uppercase tracking-widest transition-colors">
+                                    Discard Entry
                                 </a>
-                                <button type="submit" class="px-10 py-4 bg-blue-600 hover:bg-blue-700 text-white font-black text-sm uppercase tracking-[0.2em] rounded-2xl shadow-xl shadow-blue-900/20 transition-all active:scale-95 flex items-center group">
-                                    <i class="fas fa-save mr-2 group-hover:scale-110 transition-transform"></i> Save Establishment
+                                <button type="submit" class="bg-blue-700 hover:bg-blue-800 text-white px-8 py-3 rounded-lg text-xs font-bold uppercase tracking-widest transition-all shadow-md shadow-blue-900/10">
+                                    <i class="fas fa-check-double mr-2"></i> Commit to Registry
                                 </button>
                             </div>
                         </div>

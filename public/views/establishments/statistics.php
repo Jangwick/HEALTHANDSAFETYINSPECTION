@@ -115,24 +115,19 @@ try {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Establishment Statistics - Health & Safety Inspection System</title>
+    <title>Statistics Portfolio - Health & Safety Inspection System</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
     <style type="text/tailwindcss">
         @layer base {
-            html { font-size: 105%; }
-            body { @apply text-slate-200; }
-            h1, h2, h3, h4, h5, h6 { @apply font-bold tracking-tight text-white; }
+            html { font-size: 100%; }
+            body { @apply text-slate-700; }
+            h1, h2, h3, h4, h5, h6 { @apply font-bold tracking-tight text-slate-900; }
         }
-        .card { @apply bg-[#15181e] border border-white/5 rounded-2xl shadow-xl mb-6 overflow-hidden; }
-        .stat-card { @apply bg-gradient-to-br from-blue-600 to-indigo-700 p-6 rounded-2xl text-white shadow-lg; }
-        .stat-number { @apply text-3xl font-black mb-1; }
-        .stat-label { @apply text-[10px] font-black uppercase tracking-widest text-white/70; }
-        .chart-container { position: relative; height: 300px; }
     </style>
 </head>
-<body class="bg-[#0b0c10] font-sans antialiased text-base overflow-hidden">
+<body class="bg-slate-50 font-sans antialiased text-base overflow-hidden">
     <div class="flex h-screen overflow-hidden">
         <!-- Sidebar -->
         <?php 
@@ -143,11 +138,15 @@ try {
         <!-- Main Content Area -->
         <div class="flex-1 flex flex-col min-w-0 overflow-hidden text-base">
             <!-- Header -->
-            <header class="bg-white border-b border-slate-200 z-10">
-                <div class="px-6 h-20 flex items-center justify-between">
-                    <div class="flex items-center">
-                        <button class="md:hidden p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none">
-                            <i class="fas fa-bars"></i>
+            <header class="bg-white border-b border-slate-200 h-16 flex items-center justify-between px-8 shrink-0 z-10">
+                <h1 class="text-sm font-bold text-slate-700 tracking-tight">System Statistics Portfolio</h1>
+                <div class="flex items-center space-x-3">
+                    <span class="text-[10px] font-bold text-slate-500 bg-slate-100 px-3 py-1 rounded-full uppercase tracking-wider">LGU Registry Analysis</span>
+                </div>
+            </header>
+
+            <!-- Scrollable Content -->
+            <main class="flex-1 overflow-y-auto p-8 bg-slate-50">
                         </button>
                         <h2 class="text-xl font-bold text-slate-800 ml-2 md:ml-0">Compliance Analytics</h2>
                     </div>

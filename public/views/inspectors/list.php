@@ -1,13 +1,10 @@
-<?php
-/**
- * Health & Safety Inspection System
- * Inspector Profile and Certification Tracking
- */
-
+﻿<?php
 declare(strict_types=1);
 
+if (session_status() === PHP_SESSION_NONE) { session_start(); }
+
 if (!isset($_SESSION['user_id'])) {
-    header('Location: /login');
+    header('Location: login.php');
     exit;
 }
 
@@ -19,8 +16,8 @@ $db = Database::getConnection();
 $logger = new \HealthSafety\Utils\Logger();
 $inspectorService = new \HealthSafety\Services\InspectorService($db, $logger);
 
-$expiringCerts = $inspectorService->getExpiringCertifications(60); // Check next 60 days
-$inspectors = $inspectorService->listInspectors(1, 50)['data'];
+$expiringCerts = $inspectorService->getExpiringCertifications(60); 
+$inspectors = $inspectorService->listInspectors(1, 100)['data'];
 
 ?>
 <!DOCTYPE html>
@@ -28,55 +25,87 @@ $inspectors = $inspectorService->listInspectors(1, 50)['data'];
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inspector Profiles - LGU 4 Public Safety</title>
+    <title>Personnel Registry - Health & Safety Insight</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style type="text/tailwindcss">
         @layer base {
-            html { font-size: 105%; }
-            body { @apply text-slate-200; }
-            h1, h2, h3, h4, h5, h6 { @apply font-bold tracking-tight text-white; }
+            html { font-size: 100%; }
+            body { @apply text-slate-800 bg-slate-50; }
+            .mono { font-family: 'JetBrains Mono', monospace; }
         }
     </style>
 </head>
-<body class="bg-[#0b0c10] font-sans antialiased text-base overflow-hidden">
-    <div class="flex h-screen">
-        <!-- Sidebar Navigation -->
+<body class="font-sans antialiased text-base overflow-hidden selection:bg-blue-100 selection:text-blue-900">
+    <div class="flex h-screen relative">
+        <!-- Sidebar -->
         <?php 
             $activePage = 'inspectors';
             include __DIR__ . '/../partials/sidebar.php'; 
         ?>
 
         <!-- Main Content -->
-        <div class="flex-1 flex flex-col min-w-0">
-            <!-- Top Navbar -->
-            <header class="bg-white border-b border-slate-200 h-20 flex items-center justify-between px-8 shrink-0">
-                <div class="flex items-center gap-3">
-                    <h1 class="text-xl font-bold text-slate-800">Inspector Management</h1>
-                    <span class="px-2 py-0.5 bg-blue-100 text-blue-700 text-[10px] font-bold rounded uppercase">LGU 4 Authentication</span>
+        <div class="flex-1 flex flex-col min-w-0 bg-slate-50 relative">
+            <!-- Institutional Header -->
+            <header class="h-20 bg-white border-b border-slate-200 flex items-center justify-between px-10 shrink-0 z-20">
+                <div class="flex items-center space-x-4">
+                    <div class="w-10 h-10 bg-blue-700 rounded-xl flex items-center justify-center shadow-lg shadow-blue-900/20 rotate-3">
+                        <i class="fas fa-user-shield text-white text-lg"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-sm font-black text-slate-900 tracking-tighter uppercase italic leading-none">Personnel Registry</h1>
+                        <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-1">Official Inspector Dossier Management</p>
+                    </div>
+                </div>
+
+                <div class="flex items-center space-x-6">
+                    <div class="hidden md:flex flex-col items-end mr-4">
+                        <span class="text-[10px] font-black text-slate-900 uppercase italic leading-none"><?= $_SESSION['username'] ?? 'OPERATOR' ?></span>
+                        <span class="text-[8px] font-bold text-blue-600 uppercase tracking-[0.2em] mt-1 italic">Registry Officer</span>
+                    </div>
+                    <button onclick="openRegistration()" class="h-11 px-6 bg-blue-700 hover:bg-blue-800 text-white font-black text-[10px] uppercase tracking-widest rounded-xl transition-all shadow-lg shadow-blue-900/10 flex items-center gap-3 group active:scale-95">
+                        <i class="fas fa-plus group-hover:rotate-90 transition-transform"></i>
+                        Enlist Personnel
+                    </button>
                 </div>
             </header>
 
-            <!-- Scrollable Content Area -->
-            <main class="flex-1 overflow-y-auto p-8 text-base">
+            <!-- Scrollable Content -->
+            <main class="flex-1 overflow-y-auto p-10">
                 
-                <!-- Alerts for Expiring Certifications -->
+                <!-- Compliance Horizon (Expiring Certifications) -->
                 <?php if (!empty($expiringCerts)): ?>
-                <div class="mb-8 bg-rose-50 border border-rose-200 rounded-xl p-4">
-                    <div class="flex items-center gap-3 mb-2">
-                        <i class="fas fa-certificate text-rose-500"></i>
-                        <h2 class="text-sm font-bold text-rose-800 uppercase tracking-tight">Certification Alerts (Upcoming 60 Days)</h2>
+                <div class="mb-10 bg-white rounded-[2rem] border border-rose-100 shadow-xl shadow-rose-900/5 p-8 relative overflow-hidden">
+                    <div class="absolute -top-10 -right-10 w-40 h-40 bg-rose-50 rounded-full blur-3xl opacity-50"></div>
+                    
+                    <div class="flex items-center gap-4 mb-8 relative">
+                        <div class="w-10 h-10 bg-rose-500 rounded-lg flex items-center justify-center shadow-lg shadow-rose-900/20">
+                            <i class="fas fa-hourglass-half text-white text-sm"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-xs font-black text-rose-800 uppercase italic">Compliance Horizon Alert</h2>
+                            <p class="text-[9px] font-bold text-rose-400 uppercase tracking-widest mt-0.5 italic">Certification Terminus Detected (60-Day Protocol)</p>
+                        </div>
                     </div>
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 relative">
                         <?php foreach ($expiringCerts as $cert): ?>
-                        <div class="bg-white border border-rose-100 p-3 rounded-lg flex justify-between items-center shadow-sm">
-                            <div>
-                                <div class="text-xs font-bold text-slate-800"><?= htmlspecialchars($cert['inspector_name']) ?></div>
-                                <div class="text-[10px] text-slate-500 font-medium"><?= htmlspecialchars($cert['certification_type']) ?></div>
+                        <div class="bg-rose-50/30 border border-rose-100/50 rounded-2xl p-5 group hover:bg-white hover:shadow-xl hover:shadow-rose-900/5 transition-all">
+                            <div class="flex justify-between items-start mb-3">
+                                <span class="w-8 h-8 rounded-lg bg-white flex items-center justify-center border border-rose-100 italic font-black text-rose-500 text-xs">
+                                    <?= substr($cert['inspector_name'], 0, 1) ?>
+                                </span>
+                                <span class="px-2 py-0.5 bg-rose-500 text-white text-[8px] font-black uppercase rounded block italic animate-pulse">Critical</span>
                             </div>
-                            <div class="text-right">
-                                <div class="text-[10px] text-rose-600 font-black"><?= date('M d', strtotime($cert['expiry_date'])) ?></div>
-                                <div class="text-[8px] text-slate-400 font-bold uppercase">Expires In <?= round((strtotime($cert['expiry_date']) - time()) / 86400) ?> Days</div>
+                            <h3 class="text-[11px] font-black text-slate-800 uppercase italic truncate leading-none mb-1">
+                                <?= htmlspecialchars($cert['inspector_name']) ?>
+                            </h3>
+                            <p class="text-[9px] font-bold text-slate-400 uppercase tracking-tight italic mb-4">
+                                <?= htmlspecialchars($cert['certification_type']) ?>
+                            </p>
+                            <div class="flex items-center justify-between pt-3 border-t border-rose-100/50">
+                                <div class="text-[9px] font-black text-rose-600 uppercase italic"><?= date('M d, Y', strtotime($cert['expiry_date'])) ?></div>
+                                <div class="text-[8px] font-bold text-slate-400 uppercase italic">T-Minus <?= round((strtotime($cert['expiry_date']) - time()) / 86400) ?>D</div>
                             </div>
                         </div>
                         <?php endforeach; ?>
@@ -84,165 +113,124 @@ $inspectors = $inspectorService->listInspectors(1, 50)['data'];
                 </div>
                 <?php endif; ?>
 
-                <div class="grid grid-cols-1 xl:grid-cols-2 gap-8">
-                    <!-- Inspector List Column -->
-                    <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-                        <div class="px-6 py-4 border-b border-slate-100 bg-slate-50/50 flex justify-between items-center">
-                            <h3 class="text-sm font-bold text-slate-800 uppercase tracking-widest">Active Inspectors</h3>
-                            <button class="text-blue-600 text-xs font-bold hover:underline"><i class="fas fa-plus mr-1"></i> Register New</button>
+                <!-- Active Personnel Registry -->
+                <div class="bg-white rounded-[2.5rem] shadow-2xl shadow-blue-900/5 border border-slate-100 overflow-hidden">
+                    <div class="px-10 py-8 border-b border-slate-50 flex flex-col md:flex-row md:items-center justify-between gap-6">
+                        <div>
+                            <h3 class="text-xs font-black text-slate-900 uppercase italic">Active Registry Dossiers</h3>
+                            <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-1 italic">Authorized Inspection Personnel</p>
                         </div>
-                        <div class="divide-y divide-slate-100">
-                            <?php foreach ($inspectors as $i): ?>
-                            <div class="p-4 hover:bg-slate-50 transition-colors flex items-center gap-4">
-                                <div class="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 font-black border border-slate-200">
-                                    <?= substr($i['full_name'], 0, 1) ?>
-                                </div>
-                                <div class="flex-1">
-                                    <h4 class="text-sm font-bold text-slate-900"><?= htmlspecialchars((string)$i['full_name']) ?></h4>
-                                    <div class="flex gap-4 mt-0.5">
-                                        <div class="text-[10px] text-slate-500"><i class="fas fa-id-badge mr-1"></i> <?= htmlspecialchars((string)$i['badge_number']) ?></div>
-                                        <div class="text-[10px] text-slate-500"><i class="fas fa-suitcase mr-1"></i> <?= htmlspecialchars((string)$i['years_of_experience']) ?> Years</div>
-                                    </div>
-                                </div>
-                                <div class="text-right">
-                                    <span class="px-2 py-0.5 bg-emerald-100 text-emerald-700 text-[10px] font-bold rounded-full uppercase">Active</span>
-                                    <div class="mt-1 text-[8px] text-slate-400 font-black uppercase">Verified ID</div>
-                                </div>
-                                <button onclick="viewInspectorActionDetails(<?= $i['inspector_id'] ?>)" class="p-2 text-slate-300 hover:text-blue-600 transition-colors" title="Credential & Activity Details">
-                                    <i class="fas fa-chevron-right"></i>
-                                </button>
+                        <div class="flex items-center gap-4">
+                            <div class="relative group">
+                                <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-blue-700 transition-colors"></i>
+                                <input type="text" placeholder="Filter Dossiers..." class="w-64 h-11 pl-12 pr-4 bg-slate-50 border-none rounded-xl text-[11px] font-bold uppercase italic focus:ring-2 focus:ring-blue-700/10 placeholder:text-slate-300 transition-all">
                             </div>
-                            <?php endforeach; ?>
                         </div>
                     </div>
 
-                    <!-- Performance Stats / Visual -->
-                    <div class="space-y-8">
-                        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
-                            <h3 class="text-sm font-bold text-slate-800 uppercase tracking-widest mb-4">Domain Specializations</h3>
-                            <div class="flex flex-wrap gap-2">
-                                <span class="px-3 py-1.5 bg-amber-50 text-amber-700 rounded-lg text-xs font-bold border border-amber-100">Fire Safety</span>
-                                <span class="px-3 py-1.5 bg-blue-50 text-blue-700 rounded-lg text-xs font-bold border border-blue-100">Bio-Hazard</span>
-                                <span class="px-3 py-1.5 bg-emerald-50 text-emerald-700 rounded-lg text-xs font-bold border border-emerald-100">Structural</span>
-                                <span class="px-3 py-1.5 bg-rose-50 text-rose-700 rounded-lg text-xs font-bold border border-rose-100">Sanitary</span>
-                                <span class="px-3 py-1.5 bg-purple-50 text-purple-700 rounded-lg text-xs font-bold border border-purple-100">Electrical</span>
-                            </div>
-                        </div>
-
-                        <div class="bg-slate-900 rounded-xl p-6 text-white relative overflow-hidden shadow-2xl">
-                             <div class="relative z-10">
-                                <h3 class="text-xs font-black text-blue-400 uppercase tracking-widest mb-1">Safety Culture AI Insights</h3>
-                                <p class="text-lg font-bold mb-4">Workload Distribution Analysis</p>
-                                <div class="space-y-4">
-                                    <div>
-                                        <div class="flex justify-between text-[10px] font-bold mb-1 uppercase tracking-tight">
-                                            <span>Current Deployment</span>
-                                            <span>84%</span>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-slate-50/50">
+                                    <th class="px-10 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest italic">Personnel ID / Name</th>
+                                    <th class="px-10 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest italic">Rank / Class</th>
+                                    <th class="px-10 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest italic">Dossier Status</th>
+                                    <th class="px-10 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest italic">Operations</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-50">
+                                <?php foreach ($inspectors as $i): ?>
+                                <tr class="group hover:bg-blue-50/20 transition-colors">
+                                    <td class="px-10 py-6">
+                                        <div class="flex items-center gap-4">
+                                            <div class="w-12 h-12 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-center font-black text-blue-700 italic group-hover:scale-110 transition-transform shadow-sm">
+                                                <?= substr($i['full_name'], 0, 1) ?>
+                                            </div>
+                                            <div>
+                                                <div class="text-[11px] font-black text-slate-900 uppercase italic leading-none mb-1">
+                                                    <?= htmlspecialchars($i['full_name']) ?>
+                                                </div>
+                                                <div class="text-[9px] font-bold text-blue-600/60 mono italic tracking-tighter">
+                                                    REG-<?= str_pad((string)$i['id'], 5, '0', STR_PAD_LEFT) ?>
+                                                </div>
+                                            </div>
                                         </div>
-                                        <div class="h-1.5 w-full bg-white/10 rounded-full overflow-hidden">
-                                            <div class="h-full w-[84%] bg-blue-500 shadow-glow shadow-blue-500/50 transition-all duration-1000"></div>
+                                    </td>
+                                    <td class="px-10 py-6">
+                                        <span class="text-[10px] font-black text-slate-700 uppercase italic"><?= htmlspecialchars($i['rank'] ?? 'Standard') ?></span>
+                                        <p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mt-1 italic">Inspection Division</p>
+                                    </td>
+                                    <td class="px-10 py-6">
+                                        <div class="flex items-center gap-2">
+                                            <div class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
+                                            <span class="text-[9px] font-black text-emerald-700 uppercase italic tracking-widest">Authorized</span>
                                         </div>
-                                    </div>
-                                    <div>
-                                        <div class="flex justify-between text-[10px] font-bold mb-1 uppercase tracking-tight text-emerald-400">
-                                            <span>Compliance Accuracy Rate</span>
-                                            <span>96.2%</span>
+                                    </td>
+                                    <td class="px-10 py-6">
+                                        <div class="flex items-center gap-3">
+                                            <button class="w-10 h-10 rounded-xl bg-white border border-slate-200 text-slate-400 hover:text-blue-700 hover:border-blue-200 hover:shadow-lg hover:shadow-blue-900/5 flex items-center justify-center transition-all group/btn">
+                                                <i class="fas fa-id-card text-xs group-hover/btn:scale-110 transition-transform"></i>
+                                            </button>
+                                            <button class="w-10 h-10 rounded-xl bg-white border border-slate-200 text-slate-400 hover:text-blue-700 hover:border-blue-200 hover:shadow-lg hover:shadow-blue-900/5 flex items-center justify-center transition-all group/btn">
+                                                <i class="fas fa-history text-xs group-hover/btn:scale-110 transition-transform"></i>
+                                            </button>
                                         </div>
-                                        <div class="h-1.5 w-full bg-white/10 rounded-full overflow-hidden">
-                                            <div class="h-full w-[96.2%] bg-emerald-500 shadow-glow shadow-emerald-500/50 transition-all duration-1000"></div>
-                                        </div>
-                                    </div>
-                                </div>
-                             </div>
-                             <div class="absolute -right-4 -bottom-4 text-white/5 text-8xl rotate-12">
-                                <i class="fas fa-robot"></i>
-                             </div>
-                        </div>
+                                    </td>
+                                </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
-
             </main>
         </div>
     </div>
-    <!-- Inspector Detail Modal -->
-    <div id="inspectorModal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-white w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden border border-slate-200">
-            <div id="inspectorModalContent">
-                <!-- Data loaded via JS -->
-            </div>
-            <div class="p-4 bg-slate-50 border-t border-slate-200 flex justify-end">
-                <button onclick="closeInspectorModal()" class="px-5 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-lg text-sm font-bold transition-all">
-                    Dismiss
-                </button>
-            </div>
+
+    <!-- Registration UI Modal -->
+    <div id="registrationModal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[100] hidden flex items-center justify-center p-6">
+        <div class="bg-white w-full max-w-lg rounded-[2.5rem] shadow-2xl overflow-hidden relative border border-white animate-in zoom-in-95 duration-300">
+             <div class="p-10">
+                <div class="flex justify-between items-start mb-10">
+                    <div>
+                        <h2 class="text-sm font-black text-slate-900 uppercase italic leading-none">Personnel Enlistment</h2>
+                        <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-1">Register New Authorized Inspector</p>
+                    </div>
+                    <button onclick="closeRegistration()" class="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 hover:text-rose-500 transition-colors">
+                        <i class="fas fa-times text-xs"></i>
+                    </button>
+                </div>
+
+                <form class="space-y-6">
+                    <div class="space-y-2">
+                        <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest italic ml-1">Personnel Full Name</label>
+                        <input type="text" class="w-full h-12 px-5 bg-slate-50 border-none rounded-xl text-xs font-bold uppercase italic focus:ring-2 focus:ring-blue-700/10 placeholder:text-slate-300" placeholder="e.g. ANTONIO VALERIO">
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="space-y-2">
+                            <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest italic ml-1">Credential Email</label>
+                            <input type="email" class="w-full h-12 px-5 bg-slate-50 border-none rounded-xl text-xs font-bold focus:ring-2 focus:ring-blue-700/10 placeholder:text-slate-300" placeholder="inspector@lgu.gov">
+                        </div>
+                        <div class="space-y-2">
+                            <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest italic ml-1">Phone Protocol</label>
+                            <input type="tel" class="w-full h-12 px-5 bg-slate-50 border-none rounded-xl text-xs font-bold focus:ring-2 focus:ring-blue-700/10 placeholder:text-slate-300" placeholder="+63 000...">
+                        </div>
+                    </div>
+                    <div class="pt-6">
+                        <button type="submit" class="w-full h-14 bg-blue-700 hover:bg-blue-800 text-white font-black text-xs uppercase tracking-widest rounded-2xl shadow-xl shadow-blue-900/20 transition-all active:scale-95">
+                            Finalize Enlistment Protocol
+                        </button>
+                    </div>
+                </form>
+             </div>
         </div>
     </div>
 
     <script>
-        const modal = document.getElementById('inspectorModal');
-        const content = document.getElementById('inspectorModalContent');
-
-        function closeInspectorModal() {
-            modal.classList.add('hidden');
+        function openRegistration() {
+            document.getElementById('registrationModal').classList.remove('hidden');
         }
-
-        async function viewInspectorActionDetails(id) {
-            modal.classList.remove('hidden');
-            content.innerHTML = '<div class="p-20 text-center"><i class="fas fa-spinner fa-spin text-2xl text-blue-600"></i></div>';
-            
-            // Logic to fetch inspector details could go here
-            // For now, we simulate the "Action Details" view
-            setTimeout(() => {
-                content.innerHTML = `
-                    <div class="p-8">
-                        <div class="flex items-center gap-6 mb-8">
-                            <div class="w-20 h-20 bg-blue-600 rounded-2xl flex items-center justify-center text-white text-3xl font-black shadow-xl shadow-blue-200">
-                                <i class="fas fa-user-tie"></i>
-                            </div>
-                            <div>
-                                <h2 class="text-2xl font-black text-slate-900 tracking-tight italic">Actionable Profile</h2>
-                                <p class="text-xs text-slate-500 font-bold uppercase tracking-widest mt-1">LGU Credentials & Performance</p>
-                            </div>
-                        </div>
-
-                        <div class="space-y-6">
-                            <div class="bg-blue-50 border border-blue-100 p-4 rounded-xl">
-                                <h4 class="text-[10px] font-black text-blue-700 uppercase tracking-widest mb-3 flex items-center">
-                                    <i class="fas fa-certificate mr-2"></i> Active Certifications
-                                </h4>
-                                <div class="space-y-2">
-                                    <div class="flex justify-between items-center bg-white p-2.5 rounded-lg border border-blue-100 shadow-sm">
-                                        <span class="text-xs font-bold text-slate-700">OHSAS Lead Auditor</span>
-                                        <span class="text-[9px] px-2 py-0.5 bg-emerald-100 text-emerald-700 rounded-full font-bold uppercase">Valid</span>
-                                    </div>
-                                    <div class="flex justify-between items-center bg-white p-2.5 rounded-lg border border-blue-100 shadow-sm">
-                                        <span class="text-xs font-bold text-slate-700">Fire Safety Specialist</span>
-                                        <span class="text-[9px] px-2 py-0.5 bg-emerald-100 text-emerald-700 rounded-full font-bold uppercase">Valid</span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div>
-                                <h4 class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">Recent Operational Actions</h4>
-                                <div class="relative pl-6 space-y-6 border-l-2 border-slate-100 ml-2">
-                                    <div class="relative">
-                                        <div class="absolute -left-[31px] top-1 w-4 h-4 rounded-full bg-blue-500 border-4 border-white"></div>
-                                        <p class="text-[10px] font-bold text-slate-400 uppercase italic">Yesterday</p>
-                                        <p class="text-sm font-bold text-slate-800">Conducted High-Risk Food Safety Audit</p>
-                                        <p class="text-[10px] text-slate-500 mt-1">Establishment: Green Valley Bistro (Ref #9234)</p>
-                                    </div>
-                                    <div class="relative">
-                                        <div class="absolute -left-[31px] top-1 w-4 h-4 rounded-full bg-slate-300 border-4 border-white"></div>
-                                        <p class="text-[10px] font-bold text-slate-400 uppercase italic">3 Days Ago</p>
-                                        <p class="text-sm font-bold text-slate-800">Completed LGU Forensic Training</p>
-                                        <p class="text-[10px] text-slate-500 mt-1">Module: Multi-Agency Data Interoperability</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            }, 600);
+        function closeRegistration() {
+            document.getElementById('registrationModal').classList.add('hidden');
         }
     </script>
 </body>

@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 // Session already started by index.php
 if (!isset($_SESSION['user_id'])) {
     header('Location: /views/auth/login.php');
@@ -25,7 +25,7 @@ try {
         $required = ['name', 'type', 'owner_name', 'owner_phone', 'address_street', 'address_barangay', 'address_city'];
         foreach ($required as $field) {
             if (empty($_POST[$field])) {
-                throw new Exception("Field '$field' is required");
+                throw new Exception("Field '$field' is required for the Institutional Registry");
             }
         }
         
@@ -72,10 +72,7 @@ try {
             $establishmentId
         ]);
         
-        $success = "Establishment updated successfully!";
-        
-        // Redirect to view page after brief delay
-        header("Refresh: 2; url=/views/establishments/view.php?id=$establishmentId");
+        $success = "Establishment record successfully updated in registry.";
     }
     
     // Get establishment data
@@ -98,21 +95,25 @@ try {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edit <?php echo  htmlspecialchars($establishment['name']) ?> - Health & Safety Inspection System</title>
+    <title>Edit Registry Entry - Health & Safety Insight</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css" rel="stylesheet">
     <style type="text/tailwindcss">
         @layer base {
-            html { font-size: 105%; }
-            body { @apply text-slate-900 font-medium; }
+            html { font-size: 100%; }
+            body { @apply text-slate-700 bg-slate-50; }
+            h1, h2, h3 { @apply font-bold tracking-tight text-slate-900; }
+            .form-input { 
+                @apply w-full px-4 py-3 bg-white border border-slate-200 rounded-lg text-sm text-slate-700 
+                placeholder:text-slate-400 focus:ring-2 focus:ring-blue-700/10 focus:border-blue-700 
+                outline-none transition-all shadow-sm;
+            }
+            .form-label { @apply block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2 ml-1; }
+            .card { @apply bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden; }
         }
-        .form-section { background: #f8f9fa; padding: 1.5rem; border-radius: 8px; margin-bottom: 1.5rem; }
-        .section-title { color: #495057; font-weight: 600; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 2px solid #dee2e6; }
     </style>
 </head>
-<body class="bg-gray-50 font-sans antialiased">
+<body class="font-sans antialiased text-base overflow-hidden">
     <div class="flex h-screen overflow-hidden">
         <!-- Sidebar Navigation -->
         <?php 
@@ -121,211 +122,175 @@ try {
         ?>
 
         <!-- Main Content Area -->
-        <div class="flex-1 flex flex-col overflow-hidden">
-            <!-- Header -->
-            <header class="bg-white border-b border-slate-200 h-16 flex items-center justify-between px-8 shrink-0">
-                <h1 class="text-xl font-bold text-slate-800">Edit Establishment</h1>
-                <div class="flex items-center space-x-3">
-                    <a href="/views/establishments/view.php?id=<?php echo  $establishmentId ?>" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2 rounded-lg text-sm font-bold flex items-center transition-all">
-                        <i class="fas fa-eye mr-2"></i> View Details
+        <div class="flex-1 flex flex-col min-w-0 overflow-hidden text-base">
+            <!-- Institutional Header -->
+            <header class="bg-white border-b border-slate-200 h-16 flex items-center justify-between px-8 shrink-0 z-10">
+                <div class="flex items-center space-x-4">
+                    <a href="/establishments/view?id=<?= $establishmentId ?>" class="text-slate-400 hover:text-slate-600 transition-colors">
+                        <i class="fas fa-arrow-left"></i>
                     </a>
-                    <a href="/views/establishments/list.php" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2 rounded-lg text-sm font-bold flex items-center transition-all">
-                        <i class="fas fa-arrow-left mr-2"></i> Back to List
+                    <h1 class="text-sm font-bold text-slate-800 tracking-tight uppercase">Registry Revision</h1>
+                    <div class="h-4 w-px bg-slate-200"></div>
+                    <span class="text-[10px] font-bold text-blue-700 uppercase tracking-widest italic"><?= htmlspecialchars($establishment['name']) ?></span>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <a href="/establishments/view?id=<?= $establishmentId ?>" class="text-[10px] font-black text-slate-400 hover:text-blue-700 uppercase tracking-[0.2em] transition-colors">
+                        View Dossier
                     </a>
                 </div>
             </header>
 
             <!-- Scrollable Content -->
-            <main class="flex-1 overflow-y-auto p-8">
-                <div class="max-w-5xl mx-auto">
-                    <!-- Notifications -->
-                    <?php if ($error): ?>
-                    <div class="alert alert-danger alert-dismissible fade show mb-6">
-                        <i class="fas fa-exclamation-triangle mr-2"></i> <?php echo  htmlspecialchars($error) ?>
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                    </div>
+            <main class="flex-1 overflow-y-auto p-8 bg-slate-50">
+                <div class="max-w-4xl mx-auto">
+                    <?php if (!empty($error)): ?>
+                        <div class="mb-8 p-4 bg-rose-50 border border-rose-100 rounded-xl flex items-center text-rose-700 text-xs font-bold uppercase tracking-wider">
+                            <i class="fas fa-exclamation-circle mr-3"></i> <?= htmlspecialchars($error) ?>
+                        </div>
                     <?php endif; ?>
 
-                    <?php if ($success): ?>
-                    <div class="alert alert-success alert-dismissible fade show mb-6">
-                        <i class="fas fa-check-circle mr-2"></i> <?php echo  htmlspecialchars($success) ?>
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                    </div>
+                    <?php if (!empty($success)): ?>
+                        <div class="mb-8 p-4 bg-emerald-50 border border-emerald-100 rounded-xl flex items-center text-emerald-700 text-xs font-bold uppercase tracking-wider">
+                            <i class="fas fa-check-circle mr-3"></i> <?= htmlspecialchars($success) ?>
+                        </div>
                     <?php endif; ?>
 
-                    <div class="mb-6">
-                        <h2 class="text-2xl font-bold text-slate-900 mb-1"><?php echo htmlspecialchars($establishment['name']); ?></h2>
-                        <p class="text-slate-500">Update establishment information and compliance status</p>
-                    </div>
-
-                    <form method="POST" action="">
-                        <div class="card">
-                            <div class="card-body">
-                                <!-- Basic Information -->
-                                <div class="form-section">
-                                    <h5 class="section-title"><i class="bi bi-info-circle"></i> Basic Information</h5>
-                                    <div class="row">
-                                        <div class="col-md-8">
-                                            <div class="mb-3">
-                                                <label class="form-label">Establishment Name <span class="text-danger">*</span></label>
-                                                <input type="text" class="form-control" name="name" required 
-                                                       value="<?php echo  htmlspecialchars($establishment['name']) ?>">
-                                            </div>
-                                        </div>
-                                        <div class="col-md-4">
-                                            <div class="mb-3">
-                                                <label class="form-label">Type <span class="text-danger">*</span></label>
-                                                <select class="form-select" name="type" required>
-                                                    <option value="">Select Type</option>
-                                                    <?php
-                                                    $types = ['restaurant', 'school', 'hospital', 'hotel', 'market', 'factory', 'office', 'salon', 'gym', 'other'];
-                                                    foreach ($types as $type):
-                                                    ?>
-                                                    <option value="<?php echo  $type ?>" <?php echo  $establishment['type'] === $type ? 'selected' : '' ?>>
-                                                        <?php echo  ucfirst($type) ?>
-                                                    </option>
-                                                    <?php endforeach; ?>
-                                                </select>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-md-4">
-                                            <div class="mb-3">
-                                                <label class="form-label">Compliance Status <span class="text-danger">*</span></label>
-                                                <select class="form-select" name="compliance_status" required>
-                                                    <option value="compliant" <?php echo  $establishment['compliance_status'] === 'compliant' ? 'selected' : '' ?>>Compliant</option>
-                                                    <option value="non_compliant" <?php echo  $establishment['compliance_status'] === 'non_compliant' ? 'selected' : '' ?>>Non-Compliant</option>
-                                                    <option value="pending" <?php echo  $establishment['compliance_status'] === 'pending' ? 'selected' : '' ?>>Pending</option>
-                                                    <option value="suspended" <?php echo  $establishment['compliance_status'] === 'suspended' ? 'selected' : '' ?>>Suspended</option>
-                                                </select>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-4">
-                                            <div class="mb-3">
-                                                <label class="form-label">Capacity (persons)</label>
-                                                <input type="number" class="form-control" name="capacity" min="0"
-                                                       value="<?php echo  htmlspecialchars($establishment['capacity'] ?? '') ?>">
-                                            </div>
-                                        </div>
-                                        <div class="col-md-4">
-                                            <div class="mb-3">
-                                                <label class="form-label">Operating Hours</label>
-                                                <input type="text" class="form-control" name="operating_hours"
-                                                       value="<?php echo  htmlspecialchars($establishment['operating_hours'] ?? '') ?>">
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="mb-0">
-                                        <label class="form-label">Description/Notes</label>
-                                        <textarea class="form-control" name="description" rows="3"><?php echo  htmlspecialchars($establishment['description'] ?? '') ?></textarea>
-                                    </div>
+                    <form method="POST" class="space-y-8 pb-12">
+                        <!-- Entity Core Details -->
+                        <div class="card relative p-8">
+                            <div class="absolute top-0 left-0 w-full h-1 bg-amber-500"></div>
+                            <div class="mb-8 flex justify-between items-center border-b border-slate-50 pb-4">
+                                <h2 class="text-[11px] font-black text-slate-800 uppercase tracking-widest flex items-center">
+                                    <i class="fas fa-building mr-2 text-amber-500"></i> Amend Core Parameters
+                                </h2>
+                                <span class="text-[9px] font-bold text-slate-300 italic">Registry Section 1.0</span>
+                            </div>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div class="md:col-span-2">
+                                    <label class="form-label">Institution Name <span class="text-rose-500">*</span></label>
+                                    <input type="text" name="name" required value="<?= htmlspecialchars($establishment['name']) ?>" class="form-input">
+                                </div>
+                                
+                                <div>
+                                    <label class="form-label">Classification <span class="text-rose-500">*</span></label>
+                                    <select name="type" required class="form-input appearance-none">
+                                        <?php
+                                            $types = [
+                                                'restaurant' => 'Restaurant / Culinary',
+                                                'school' => 'Educational Institution',
+                                                'hospital' => 'Medical Facility',
+                                                'hotel' => 'Hospitality / Resort',
+                                                'market' => 'Public Commerce',
+                                                'office' => 'Corporate / Admin',
+                                                'factory' => 'Industrial / Mfg',
+                                                'other' => 'General Commercial'
+                                            ];
+                                            foreach($types as $val => $label):
+                                        ?>
+                                            <option value="<?= $val ?>" <?= $establishment['type'] === $val ? 'selected' : '' ?>><?= $label ?></option>
+                                        <?php endforeach; ?>
+                                    </select>
                                 </div>
 
-                                <!-- Owner Information -->
-                                <div class="form-section">
-                                    <h5 class="section-title"><i class="bi bi-person"></i> Owner Information</h5>
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <div class="mb-3">
-                                                <label class="form-label">Owner Name <span class="text-danger">*</span></label>
-                                                <input type="text" class="form-control" name="owner_name" required
-                                                       value="<?php echo  htmlspecialchars($establishment['owner_name']) ?>">
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="mb-3">
-                                                <label class="form-label">Owner Phone <span class="text-danger">*</span></label>
-                                                <input type="tel" class="form-control" name="owner_phone" required
-                                                       value="<?php echo  htmlspecialchars($establishment['owner_phone']) ?>">
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="mb-0">
-                                        <label class="form-label">Owner Email</label>
-                                        <input type="email" class="form-control" name="owner_email"
-                                               value="<?php echo  htmlspecialchars($establishment['owner_email'] ?? '') ?>">
-                                    </div>
+                                <div>
+                                    <label class="form-label">Compliance Mandate <span class="text-rose-500">*</span></label>
+                                    <select name="compliance_status" required class="form-input appearance-none font-bold italic">
+                                        <option value="compliant" <?= $establishment['compliance_status'] === 'compliant' ? 'selected' : '' ?>>Compliant</option>
+                                        <option value="non_compliant" <?= $establishment['compliance_status'] === 'non_compliant' ? 'selected' : '' ?>>Non-Compliant</option>
+                                        <option value="pending" <?= $establishment['compliance_status'] === 'pending' ? 'selected' : '' ?>>Pending Review</option>
+                                        <option value="suspended" <?= $establishment['compliance_status'] === 'suspended' ? 'selected' : '' ?>>Suspended</option>
+                                    </select>
                                 </div>
 
-                                <!-- Address Information -->
-                                <div class="form-section">
-                                    <h5 class="section-title"><i class="bi bi-geo-alt"></i> Address Information</h5>
-                                    <div class="mb-3">
-                                        <label class="form-label">Street Address <span class="text-danger">*</span></label>
-                                        <input type="text" class="form-control" name="address_street" required
-                                               value="<?php echo  htmlspecialchars($establishment['address_street']) ?>">
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-md-4">
-                                            <div class="mb-3">
-                                                <label class="form-label">Barangay <span class="text-danger">*</span></label>
-                                                <input type="text" class="form-control" name="address_barangay" required
-                                                       value="<?php echo  htmlspecialchars($establishment['address_barangay']) ?>">
-                                            </div>
-                                        </div>
-                                        <div class="col-md-4">
-                                            <div class="mb-3">
-                                                <label class="form-label">City/Municipality <span class="text-danger">*</span></label>
-                                                <input type="text" class="form-control" name="address_city" required
-                                                       value="<?php echo  htmlspecialchars($establishment['address_city']) ?>">
-                                            </div>
-                                        </div>
-                                        <div class="col-md-4">
-                                            <div class="mb-3">
-                                                <label class="form-label">Province</label>
-                                                <input type="text" class="form-control" name="address_province"
-                                                       value="<?php echo  htmlspecialchars($establishment['address_province'] ?? '') ?>">
-                                            </div>
-                                        </div>
-                                    </div>
+                                <div>
+                                    <label class="form-label">Permit Identifier</label>
+                                    <input type="text" name="business_permit_number" value="<?= htmlspecialchars($establishment['business_permit_number'] ?? '') ?>" class="form-input font-mono">
                                 </div>
 
-                                <!-- Business Permit Information -->
-                                <div class="form-section">
-                                    <h5 class="section-title"><i class="bi bi-file-text"></i> Business Permit Information</h5>
-                                    <div class="row">
-                                        <div class="col-md-4">
-                                            <div class="mb-3">
-                                                <label class="form-label">Business Permit Number</label>
-                                                <input type="text" class="form-control" name="business_permit_number"
-                                                       value="<?php echo  htmlspecialchars($establishment['business_permit_number'] ?? '') ?>">
-                                            </div>
-                                        </div>
-                                        <div class="col-md-4">
-                                            <div class="mb-3">
-                                                <label class="form-label">Permit Issue Date</label>
-                                                <input type="date" class="form-control" name="permit_issue_date"
-                                                       value="<?php echo  htmlspecialchars($establishment['permit_issue_date'] ?? '') ?>">
-                                            </div>
-                                        </div>
-                                        <div class="col-md-4">
-                                            <div class="mb-0">
-                                                <label class="form-label">Permit Expiry Date</label>
-                                                <input type="date" class="form-control" name="permit_expiry_date"
-                                                       value="<?php echo  htmlspecialchars($establishment['permit_expiry_date'] ?? '') ?>">
-                                            </div>
-                                        </div>
-                                    </div>
+                                <div>
+                                    <label class="form-label">Occupancy Capacity</label>
+                                    <input type="number" name="capacity" value="<?= htmlspecialchars($establishment['capacity'] ?? '') ?>" class="form-input">
                                 </div>
 
-                                <!-- Form Actions -->
-                                <div class="d-flex justify-content-between align-items-center pt-3 border-top">
-                                    <div class="text-muted">
-                                        <small>
-                                            <span class="text-danger">*</span> Required fields<br>
-                                            Last updated: <?php echo  date('F d, Y g:i A', strtotime($establishment['updated_at'] ?? $establishment['created_at'])) ?>
-                                        </small>
-                                    </div>
-                                    <div>
-                                        <a href="/views/establishments/view.php?id=<?php echo  $establishmentId ?>" class="btn btn-outline-secondary me-2">
-                                            <i class="bi bi-x-circle"></i> Cancel
-                                        </a>
-                                        <button type="submit" class="btn btn-primary">
-                                            <i class="bi bi-save"></i> Save Changes
-                                        </button>
-                                    </div>
+                                <div class="md:col-span-2">
+                                    <label class="form-label">Abridged Operational Scope</label>
+                                    <textarea name="description" rows="3" class="form-input resize-none"><?= htmlspecialchars($establishment['description'] ?? '') ?></textarea>
                                 </div>
+                            </div>
+                        </div>
+
+                        <!-- Ownership Structure -->
+                        <div class="card p-8">
+                            <div class="mb-8 flex justify-between items-center border-b border-slate-50 pb-4">
+                                <h2 class="text-[11px] font-black text-slate-800 uppercase tracking-widest flex items-center">
+                                    <i class="fas fa-user-tie mr-2 text-emerald-600"></i> Legal Records
+                                </h2>
+                                <span class="text-[9px] font-bold text-slate-300 italic">Registry Section 2.0</span>
+                            </div>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label class="form-label">Registered Principal <span class="text-rose-500">*</span></label>
+                                    <input type="text" name="owner_name" required value="<?= htmlspecialchars($establishment['owner_name']) ?>" class="form-input">
+                                </div>
+                                
+                                <div>
+                                    <label class="form-label">Direct Line <span class="text-rose-500">*</span></label>
+                                    <input type="tel" name="owner_phone" required value="<?= htmlspecialchars($establishment['owner_phone']) ?>" class="form-input font-mono text-blue-700">
+                                </div>
+
+                                <div class="md:col-span-2">
+                                    <label class="form-label">Institutional Email</label>
+                                    <input type="email" name="owner_email" value="<?= htmlspecialchars($establishment['owner_email'] ?? '') ?>" class="form-input">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Physical Location -->
+                        <div class="card p-8">
+                            <div class="mb-8 flex justify-between items-center border-b border-slate-50 pb-4">
+                                <h2 class="text-[11px] font-black text-slate-800 uppercase tracking-widest flex items-center">
+                                    <i class="fas fa-map-marker-alt mr-2 text-rose-500"></i> Geospatial Entry
+                                </h2>
+                                <span class="text-[9px] font-bold text-slate-300 italic">Registry Section 3.0</span>
+                            </div>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                <div class="md:col-span-3">
+                                    <label class="form-label">Street / Site Address <span class="text-rose-500">*</span></label>
+                                    <input type="text" name="address_street" required value="<?= htmlspecialchars($establishment['address_street']) ?>" class="form-input">
+                                </div>
+
+                                <div>
+                                    <label class="form-label">Barangay <span class="text-rose-500">*</span></label>
+                                    <input type="text" name="address_barangay" required value="<?= htmlspecialchars($establishment['address_barangay']) ?>" class="form-input">
+                                </div>
+
+                                <div>
+                                    <label class="form-label">City / LGU <span class="text-rose-500">*</span></label>
+                                    <input type="text" name="address_city" required value="<?= htmlspecialchars($establishment['address_city']) ?>" class="form-input">
+                                </div>
+
+                                <div>
+                                    <label class="form-label">Province</label>
+                                    <input type="text" name="address_province" value="<?= htmlspecialchars($establishment['address_province'] ?? '') ?>" class="form-input">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Update Interface -->
+                        <div class="flex items-center justify-between pt-6 border-t border-slate-200">
+                            <div class="text-[9px] font-bold text-slate-400 italic uppercase">
+                                <i class="fas fa-history mr-2"></i> Last audit update: <?= date('M d, Y H:i', strtotime($establishment['updated_at'] ?? $establishment['created_at'])) ?>
+                            </div>
+                            <div class="flex items-center space-x-6">
+                                <a href="/establishments/view?id=<?= $establishmentId ?>" class="text-xs font-bold text-slate-400 hover:text-slate-600 uppercase tracking-widest transition-colors">
+                                    Revert Changes
+                                </a>
+                                <button type="submit" class="bg-amber-500 hover:bg-amber-600 text-white px-8 py-3 rounded-lg text-xs font-bold uppercase tracking-widest transition-all shadow-md shadow-amber-900/10">
+                                    <i class="fas fa-save mr-2"></i> Update Registry Record
+                                </button>
                             </div>
                         </div>
                     </form>
@@ -333,7 +298,5 @@ try {
             </main>
         </div>
     </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
