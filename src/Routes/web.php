@@ -55,7 +55,11 @@ $webRoutes = [
     '/certificates' => ['type' => 'view', 'file' => 'certificates/list.php'],
     '/inspectors' => ['type' => 'view', 'file' => 'inspectors/list.php'],
     '/inspectors/list.php' => ['type' => 'view', 'file' => 'inspectors/list.php'],
+    '/integrations' => ['type' => 'view', 'file' => 'integrations/hub.php'],
+    '/integrations/hub.php' => ['type' => 'view', 'file' => 'integrations/hub.php'],
     '/registration' => ['type' => 'view', 'file' => 'auth/register.php'],
+    '/logout' => ['type' => 'view', 'file' => 'auth/logout.php'],
+    '/views/auth/logout.php' => ['type' => 'view', 'file' => 'auth/logout.php'],
     '/index.php' => ['type' => 'public', 'file' => 'dashboard.php'],
     '/index' => ['type' => 'public', 'file' => 'dashboard.php'],
 ];

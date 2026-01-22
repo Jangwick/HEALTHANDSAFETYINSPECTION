@@ -19,7 +19,7 @@
             <!-- Category: Command & Analytics -->
             <p class="px-4 text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-3 mt-4 opacity-70">Command Console</p>
             
-            <a href="/dashboard.php" class="<?php echo ($activePage ?? '') == 'dashboard' ? 'bg-blue-50 text-blue-700 border border-blue-100 shadow-sm' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900'; ?> group flex items-center px-4 py-3 text-xs font-semibold rounded-xl transition-all duration-200">
+            <a href="/dashboard" class="<?php echo ($activePage ?? '') == 'dashboard' ? 'bg-blue-50 text-blue-700 border border-blue-100 shadow-sm' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900'; ?> group flex items-center px-4 py-3 text-xs font-semibold rounded-xl transition-all duration-200">
                 <i class="fas fa-layer-group mr-4 text-base w-5 <?php echo ($activePage ?? '') == 'dashboard' ? 'text-blue-600' : 'text-slate-300 group-hover:text-slate-500'; ?>"></i>
                 Dashboard Overview
             </a>
@@ -30,29 +30,29 @@
             </div>
 
             <?php if (($_SESSION['role'] ?? '') !== 'establishment_owner'): ?>
-            <a href="/views/inspections/list.php" class="<?php echo ($activePage ?? '') == 'inspections' ? 'bg-blue-50 text-blue-700 border border-blue-100 shadow-sm' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900'; ?> group flex items-center px-4 py-3 text-xs font-semibold rounded-xl transition-all duration-200">
+            <a href="/inspections" class="<?php echo ($activePage ?? '') == 'inspections' ? 'bg-blue-50 text-blue-700 border border-blue-100 shadow-sm' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900'; ?> group flex items-center px-4 py-3 text-xs font-semibold rounded-xl transition-all duration-200">
                 <i class="fas fa-clipboard-check mr-4 text-base w-5 <?php echo ($activePage ?? '') == 'inspections' ? 'text-blue-600' : 'text-slate-300 group-hover:text-slate-500'; ?>"></i>
                 Inspection Logs
             </a>
 
-            <a href="/views/inspections/scheduling.php" class="<?php echo ($activePage ?? '') == 'scheduling' ? 'bg-blue-50 text-blue-700 border border-blue-100 shadow-sm' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900'; ?> group flex items-center px-4 py-3 text-xs font-semibold rounded-xl transition-all duration-200">
+            <a href="/scheduling" class="<?php echo ($activePage ?? '') == 'scheduling' ? 'bg-blue-50 text-blue-700 border border-blue-100 shadow-sm' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900'; ?> group flex items-center px-4 py-3 text-xs font-semibold rounded-xl transition-all duration-200">
                 <i class="fas fa-calendar-day mr-4 text-base w-5 <?php echo ($activePage ?? '') == 'scheduling' ? 'text-blue-600' : 'text-slate-300 group-hover:text-slate-500'; ?>"></i>
                 Scheduling Grid
             </a>
             <?php endif; ?>
             
-            <a href="/views/establishments/list.php" class="<?php echo ($activePage ?? '') == 'establishments' ? 'bg-blue-50 text-blue-700 border border-blue-100 shadow-sm' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900'; ?> group flex items-center px-4 py-3 text-xs font-semibold rounded-xl transition-all duration-200">
+            <a href="/establishments" class="<?php echo ($activePage ?? '') == 'establishments' ? 'bg-blue-50 text-blue-700 border border-blue-100 shadow-sm' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900'; ?> group flex items-center px-4 py-3 text-xs font-semibold rounded-xl transition-all duration-200">
                 <i class="fas fa-landmark mr-4 text-base w-5 <?php echo ($activePage ?? '') == 'establishments' ? 'text-blue-600' : 'text-slate-300 group-hover:text-slate-500'; ?>"></i>
                 Establishment List
             </a>
             
-            <a href="/views/certificates/list.php" class="<?php echo ($activePage ?? '') == 'certificates' ? 'bg-blue-50 text-blue-700 border border-blue-100 shadow-sm' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900'; ?> group flex items-center px-4 py-3 text-xs font-semibold rounded-xl transition-all duration-200">
+            <a href="/certificates" class="<?php echo ($activePage ?? '') == 'certificates' ? 'bg-blue-50 text-blue-700 border border-blue-100 shadow-sm' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900'; ?> group flex items-center px-4 py-3 text-xs font-semibold rounded-xl transition-all duration-200">
                 <i class="fas fa-stamp mr-4 text-base w-5 <?php echo ($activePage ?? '') == 'certificates' ? 'text-blue-600' : 'text-slate-300 group-hover:text-slate-500'; ?>"></i>
                 Safety Certificates
             </a>
 
             <?php if (($_SESSION['role'] ?? '') !== 'establishment_owner'): ?>
-            <a href="/views/violations/list.php" class="<?php echo ($activePage ?? '') == 'violations' ? 'bg-blue-50 text-blue-700 border border-blue-100 shadow-sm' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900'; ?> group flex items-center px-4 py-3 text-xs font-semibold rounded-xl transition-all duration-200">
+            <a href="/violations" class="<?php echo ($activePage ?? '') == 'violations' ? 'bg-blue-50 text-blue-700 border border-blue-100 shadow-sm' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900'; ?> group flex items-center px-4 py-3 text-xs font-semibold rounded-xl transition-all duration-200">
                 <i class="fas fa-skull-crossbones mr-4 text-base w-5 <?php echo ($activePage ?? '') == 'violations' ? 'text-blue-600' : 'text-slate-300 group-hover:text-slate-500'; ?>"></i>
                 Violations Log
             </a>
@@ -62,12 +62,12 @@
                 <p class="px-4 text-[11px] font-bold text-slate-400 uppercase tracking-widest opacity-70">Governance</p>
             </div>
 
-            <a href="/views/inspectors/list.php" class="<?php echo ($activePage ?? '') == 'inspectors' ? 'bg-blue-50 text-blue-700 border border-blue-100 shadow-sm' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900'; ?> group flex items-center px-4 py-3 text-xs font-semibold rounded-xl transition-all duration-200">
+            <a href="/inspectors" class="<?php echo ($activePage ?? '') == 'inspectors' ? 'bg-blue-50 text-blue-700 border border-blue-100 shadow-sm' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900'; ?> group flex items-center px-4 py-3 text-xs font-semibold rounded-xl transition-all duration-200">
                 <i class="fas fa-id-badge mr-4 text-base w-5 <?php echo ($activePage ?? '') == 'inspectors' ? 'text-blue-600' : 'text-slate-300 group-hover:text-slate-500'; ?>"></i>
                 Inspector Personnel
             </a>
 
-            <a href="/views/integrations/hub.php" class="<?php echo ($activePage ?? '') == 'integrations' ? 'bg-blue-50 text-blue-700 border border-blue-100 shadow-sm' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900'; ?> group flex items-center px-4 py-3 text-xs font-semibold rounded-xl transition-all duration-200">
+            <a href="/integrations" class="<?php echo ($activePage ?? '') == 'integrations' ? 'bg-blue-50 text-blue-700 border border-blue-100 shadow-sm' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900'; ?> group flex items-center px-4 py-3 text-xs font-semibold rounded-xl transition-all duration-200">
                 <i class="fas fa-hubspot mr-4 text-base w-5 <?php echo ($activePage ?? '') == 'integrations' ? 'text-blue-600' : 'text-slate-300 group-hover:text-slate-500'; ?>"></i>
                 Integration Hub
             </a>
@@ -90,7 +90,7 @@
                 </div>
             </div>
         </div>
-        <a href="/views/auth/logout.php" class="flex items-center justify-center gap-3 w-full h-11 text-xs font-bold text-slate-500 hover:text-rose-600 border border-slate-100 rounded-xl transition-all hover:bg-rose-50 hover:border-rose-100 shadow-sm">
+        <a href="/logout" class="flex items-center justify-center gap-3 w-full h-11 text-xs font-bold text-slate-500 hover:text-rose-600 border border-slate-100 rounded-xl transition-all hover:bg-rose-50 hover:border-rose-100 shadow-sm">
             <i class="fas fa-power-off text-sm opacity-60"></i>
             Sign Out
         </a>
