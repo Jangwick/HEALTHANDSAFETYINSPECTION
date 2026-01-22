@@ -215,5 +215,27 @@ class IntegrationController
         $result = $this->integrationService->getIntegrationLogs($action, $page, $perPage);
 
         Response::success($result);
+    /**
+     * Cross-Cluster Integration: Notify Law Enforcement (LGU 4 Subsystem)
+     * POST /api/integrations/notify-police
+     */
+    public function notifyLawEnforcement(): void
+    {
+        $data = json_decode(file_get_contents('php://input'), true);
+
+        if (!isset($data['violation_id'])) {
+            Response::error('violation_id is required', 400);
+            return;
+        }
+
+        $reason = $data['reason'] ?? 'Critical safety violation detected requiring police enforcement.';
+        
+        $success = $this->integrationService->notifyLawEnforcement((int)$data['violation_id'], $reason);
+
+        if ($success) {
+            Response::success(['message' => 'Police notification dispatched successfully']);
+        } else {
+            Response::error('Failed to dispatch notification. Violation record not found.', 404);
+        }
     }
 }

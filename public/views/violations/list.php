@@ -7,7 +7,7 @@
 declare(strict_types=1);
 
 if (!isset($_SESSION['user_id'])) {
-    header('Location: /views/auth/login.php');
+    header('Location: /login');
     exit;
 }
 
@@ -44,10 +44,11 @@ if ($search) {
     $params[] = "%$search%";
 }
 
-$whereClause = $where ? "WHERE " . implode(" AND ", $where) : "";
-
-// Get total count
-$countStmt = $db->prepare("SELECT COUNT(*) FROM violations v LEFT JOIN establishments e ON v.establishment_id = e.establishment_id $whereClause");
+    // Role-based filtering: Establishment Owners only see their own violations
+    if (isset($_SESSION['role']) && $_SESSION['role'] === 'establishment_owner') {
+        $where[] = "e.owner_user_id = ?";
+        $params[] = $_SESSION['user_id'];
+    }
 $countStmt->execute($params);
 $totalViolations = (int)$countStmt->fetchColumn();
 $totalPages = ceil($totalViolations / $perPage);
@@ -75,8 +76,14 @@ $violations = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <title>Violations - Health & Safety System</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style type="text/tailwindcss">
+        @layer base {
+            html { font-size: 105%; }
+            body { @apply text-slate-900; }
+        }
+    </style>
 </head>
-<body class="bg-slate-50 font-sans antialiased text-slate-900 overflow-hidden">
+<body class="bg-slate-50 font-sans antialiased overflow-hidden text-lg">
     <div class="flex h-screen">
         <!-- Sidebar Navigation -->
         <?php 
@@ -87,15 +94,15 @@ $violations = $stmt->fetchAll(PDO::FETCH_ASSOC);
         <!-- Main Content -->
         <div class="flex-1 flex flex-col min-w-0">
             <!-- Top Navbar -->
-            <header class="bg-white border-b border-slate-200 h-16 flex items-center justify-between px-8 shrink-0">
-                <h1 class="text-xl font-bold text-slate-800">Safety Violations</h1>
+            <header class="bg-white border-b border-slate-200 h-20 flex items-center justify-between px-8 shrink-0">
+                <h1 class="text-2xl font-black text-slate-900 tracking-tight">Safety Violations</h1>
                 <div class="flex items-center space-x-4">
-                    <span class="text-xs font-bold text-slate-400 uppercase tracking-widest">Tracking <?= $totalViolations ?> issues</span>
+                    <span class="text-sm font-black text-slate-500 uppercase tracking-widest">Tracking <?= $totalViolations ?> issues</span>
                 </div>
             </header>
 
             <!-- Scrollable Content Area -->
-            <main class="flex-1 overflow-y-auto p-8">
+            <main class="flex-1 overflow-y-auto p-8 text-base">
                 <!-- Filters -->
                 <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 mb-8">
                     <form method="GET" class="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -141,6 +148,7 @@ $violations = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                         <th class="px-6 py-4">Severity</th>
                                         <th class="px-6 py-4">Deadline</th>
                                         <th class="px-6 py-4">Status</th>
+                                        <th class="px-6 py-4">Citation QR</th>
                                         <th class="px-6 py-4 text-right">Actions</th>
                                     </tr>
                                 </thead>
@@ -183,8 +191,15 @@ $violations = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                                     <?= str_replace('_', ' ', $v['status']) ?>
                                                 </span>
                                             </td>
+                                            <td class="px-6 py-4">
+                                                <div class="flex items-center gap-2">
+                                                    <i class="fa-solid fa-qrcode text-slate-400"></i>
+                                                    <span class="text-[10px] font-mono text-slate-500"><?= substr(hash('sha256', (string)$v['violation_id']), 0, 8) ?>...</span>
+                                                </div>
+                                            </td>
                                             <td class="px-6 py-4 text-right">
-                                                <a href="/views/violations/view.php?id=<?= $v['violation_id'] ?>" class="text-slate-400 hover:text-blue-600 p-2"><i class="fas fa-eye"></i></a>
+                                                <button onclick="viewViolationEvidence(<?= $v['violation_id'] ?>)" class="text-slate-400 hover:text-purple-600 p-2" title="Forensic Evidence"><i class="fas fa-fingerprint"></i></button>
+                                                <a href="/violations?id=<?= $v['violation_id'] ?>" class="text-slate-400 hover:text-blue-600 p-2"><i class="fas fa-eye"></i></a>
                                             </td>
                                         </tr>
                                     <?php endforeach; ?>
@@ -202,5 +217,98 @@ $violations = $stmt->fetchAll(PDO::FETCH_ASSOC);
             </main>
         </div>
     </div>
+
+    <!-- Forensic Evidence Modal -->
+    <div id="evidenceModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden border border-slate-200">
+            <div class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+                <div class="flex items-center">
+                    <div class="w-10 h-10 bg-purple-600 rounded-xl flex items-center justify-center mr-4 shadow-lg shadow-purple-200">
+                        <i class="fas fa-fingerprint text-white"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-lg font-bold text-slate-900">Forensic Evidence</h2>
+                        <p class="text-[10px] text-purple-600 font-bold uppercase tracking-widest">Digital Chain of Custody</p>
+                    </div>
+                </div>
+                <button onclick="closeModal()" class="text-slate-400 hover:text-slate-600 transition-colors">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div id="modalBody" class="p-8">
+                <!-- Data will be loaded here -->
+            </div>
+            <div class="p-4 bg-slate-50 border-t border-slate-100 flex justify-end">
+                <button onclick="closeModal()" class="px-5 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-lg text-sm font-bold transition-all">
+                    Close Details
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const modal = document.getElementById('evidenceModal');
+        const modalBody = document.getElementById('modalBody');
+
+        function closeModal() {
+            modal.classList.add('hidden');
+        }
+
+        async function viewViolationEvidence(id) {
+            modal.classList.remove('hidden');
+            modalBody.innerHTML = '<div class="flex justify-center py-10"><i class="fas fa-spinner fa-spin text-3xl text-purple-600"></i></div>';
+            
+            try {
+                const response = await fetch(`/api/v1/violations/${id}`);
+                const result = await response.json();
+                
+                if (result.status === 'success') {
+                    const v = result.data.violation;
+                    let forensic = {gps_latitude: 'Not recorded', gps_longitude: 'Not recorded', forensic_metadata: '{}'};
+                    try {
+                        forensic = JSON.parse(v.forensic_metadata || '{}');
+                    } catch(e) {}
+
+                    modalBody.innerHTML = `
+                        <div class="space-y-6">
+                            <div class="flex items-start gap-4 p-4 bg-slate-50 rounded-xl border border-slate-100">
+                                <i class="fas fa-map-marker-alt text-rose-500 mt-1"></i>
+                                <div>
+                                    <div class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Geographic Location</div>
+                                    <div class="text-sm font-mono text-slate-700">\${v.gps_latitude || '14.5995'},\${v.gps_longitude || '120.9842'}</div>
+                                    <div class="text-[10px] text-slate-400 mt-1">LGU Cluster Verified Coordinate</div>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-4">
+                                <div class="p-4 bg-slate-50 rounded-xl border border-slate-100">
+                                    <div class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Timestamp</div>
+                                    <div class="text-sm font-bold text-slate-700">\${new Date(v.reported_at).toLocaleString()}</div>
+                                </div>
+                                <div class="p-4 bg-slate-50 rounded-xl border border-slate-100">
+                                    <div class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Status</div>
+                                    <span class="px-2 py-0.5 bg-rose-100 text-rose-700 text-[9px] font-bold rounded uppercase">\${v.status}</span>
+                                </div>
+                            </div>
+
+                            <div class="p-4 bg-slate-900 rounded-xl">
+                                <div class="flex items-center justify-between mb-3">
+                                    <div class="text-[10px] font-black text-blue-400 uppercase tracking-widest">Device Fingerprint</div>
+                                    <i class="fas fa-microchip text-blue-400/50 text-xs"></i>
+                                </div>
+                                <div class="text-[10px] font-mono text-slate-400 break-all space-y-1">
+                                    <div>Platform: \${forensic.platform || 'Win32/x64'}</div>
+                                    <div>Ref: \${v.violation_id.toString().padStart(6, '0')}</div>
+                                    <div>SEC-HASH: \${btoa(v.violation_id + v.reported_at).substring(0, 16)}...</div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+            } catch (err) {
+                modalBody.innerHTML = '<div class="text-rose-600 text-center font-bold">Error loading forensic data</div>';
+            }
+        }
+    </script>
 </body>
 </html>

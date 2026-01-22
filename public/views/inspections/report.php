@@ -1,7 +1,7 @@
 <?php
 // Session already started by index.php
 if (!isset($_SESSION['user_id'])) {
-    header('Location: /views/auth/login.php');
+    header('Location: /login');
     exit;
 }
 

@@ -309,6 +309,34 @@ class InspectorService
         ];
     }
 
+    /**
+     * Get expiring certifications for proactive tracking (LGU Enhancement)
+     */
+    public function getExpiringCertifications(int $daysAhead = 30): array
+    {
+        $stmt = $this->pdo->prepare("
+            SELECT 
+                ic.*,
+                CONCAT(u.first_name, ' ', u.last_name) as inspector_name,
+                i.badge_number
+            FROM inspector_certifications ic
+            JOIN inspectors i ON ic.inspector_id = i.inspector_id
+            JOIN users u ON i.user_id = u.user_id
+            WHERE ic.expiry_date BETWEEN NOW() AND DATE_ADD(NOW(), INTERVAL :days DAY)
+            AND ic.status = 'valid'
+            ORDER BY ic.expiry_date ASC
+        ");
+        $stmt->execute(['days' => $daysAhead]);
+        $expiring = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        $this->logger->info("Expiring certifications check performed", [
+            'days_ahead' => $daysAhead,
+            'count' => count($expiring)
+        ]);
+
+        return $expiring;
+    }
+
     private function generateBadgeNumber(): string
     {
         $stmt = $this->pdo->query('SELECT badge_number FROM inspectors ORDER BY inspector_id DESC LIMIT 1');

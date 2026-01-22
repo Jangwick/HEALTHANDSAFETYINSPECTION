@@ -1,7 +1,7 @@
 <?php
 // Session already started by index.php
 if (!isset($_SESSION['user_id'])) {
-    header('Location: /views/auth/login.php');
+    header('Location: /login');
     exit;
 }
 
@@ -37,6 +37,9 @@ try {
         $severity = $_POST['severity'] ?? 'minor';
         $correctiveAction = trim($_POST['corrective_action'] ?? '');
         $deadline = $_POST['deadline'] ?? null;
+        $latitude = $_POST['gps_latitude'] ?? null;
+        $longitude = $_POST['gps_longitude'] ?? null;
+        $forensicMetadata = $_POST['forensic_metadata'] ?? null;
         
         if (empty($description)) {
             $error = 'Description is required';
@@ -44,16 +47,21 @@ try {
             // Insert violation
             $stmt = $db->prepare("
                 INSERT INTO violations 
-                (inspection_id, description, violation_type, severity, corrective_action, deadline, status, created_at)
-                VALUES (?, ?, ?, ?, ?, ?, 'open', NOW())
+                (inspection_id, establishment_id, description, violation_type, severity, corrective_action, deadline, gps_latitude, gps_longitude, forensic_metadata, status, reported_by, reported_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'open', ?, NOW())
             ");
             $stmt->execute([
                 $inspectionId,
+                $inspection['establishment_id'] ?? 0,
                 $description,
                 $violationType,
                 $severity,
                 $correctiveAction,
-                $deadline ?: null
+                $deadline ?: null,
+                $latitude,
+                $longitude,
+                $forensicMetadata,
+                $_SESSION['user_id']
             ]);
             
             $violationId = $db->lastInsertId();
@@ -184,7 +192,12 @@ try {
             <?php endif; ?>
 
             <?php if (!isset($success)): ?>
-                <form method="POST" enctype="multipart/form-data" class="space-y-8">
+                <form method="POST" enctype="multipart/form-data" class="space-y-8" id="violationForm">
+                    <!-- Forensic Metadata Hidden Fields -->
+                    <input type="hidden" name="gps_latitude" id="gps_latitude">
+                    <input type="hidden" name="gps_longitude" id="gps_longitude">
+                    <input type="hidden" name="forensic_metadata" id="forensic_metadata">
+
                     <div class="space-y-3">
                         <label class="block mono text-[9px] text-slate-500 uppercase tracking-[0.3em] font-bold italic ml-2">VIOLATION_DESCRIPTION <span class="text-rose-500">*</span></label>
                         <textarea name="description" rows="3" required placeholder="NARRATIVE_OF_NON_COMPLIANCE..." 
@@ -285,6 +298,32 @@ try {
             window.opener.location.reload();
         }
         <?php endif; ?>
+
+        // Automatic Forensic Data Collection (LGU 4 AI Enhancement)
+        document.addEventListener('DOMContentLoaded', () => {
+            // 1. Capture Geolocation
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition((position) => {
+                    document.getElementById('gps_latitude').value = position.coords.latitude;
+                    document.getElementById('gps_longitude').value = position.coords.longitude;
+                    console.log('GPS captured:', position.coords.latitude, position.coords.longitude);
+                }, (error) => {
+                    console.error('GPS Capture Error:', error.message);
+                }, { enableHighAccuracy: true });
+            }
+
+            // 2. Capture Device/Session Metadata
+            const metadata = {
+                browser: navigator.userAgent,
+                platform: navigator.platform,
+                screen_resolution: `${window.screen.width}x${window.screen.height}`,
+                timestamp: new Date().toISOString(),
+                language: navigator.language,
+                time_on_site: performance.now(),
+                memory: navigator.deviceMemory || 'unknown'
+            };
+            document.getElementById('forensic_metadata').value = JSON.stringify(metadata);
+        });
     </script>
 </body>
 </html>

@@ -25,6 +25,46 @@ Complete implementation of the Health & Safety Inspection System features for Ph
 
 ---
 
+### 5. Advanced LGU System Enhancements (New) 🚀
+
+**Submodule: Safety Culture AI (Gemini Integration)**
+- ✅ **Predictive Risk Scoring:** Added `AIService::calculateEstablishmentRisk()` to predict non-compliance.
+- ✅ **AI-Prioritized Scheduling:** Enhanced `InspectionService::getPrioritizedSchedule()` to sort inspections by AI-calculated risk levels.
+- ✅ **AI Evidence Analysis:** Added `AIService::analyzeEvidence()` for computer vision detection in inspection photos.
+
+**Submodule: Violation & Citation Management**
+- ✅ **Digital Citation Issuance:** `ViolationService::generateCitationForViolation()` creates unique QR-ready citation hashes.
+- ✅ **Metadata-Rich Evidence:** Photos now include GPS coordinates and timestamps for legal validity.
+
+**Submodule: Inspector & Certification Tracking**
+- ✅ **Proactive Renewal Management:** `InspectorService::getExpiringCertifications()` tracks expiring safety licenses.
+
+**Submodule: Cross-LGU Subsystem Integration**
+- ✅ **Law Enforcement Gateway:** `IntegrationService::notifyLawEnforcement()` allows auto-referral of critical safety hazards to police.
+- ✅ **Inter-Agency Webhooks:** Event-driven notification system for fire safety and building permits.
+
+---
+
+## Technical Architecture Update
+**File:** `/public/views/inspections/list.php`
+
+**Features:**
+- ✅ Advanced filtering by status (pending, scheduled, in_progress, completed, cancelled)
+- ✅ Filter by inspection type (food_safety, building_safety, fire_safety, etc.)
+- ✅ Search functionality by establishment name
+- ✅ Pagination (20 inspections per page)
+- ✅ Dynamic action buttons based on status
+  - **View** - Available for all statuses
+  - **Start** - For pending/scheduled inspections
+  - **Continue** - For in-progress inspections
+- ✅ Color-coded status badges
+- ✅ Sortable columns
+- ✅ Responsive design
+
+**Access:** `http://localhost:8000/views/inspections/list.php`
+
+---
+
 ### 2. Create Inspection Form
 **File:** `/public/views/inspections/create.php`
 

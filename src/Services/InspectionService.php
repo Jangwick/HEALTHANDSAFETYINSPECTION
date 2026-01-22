@@ -254,6 +254,33 @@ class InspectionService
     }
 
     /**
+     * Prioritize inspections based on AI Risk Scores (LGU Enhancement)
+     */
+    public function getPrioritizedSchedule(string $date): array
+    {
+        // Fetch inspections for the date joins with establishment risk data
+        $stmt = $this->pdo->prepare("
+            SELECT i.*, e.name as establishment_name, e.risk_category, e.compliance_status
+            FROM inspections i
+            JOIN establishments e ON i.establishment_id = e.establishment_id
+            WHERE i.scheduled_date = ? AND i.status = 'pending'
+            ORDER BY 
+                CASE 
+                    WHEN e.risk_category = 'high' THEN 1
+                    WHEN i.priority = 'urgent' THEN 2
+                    WHEN e.compliance_status = 'non_compliant' THEN 3
+                    ELSE 4
+                END ASC
+        ");
+        $stmt->execute([$date]);
+        $inspections = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        $this->logger->info("AI-Prioritized schedule generated for $date", ['count' => count($inspections)]);
+        
+        return $inspections;
+    }
+
+    /**
      * Complete inspection
      */
     public function completeInspection(int $inspectionId, array $data): array

@@ -7,7 +7,7 @@
 declare(strict_types=1);
 
 if (!isset($_SESSION['user_id'])) {
-    header('Location: /views/auth/login.php');
+    header('Location: /login');
     exit;
 }
 
@@ -51,6 +51,12 @@ try {
         $params[] = "%$search%";
         $params[] = "%$search%";
         $params[] = "%$search%";
+    }
+
+    // Role-based filtering: Establishment Owners only see their own
+    if (isset($_SESSION['role']) && $_SESSION['role'] === 'establishment_owner') {
+        $where[] = "e.owner_user_id = ?";
+        $params[] = $_SESSION['user_id'];
     }
     
     $whereClause = $where ? "WHERE " . implode(" AND ", $where) : "";
@@ -102,8 +108,14 @@ try {
     <title>Establishments - Health & Safety System</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style type="text/tailwindcss">
+        @layer base {
+            html { font-size: 105%; }
+            body { @apply text-white font-medium; }
+        }
+    </style>
 </head>
-<body class="bg-[#0b0c10] font-sans antialiased text-slate-200 overflow-hidden">
+<body class="bg-[#0b0c10] font-sans antialiased overflow-hidden text-lg">
     <div class="flex h-screen">
         <!-- Sidebar Navigation -->
         <?php 
@@ -128,19 +140,19 @@ try {
                 <!-- Stats Overview -->
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
                     <div class="bg-[#15181e] p-6 rounded-2xl border border-white/5 shadow-xl">
-                        <div class="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-2">Total Registered</div>
+                        <div class="text-xs font-black text-slate-400 uppercase tracking-[0.2em] mb-2">Total Registered</div>
                         <div class="text-3xl font-bold text-white tracking-tight"><?php echo  number_format((float)($stats['total'] ?? 0)) ?></div>
                     </div>
                     <div class="bg-[#15181e] p-6 rounded-2xl border border-white/5 shadow-xl">
-                        <div class="text-[10px] font-black text-emerald-500 uppercase tracking-[0.2em] mb-2">Compliant</div>
+                        <div class="text-xs font-black text-emerald-400 uppercase tracking-[0.2em] mb-2">Compliant</div>
                         <div class="text-3xl font-bold text-white tracking-tight"><?php echo  number_format((float)($stats['compliant'] ?? 0)) ?></div>
                     </div>
                     <div class="bg-[#15181e] p-6 rounded-2xl border border-white/5 shadow-xl">
-                        <div class="text-[10px] font-black text-rose-500 uppercase tracking-[0.2em] mb-2">Non-Compliant</div>
+                        <div class="text-xs font-black text-rose-400 uppercase tracking-[0.2em] mb-2">Non-Compliant</div>
                         <div class="text-3xl font-bold text-white tracking-tight"><?php echo  number_format((float)($stats['non_compliant'] ?? 0)) ?></div>
                     </div>
                     <div class="bg-[#15181e] p-6 rounded-2xl border border-white/5 shadow-xl">
-                        <div class="text-[10px] font-black text-amber-500 uppercase tracking-[0.2em] mb-2">Pending Review</div>
+                        <div class="text-xs font-black text-amber-400 uppercase tracking-[0.2em] mb-2">Pending Review</div>
                         <div class="text-3xl font-bold text-white tracking-tight"><?php echo  number_format((float)($stats['pending'] ?? 0)) ?></div>
                     </div>
                 </div>
@@ -149,18 +161,18 @@ try {
                 <div class="bg-[#15181e] rounded-2xl shadow-xl border border-white/5 p-6 mb-8">
                     <form method="GET" class="grid grid-cols-1 md:grid-cols-5 gap-6 items-end">
                         <div class="md:col-span-2">
-                            <label class="block text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-2.5">Search</label>
+                            <label class="block text-xs font-black text-slate-400 uppercase tracking-[0.2em] mb-2.5">Search</label>
                             <div class="relative group">
                                 <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-slate-500 group-focus-within:text-blue-500 transition-colors">
                                     <i class="fas fa-search"></i>
                                 </span>
                                 <input type="text" name="search" value="<?php echo  htmlspecialchars($search) ?>" placeholder="Name, owner, or permit..." 
-                                    class="w-full pl-11 pr-4 py-3 bg-[#0b0c10] border border-white/10 rounded-xl text-sm text-slate-200 focus:ring-2 focus:ring-blue-500/50 outline-none transition-all">
+                                    class="w-full pl-11 pr-4 py-3 bg-[#0b0c10] border border-white/10 rounded-xl text-base text-slate-200 focus:ring-2 focus:ring-blue-500/50 outline-none transition-all">
                             </div>
                         </div>
                         <div>
-                            <label class="block text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-2.5">Type</label>
-                            <select name="type" class="w-full bg-[#0b0c10] border border-white/10 rounded-xl py-3 px-4 text-sm text-slate-300 focus:ring-2 focus:ring-blue-500/50 outline-none transition-all appearance-none cursor-pointer">
+                            <label class="block text-xs font-black text-slate-400 uppercase tracking-[0.2em] mb-2.5">Type</label>
+                            <select name="type" class="w-full bg-[#0b0c10] border border-white/10 rounded-xl py-3 px-4 text-base text-slate-300 focus:ring-2 focus:ring-blue-500/50 outline-none transition-all appearance-none cursor-pointer font-bold">
                                 <option value="">All Types</option>
                                 <option value="restaurant" <?php echo  $type === 'restaurant' ? 'selected' : '' ?>>Restaurant</option>
                                 <option value="school" <?php echo  $type === 'school' ? 'selected' : '' ?>>School</option>
@@ -170,8 +182,8 @@ try {
                             </select>
                         </div>
                         <div>
-                            <label class="block text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-2.5">Status</label>
-                            <select name="status" class="w-full bg-[#0b0c10] border border-white/10 rounded-xl py-3 px-4 text-sm text-slate-300 focus:ring-2 focus:ring-blue-500/50 outline-none transition-all appearance-none cursor-pointer">
+                            <label class="block text-xs font-black text-slate-400 uppercase tracking-[0.2em] mb-2.5">Status</label>
+                            <select name="status" class="w-full bg-[#0b0c10] border border-white/10 rounded-xl py-3 px-4 text-base text-slate-300 focus:ring-2 focus:ring-blue-500/50 outline-none transition-all appearance-none cursor-pointer font-bold">
                                 <option value="">All Statuses</option>
                                 <option value="compliant" <?php echo  $status === 'compliant' ? 'selected' : '' ?>>Compliant</option>
                                 <option value="non_compliant" <?php echo  $status === 'non_compliant' ? 'selected' : '' ?>>Non-Compliant</option>
@@ -201,7 +213,7 @@ try {
                                 </thead>
                                 <tbody class="divide-y divide-white/5">
                                     <?php foreach ($establishments as $est): ?>
-                                        <tr class="hover:bg-white/[0.02] transition-colors cursor-pointer group" onclick="window.location='/establishments/view.php?id=<?php echo  $est['establishment_id'] ?>'">
+                                        <tr class="hover:bg-white/[0.02] transition-colors cursor-pointer group" onclick="window.location='/establishments/view?id=<?php echo  $est['establishment_id'] ?>'">
                                             <td class="px-8 py-6">
                                                 <div class="font-bold text-white group-hover:text-blue-400 transition-colors"><?php echo  htmlspecialchars($est['name']) ?></div>
                                                 <div class="text-[10px] font-black text-slate-500 uppercase tracking-widest mt-1"><?php echo  htmlspecialchars($est['business_permit_number'] ?? 'No Permit') ?></div>
@@ -234,7 +246,7 @@ try {
                                             </td>
                                             <td class="px-8 py-6 text-right" onclick="event.stopPropagation()">
                                                 <div class="flex justify-end space-x-2">
-                                                    <a href="/establishments/view.php?id=<?php echo  $est['establishment_id'] ?>" class="p-2.5 bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white rounded-lg transition-all" title="View Details">
+                                                    <a href="/establishments/view?id=<?php echo  $est['establishment_id'] ?>" class="p-2.5 bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white rounded-lg transition-all" title="Full Report">
                                                         <i class="fas fa-eye text-sm"></i>
                                                     </a>
                                                     <a href="/inspections/create?establishment_id=<?php echo  $est['establishment_id'] ?>" class="p-2.5 bg-emerald-600/10 hover:bg-emerald-600 text-emerald-500 hover:text-white rounded-lg transition-all" title="Schedule Inspection">

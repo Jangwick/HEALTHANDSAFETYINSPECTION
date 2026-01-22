@@ -74,6 +74,22 @@ class ViolationController
         }
     }
 
+    public function show(int $id): void
+    {
+        $this->roleMiddleware->requirePermission('violations.read');
+
+        try {
+            $violation = $this->violationService->getViolationById($id);
+            if (!$violation) {
+                Response::error('NOT_FOUND', 'Violation not found', null, 404);
+                return;
+            }
+            Response::success(['violation' => $violation]);
+        } catch (\Exception $e) {
+            Response::error('SERVER_ERROR', $e->getMessage(), null, 500);
+        }
+    }
+
     public function resolve(int $id, array $data): void
     {
         $this->roleMiddleware->requirePermission('violations.update');

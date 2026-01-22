@@ -570,4 +570,41 @@ class IntegrationService
             'last_delivery_at' => $stats['last_delivery_at']
         ];
     }
+
+    /**
+     * Cross-Cluster Integration: Notify Law Enforcement (LGU 4 Subsystem)
+     */
+    public function notifyLawEnforcement(int $violationId, string $reason): bool
+    {
+        // Fetch violation details
+        $stmt = $this->db->prepare("
+            SELECT v.*, e.name as establishment_name, e.address_street
+            FROM violations v
+            JOIN establishments e ON v.establishment_id = e.establishment_id
+            WHERE v.violation_id = ?
+        ");
+        $stmt->execute([$violationId]);
+        $violation = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$violation) return false;
+
+        $payload = [
+            'agency' => 'LGU_POLICE_DEPT',
+            'alert_type' => 'ENFORCEMENT_REQUIRED',
+            'priority' => ($violation['severity'] === 'critical') ? 'high' : 'medium',
+            'establishment' => $violation['establishment_name'],
+            'address' => $violation['address_street'],
+            'violation_details' => $violation['description'],
+            'incident_reason' => $reason,
+            'timestamp' => date('Y-m-d H:i:s')
+        ];
+
+        // Log the integration activity
+        $this->logIntegrationActivity('law_enforcement_alert', $payload);
+        
+        // In a real system, this would call an external API endpoint of the Police Subsystem
+        $this->logger->info("Law Enforcement Alert Sent", ['violation_id' => $violationId]);
+        
+        return true;
+    }
 }

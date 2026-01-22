@@ -33,13 +33,22 @@ try {
         header('Location: /views/establishments/list.php');
         exit;
     }
+
+    // Role-based access control: Owners can only see their own establishment
+    if (isset($_SESSION['role']) && $_SESSION['role'] === 'establishment_owner') {
+        if ($establishment['owner_user_id'] != $_SESSION['user_id']) {
+            header('Location: /views/establishments/list.php');
+            exit;
+        }
+    }
     
     // Get inspection history
     $inspections = $db->prepare("
         SELECT i.*,
                CONCAT(u.first_name, ' ', u.last_name) as inspector_name
         FROM inspections i
-        LEFT JOIN users u ON i.assigned_to = u.user_id
+        LEFT JOIN inspectors ins ON i.inspector_id = ins.inspector_id
+        LEFT JOIN users u ON ins.user_id = u.user_id
         WHERE i.establishment_id = ?
         ORDER BY i.scheduled_date DESC
         LIMIT 10
@@ -104,14 +113,16 @@ try {
                     <h1 class="text-2xl font-bold text-white tracking-tight"><?php echo  htmlspecialchars($establishment['name']) ?></h1>
                 </div>
                 <div class="flex items-center space-x-4">
+                    <?php if ($_SESSION['role'] !== 'establishment_owner'): ?>
                     <a href="/inspections/create?establishment_id=<?php echo  $establishment['establishment_id'] ?>" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl text-sm font-bold flex items-center shadow-lg shadow-blue-900/20 transition-all active:scale-95 group">
                         <i class="fas fa-plus mr-2 group-hover:rotate-90 transition-transform"></i> Schedule Inspection
                     </a>
+                    <?php endif; ?>
                 </div>
             </header>
 
             <!-- Scrollable Content Area -->
-            <main class="flex-1 overflow-y-auto p-8 bg-[#0b0c10]">
+            <main class="flex-1 overflow-y-auto p-8 bg-[#0b0c10] text-base">
                 <?php if ($success): ?>
                 <div class="max-w-7xl mx-auto mb-8 p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-xl flex items-center text-emerald-500">
                     <i class="fas fa-check-circle mr-3"></i>
@@ -155,9 +166,11 @@ try {
                                         </div>
                                     </div>
                                     <div class="flex space-x-3">
+                                        <?php if ($_SESSION['role'] !== 'establishment_owner'): ?>
                                         <button class="px-6 py-3 bg-[#1e232b] hover:bg-[#252b35] text-white rounded-xl text-sm font-bold border border-white/5 transition-all active:scale-95 shadow-lg">
                                             <i class="fas fa-edit mr-2 text-slate-400"></i> Edit
                                         </button>
+                                        <?php endif; ?>
                                         <button class="px-6 py-3 bg-white/[0.03] hover:bg-white/[0.08] text-white rounded-xl text-sm font-bold border border-white/10 transition-all active:scale-95">
                                             <i class="fas fa-download mr-2 text-slate-400"></i> Export
                                         </button>

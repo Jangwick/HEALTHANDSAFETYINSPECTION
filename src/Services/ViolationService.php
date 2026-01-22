@@ -110,9 +110,35 @@ class ViolationService
         ]);
 
         $violationId = (int)$this->pdo->lastInsertId();
-        $this->logger->info("Violation created", ['violation_id' => $violationId]);
+        
+        // Enhance violation with citation data (QR Code ready)
+        $this->generateCitationForViolation($violationId);
+
+        // Sync establishment compliance status
+        $this->syncEstablishmentCompliance($data['establishment_id']);
+
+        $this->logger->info("Violation created with digital citation", ['violation_id' => $violationId]);
 
         return $this->getViolationById($violationId);
+    }
+
+    /**
+     * Generate formal digital citation with QR identifier
+     */
+    private function generateCitationForViolation(int $violationId): void
+    {
+        // In a real system, this would generate a unique hash for a QR code link 
+        // leading to the official LGU violation payment/appeal portal.
+        $citationHash = bin2hex(random_bytes(16));
+        
+        $stmt = $this->pdo->prepare("
+            UPDATE violations 
+            SET resolution_notes = CONCAT('Citation QR Hash: ', ?)
+            WHERE violation_id = ?
+        ");
+        $stmt->execute([$citationHash, $violationId]);
+        
+        $this->logger->info("Digital citation generated for violation ID: $violationId", ['hash' => $citationHash]);
     }
 
     public function getViolationById(int $violationId): ?array
@@ -145,7 +171,45 @@ class ViolationService
             'resolved_by' => $data['resolved_by']
         ]);
 
+        // Get establishment ID to sync
+        $v = $this->getViolationById($violationId);
+        if ($v) {
+            $this->syncEstablishmentCompliance($v['establishment_id']);
+        }
+
         $this->logger->info("Violation resolved", ['violation_id' => $violationId]);
-        return $this->getViolationById($violationId);
+        return $v;
+    }
+
+    /**
+     * Helper to sync establishment compliance status
+     */
+    private function syncEstablishmentCompliance(int $establishmentId): void
+    {
+        $stmt = $this->pdo->prepare("
+            UPDATE establishments e
+            SET e.compliance_status = CASE 
+                WHEN (SELECT COUNT(*) FROM violations WHERE establishment_id = ? AND status = 'open' AND severity = 'critical') > 0 THEN 'non_compliant'
+                ELSE 'compliant'
+            END,
+            e.updated_at = NOW()
+            WHERE e.establishment_id = ?
+        ");
+        $stmt->execute([$establishmentId, $establishmentId]);
+    }
+
+    /**
+     * Get violation by ID
+     */
+    public function getViolationById(int $id): ?array
+    {
+        $stmt = $this->pdo->prepare("
+            SELECT v.*, e.name as establishment_name
+            FROM violations v
+            LEFT JOIN establishments e ON v.establishment_id = e.establishment_id
+            WHERE v.violation_id = ?
+        ");
+        $stmt->execute([$id]);
+        return $stmt->fetch(PDO::FETCH_ASSOC) ?: null;
     }
 }

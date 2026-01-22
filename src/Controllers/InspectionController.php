@@ -42,6 +42,13 @@ class InspectionController
             'date_to' => $_GET['date_to'] ?? null
         ];
 
+        // Custom prioritize logic (LGU 4 AI Enhancement)
+        if (isset($_GET['prioritize']) && $_GET['prioritize'] === 'true' && !empty($_GET['date'])) {
+            $result = $this->inspectionService->getPrioritizedSchedule($_GET['date']);
+            Response::success(['data' => $result, 'source' => 'AI_PRIORITIZATION_ENGINE']);
+            return;
+        }
+
         $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
         $perPage = isset($_GET['per_page']) ? (int)$_GET['per_page'] : 20;
 

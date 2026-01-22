@@ -39,7 +39,7 @@ try {
     $inspection = $stmt->fetch(PDO::FETCH_ASSOC);
     
     if (!$inspection) {
-        header('Location: /views/inspections/list.php');
+        header('Location: /inspections');
         exit;
     }
     

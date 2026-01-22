@@ -1,7 +1,7 @@
 <?php
 // Session already started by index.php
 if (!isset($_SESSION['user_id'])) {
-    header('Location: /views/auth/login.php');
+    header('Location: /login');
     exit;
 }
 
@@ -70,7 +70,8 @@ try {
                CONCAT(u.first_name, ' ', u.last_name) as inspector_name
         FROM establishments e
         INNER JOIN inspections i ON e.establishment_id = i.establishment_id
-        LEFT JOIN users u ON i.assigned_to = u.user_id
+        LEFT JOIN inspectors ins ON i.inspector_id = ins.inspector_id
+        LEFT JOIN users u ON ins.user_id = u.user_id
         WHERE i.scheduled_date >= DATE_SUB(NOW(), INTERVAL 30 DAY)
         ORDER BY i.scheduled_date DESC
         LIMIT 10
@@ -140,10 +141,10 @@ try {
         ?>
 
         <!-- Main Content Area -->
-        <div class="flex-1 flex flex-col overflow-hidden text-sm">
+        <div class="flex-1 flex flex-col min-w-0 overflow-hidden text-base">
             <!-- Header -->
             <header class="bg-white border-b border-slate-200 z-10">
-                <div class="px-6 h-16 flex items-center justify-between">
+                <div class="px-6 h-20 flex items-center justify-between">
                     <div class="flex items-center">
                         <button class="md:hidden p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none">
                             <i class="fas fa-bars"></i>
@@ -353,7 +354,7 @@ try {
                         <?php else: ?>
                         <div class="list-group list-group-flush">
                             <?php foreach ($expiringPermits as $est): ?>
-                            <a href="/views/establishments/view.php?id=<?php echo  $est['establishment_id'] ?>" 
+                            <a href="/establishments/view?id=<?php echo  $est['establishment_id'] ?>" 
                                class="list-group-item list-group-item-action alert-warning-custom">
                                 <div class="d-flex justify-content-between align-items-start">
                                     <div>
@@ -389,7 +390,7 @@ try {
                         <?php else: ?>
                         <div class="list-group list-group-flush">
                             <?php foreach ($recentlyInspected as $est): ?>
-                            <a href="/views/establishments/view.php?id=<?php echo  $est['establishment_id'] ?>" 
+                            <a href="/establishments/view?id=<?php echo  $est['establishment_id'] ?>" 
                                class="list-group-item list-group-item-action">
                                 <div class="d-flex justify-content-between align-items-start">
                                     <div>
@@ -432,7 +433,7 @@ try {
                                         <?php echo  htmlspecialchars($est['address_barangay']) ?>
                                     </small>
                                 </div>
-                                <a href="/views/inspections/create.php?establishment_id=<?php echo  $est['establishment_id'] ?>" 
+                                <a href="/inspections/create?establishment_id=<?php echo  $est['establishment_id'] ?>" 
                                    class="btn btn-sm btn-outline-primary">
                                     <i class="bi bi-plus"></i> Schedule
                                 </a>
@@ -451,12 +452,6 @@ try {
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-    async function handleLogout() {
-        if (confirm('Are you sure you want to sign out?')) {
-            window.location.href = '/views/auth/logout.php';
-        }
-    }
-    
     // Original chart scripts
         // Type Distribution Chart
         const typeCtx = document.getElementById('typeChart').getContext('2d');

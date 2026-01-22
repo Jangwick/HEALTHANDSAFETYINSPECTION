@@ -54,8 +54,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <title>Login - Health & Safety Inspections System</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style type="text/tailwindcss">
+        @layer base {
+            html { font-size: 105%; }
+            body { @apply text-gray-900; }
+        }
+    </style>
 </head>
-<body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
+<body class="bg-gradient-to-br from-blue-100 to-indigo-200 min-h-screen font-medium">
     <div class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
         <div class="max-w-md w-full space-y-8">
             <!-- Logo and Header -->
@@ -90,8 +96,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <form method="POST" class="space-y-6">
                     <!-- Username Field -->
                     <div>
-                        <label for="username" class="block text-sm font-semibold text-gray-700 mb-2">
-                            <i class="fas fa-user mr-2 text-blue-600"></i>Username or Email
+                        <label for="username" class="block text-base font-bold text-gray-800 mb-2">
+                            <i class="fas fa-user mr-2 text-blue-700"></i>Username or Email
                         </label>
                         <input 
                             id="username" 
@@ -100,15 +106,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             required 
                             autocomplete="username"
                             value="<?php echo  htmlspecialchars($_POST['username'] ?? '') ?>"
-                            class="appearance-none rounded-lg relative block w-full px-4 py-3 border border-gray-300 placeholder-gray-400 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-150"
+                            class="appearance-none rounded-lg relative block w-full px-4 py-3 border border-gray-400 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition duration-150 text-base"
                             placeholder="Enter your username or email"
                         >
                     </div>
 
                     <!-- Password Field -->
                     <div>
-                        <label for="password" class="block text-sm font-semibold text-gray-700 mb-2">
-                            <i class="fas fa-lock mr-2 text-blue-600"></i>Password
+                        <label for="password" class="block text-base font-bold text-gray-800 mb-2">
+                            <i class="fas fa-lock mr-2 text-blue-700"></i>Password
                         </label>
                         <div class="relative">
                             <input 
@@ -117,15 +123,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 type="password" 
                                 required 
                                 autocomplete="current-password"
-                                class="appearance-none rounded-lg relative block w-full px-4 py-3 border border-gray-300 placeholder-gray-400 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-150"
+                                class="appearance-none rounded-lg relative block w-full px-4 py-3 border border-gray-400 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition duration-150 text-base"
                                 placeholder="Enter your password"
                             >
                             <button 
                                 type="button" 
                                 onclick="togglePassword()"
-                                class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                                class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-600 hover:text-gray-900"
                             >
-                                <i id="toggleIcon" class="fas fa-eye"></i>
+                                <i id="toggleIcon" class="fas fa-eye text-lg"></i>
                             </button>
                         </div>
                     </div>
@@ -137,15 +143,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 id="remember-me" 
                                 name="remember-me" 
                                 type="checkbox" 
-                                class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded cursor-pointer"
+                                class="h-5 w-5 text-blue-600 focus:ring-blue-500 border-gray-300 rounded cursor-pointer"
                             >
-                            <label for="remember-me" class="ml-2 block text-sm text-gray-700 cursor-pointer">
+                            <label for="remember-me" class="ml-2 block text-base font-bold text-gray-800 cursor-pointer">
                                 Remember me
                             </label>
                         </div>
 
-                        <div class="text-sm">
-                            <a href="/forgot-password" class="font-medium text-blue-600 hover:text-blue-500 transition duration-150">
+                        <div class="text-base">
+                            <a href="/forgot-password" class="font-bold text-blue-700 hover:text-blue-500 transition duration-150">
                                 Forgot password?
                             </a>
                         </div>
@@ -155,9 +161,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <div>
                         <button 
                             type="submit" 
-                            class="group relative w-full flex justify-center items-center py-3 px-4 border border-transparent text-sm font-semibold rounded-lg text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-150 shadow-md hover:shadow-lg"
+                            class="group relative w-full flex justify-center items-center py-4 px-4 border border-transparent text-base font-bold rounded-lg text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-150 shadow-md hover:shadow-lg"
                         >
-                            <i class="fas fa-sign-in-alt mr-2"></i>
+                            <i class="fas fa-sign-in-alt mr-2 text-lg"></i>
                             <span>Sign in</span>
                         </button>
                     </div>

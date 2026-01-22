@@ -1,7 +1,7 @@
 <?php
 // Session already started by index.php
 if (!isset($_SESSION['user_id'])) {
-    header('Location: /views/auth/login.php');
+    header('Location: /login');
     exit;
 }
 
@@ -106,7 +106,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </header>
 
             <!-- Scrollable Content Area -->
-            <main class="flex-1 overflow-y-auto p-8 bg-[#0b0c10]">
+            <main class="flex-1 overflow-y-auto p-8 bg-[#0b0c10] text-base">
                 <div class="max-w-4xl mx-auto">
                     <?php if (!empty($error)): ?>
                         <div class="mb-8 p-4 bg-rose-500/10 border border-rose-500/20 rounded-xl flex items-center text-rose-500 animate-pulse">

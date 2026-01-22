@@ -54,6 +54,8 @@ if ($requestUri === '' || $requestUri[0] !== '/') {
     $requestUri = '/' . $requestUri;
 }
 
+error_log("CLEANED_URI: " . $requestUri);
+
 // Log API request
 $startTime = microtime(true);
 

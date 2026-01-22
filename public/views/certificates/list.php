@@ -45,6 +45,12 @@ try {
         $params[] = "%$search%";
         $params[] = "%$search%";
     }
+
+    // Role-based filtering: Establishment Owners only see their own certificates
+    if (isset($_SESSION['role']) && $_SESSION['role'] === 'establishment_owner') {
+        $where[] = "e.owner_user_id = ?";
+        $params[] = $_SESSION['user_id'];
+    }
     
     $whereClause = !empty($where) ? 'WHERE ' . implode(' AND ', $where) : '';
     
@@ -87,8 +93,14 @@ try {
     <title>Certificates - Health & Safety System</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style type="text/tailwindcss">
+        @layer base {
+            html { font-size: 105%; }
+            body { @apply text-slate-900; }
+        }
+    </style>
 </head>
-<body class="bg-slate-50 font-sans antialiased text-slate-900 overflow-hidden">
+<body class="bg-slate-50 font-sans antialiased overflow-hidden text-lg">
     <div class="flex h-screen">
         <!-- Sidebar Navigation -->
         <?php 
@@ -99,17 +111,17 @@ try {
         <!-- Main Content -->
         <div class="flex-1 flex flex-col min-w-0">
             <!-- Top Navbar -->
-            <header class="bg-white border-b border-slate-200 h-16 flex items-center justify-between px-8 shrink-0">
+            <header class="bg-white border-b border-slate-200 h-20 flex items-center justify-between px-8 shrink-0">
                 <h1 class="text-xl font-bold text-slate-800">Compliance Certificates</h1>
                 <div class="flex items-center space-x-4">
-                    <a href="/views/certificates/issue.php" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-semibold flex items-center shadow-sm transition-all active:scale-95">
+                    <a href="/certificates/issue" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-semibold flex items-center shadow-sm transition-all active:scale-95">
                         <i class="fas fa-plus mr-2"></i> Issue New Certificate
                     </a>
                 </div>
             </header>
 
-            <!-- Scrollable Content Area -->
-            <main class="flex-1 overflow-y-auto p-8">
+            <!-- Scrollable Content -->
+            <main class="flex-1 overflow-y-auto p-4 md:p-8 text-base">
                 <!-- Filters -->
                 <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 mb-8">
                     <form method="GET" class="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -151,7 +163,7 @@ try {
                         <div class="overflow-x-auto">
                             <table class="w-full text-left border-collapse">
                                 <thead>
-                                    <tr class="bg-slate-50 border-b border-slate-200 text-xs font-bold text-slate-500 uppercase tracking-wider">
+                                    <tr class="bg-slate-100 border-b border-slate-200 text-sm font-black text-slate-700 uppercase tracking-widest">
                                         <th class="px-6 py-4">Certificate ID / Est.</th>
                                         <th class="px-6 py-4">Type</th>
                                         <th class="px-6 py-4">Validity</th>
@@ -161,29 +173,29 @@ try {
                                 </thead>
                                 <tbody class="divide-y divide-slate-100">
                                     <?php foreach ($certificates as $cert): ?>
-                                        <tr class="hover:bg-slate-50 transition-colors">
-                                            <td class="px-6 py-4 italic">
-                                                <div class="font-bold text-slate-900 font-mono text-xs"><?php echo  htmlspecialchars($cert['certificate_number']) ?></div>
-                                                <div class="text-sm text-slate-600 font-medium"><?php echo  htmlspecialchars($cert['establishment_name']) ?></div>
+                                        <tr class="hover:bg-slate-100 transition-colors">
+                                            <td class="px-6 py-5">
+                                                <div class="font-black text-slate-900 font-mono text-sm"><?php echo  htmlspecialchars($cert['certificate_number']) ?></div>
+                                                <div class="text-base text-slate-700 font-bold"><?php echo  htmlspecialchars($cert['establishment_name']) ?></div>
                                             </td>
-                                            <td class="px-6 py-4">
-                                                <span class="text-sm text-slate-600 font-medium italic"><?php echo  ucwords(str_replace('_', ' ', $cert['certificate_type'])) ?></span>
+                                            <td class="px-6 py-5">
+                                                <span class="text-base text-slate-700 font-black italic"><?php echo  ucwords(str_replace('_', ' ', $cert['certificate_type'])) ?></span>
                                             </td>
-                                            <td class="px-6 py-4">
-                                                <div class="text-xs text-slate-500">Issued: <?php echo  date('M d, Y', strtotime($cert['issue_date'])) ?></div>
-                                                <div class="text-xs font-bold text-slate-800 italic">Expires: <?php echo  date('M d, Y', strtotime($cert['expiry_date'])) ?></div>
+                                            <td class="px-6 py-5">
+                                                <div class="text-sm text-slate-600 font-medium">Issued: <?php echo  date('M d, Y', strtotime($cert['issue_date'])) ?></div>
+                                                <div class="text-sm font-black text-slate-900 italic">Expires: <?php echo  date('M d, Y', strtotime($cert['expiry_date'])) ?></div>
                                             </td>
-                                            <td class="px-6 py-4">
+                                            <td class="px-6 py-5">
                                                 <?php
                                                     $statusClasses = [
-                                                        'active' => 'bg-emerald-100 text-emerald-700',
-                                                        'expired' => 'bg-rose-100 text-rose-700',
-                                                        'revoked' => 'bg-slate-100 text-slate-700',
-                                                        'suspended' => 'bg-amber-100 text-amber-700'
+                                                        'active' => 'bg-emerald-200 text-emerald-900 border border-emerald-300',
+                                                        'expired' => 'bg-rose-200 text-rose-900 border border-rose-300',
+                                                        'revoked' => 'bg-slate-200 text-slate-900 border border-slate-300',
+                                                        'suspended' => 'bg-amber-200 text-amber-900 border border-amber-300'
                                                     ];
-                                                    $class = $statusClasses[$cert['status']] ?? 'bg-slate-100 text-slate-700';
+                                                    $class = $statusClasses[$cert['status']] ?? 'bg-slate-200 text-slate-900';
                                                 ?>
-                                                <span class="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider <?php echo  $class ?>">
+                                                <span class="px-3 py-1.5 rounded-lg text-xs font-black uppercase tracking-widest <?php echo  $class ?>">
                                                     <?php echo  $cert['status'] ?>
                                                 </span>
                                             </td>

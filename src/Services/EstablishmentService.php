@@ -93,6 +93,35 @@ class EstablishmentService
     }
 
     /**
+     * Synchronize Compliance Status based on latest inspection and violations
+     */
+    public function syncComplianceStatus(int $establishmentId): void
+    {
+        // Check for open critical violations
+        $stmt = $this->pdo->prepare("
+            SELECT COUNT(*) 
+            FROM violations 
+            WHERE establishment_id = ? AND status = 'open' AND severity = 'critical'
+        ");
+        $stmt->execute([$establishmentId]);
+        $criticalCount = (int)$stmt->fetchColumn();
+
+        $newStatus = ($criticalCount > 0) ? 'non_compliant' : 'compliant';
+
+        $stmt = $this->pdo->prepare("
+            UPDATE establishments 
+            SET compliance_status = ?, updated_at = NOW() 
+            WHERE establishment_id = ?
+        ");
+        $stmt->execute([$newStatus, $establishmentId]);
+
+        $this->logger->info("Establishment compliance synced", [
+            'establishment_id' => $establishmentId,
+            'status' => $newStatus
+        ]);
+    }
+
+    /**
      * Get establishment by ID
      */
     public function getEstablishmentById(int $establishmentId): ?array

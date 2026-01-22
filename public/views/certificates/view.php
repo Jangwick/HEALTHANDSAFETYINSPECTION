@@ -39,6 +39,7 @@ try {
                e.owner_name,
                e.owner_contact,
                e.owner_email,
+               e.owner_user_id,
                i.reference_number as inspection_reference,
                i.inspection_type as inspection_type_slug,
                i.actual_start_datetime,
@@ -57,6 +58,14 @@ try {
     if (!$certificate) {
         header('Location: /certificates');
         exit;
+    }
+
+    // Role-based access control: Owners can only see their own certificates
+    if (isset($_SESSION['role']) && $_SESSION['role'] === 'establishment_owner') {
+        if ($certificate['owner_user_id'] != $_SESSION['user_id']) {
+            header('Location: /certificates');
+            exit;
+        }
     }
     
     // Calculate days until expiry

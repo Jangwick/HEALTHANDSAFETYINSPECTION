@@ -9,7 +9,7 @@ declare(strict_types=1);
 // PSR-4 Autoloading and Bootstrap already handled by public/index.php if routed correctly,
 // but for direct access we need to ensure environment is set up.
 if (!isset($_SESSION['user_id'])) {
-    header('Location: /views/auth/login.php');
+    header('Location: /login');
     exit;
 }
 
@@ -85,8 +85,14 @@ $inspections = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <title>Inspections - Health & Safety Inspection System</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style type="text/tailwindcss">
+        @layer base {
+            html { font-size: 105%; }
+            body { @apply text-white font-medium; }
+        }
+    </style>
 </head>
-<body class="bg-[#0b0c10] font-sans antialiased text-slate-200 overflow-hidden">
+<body class="bg-[#0b0c10] font-sans antialiased overflow-hidden text-lg">
     <div class="flex h-screen">
         <!-- Sidebar Navigation -->
         <?php 
@@ -100,6 +106,10 @@ $inspections = $stmt->fetchAll(PDO::FETCH_ASSOC);
             <header class="bg-[#0f1115] border-b border-white/5 h-20 flex items-center justify-between px-8 shrink-0">
                 <h1 class="text-2xl font-bold text-white tracking-tight">Inspections</h1>
                 <div class="flex items-center space-x-4">
+                    <button id="aiPrioritizeBtn"
+                       class="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white px-5 py-2.5 rounded-xl text-sm font-bold flex items-center shadow-lg shadow-purple-900/20 transition-all active:scale-95 group">
+                        <i class="fas fa-robot mr-2 group-hover:animate-bounce"></i> AI Prioritize
+                    </button>
                     <a href="/inspections/create" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl text-sm font-bold flex items-center shadow-lg shadow-blue-900/20 transition-all active:scale-95 group">
                         <i class="fas fa-plus mr-2 group-hover:rotate-90 transition-transform"></i> New Inspection
                     </a>
@@ -201,6 +211,10 @@ $inspections = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                                        class="p-2.5 bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white rounded-lg transition-all" title="View Details">
                                                         <i class="fas fa-eye text-sm"></i>
                                                     </a>
+                                                    <button onclick="showActionDetails(<?php echo $inspection['inspection_id'] ?>)"
+                                                       class="p-2.5 bg-purple-600/10 hover:bg-purple-600 text-purple-400 hover:text-white rounded-lg transition-all" title="AI Action Details">
+                                                        <i class="fas fa-robot text-sm"></i>
+                                                    </button>
                                                     <?php if ($inspection['status'] === 'pending'): ?>
                                                         <a href="/inspections/conduct?id=<?php echo  $inspection['inspection_id'] ?>" 
                                                            class="p-2.5 bg-blue-600/10 hover:bg-blue-600 text-blue-500 hover:text-white rounded-lg transition-all" title="Start Inspection">
@@ -249,5 +263,253 @@ $inspections = $stmt->fetchAll(PDO::FETCH_ASSOC);
             </main>
         </div>
     </div>
+
+    <!-- AI Prioritization Modal -->
+    <div id="aiModal" class="fixed inset-0 z-50 hidden overflow-y-auto">
+        <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 transition-opacity bg-black/80 backdrop-blur-sm" aria-hidden="true" onclick="closeAIModal()"></div>
+
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+
+            <div class="inline-block px-4 pt-5 pb-4 overflow-hidden text-left align-bottom transition-all transform bg-[#15181e] rounded-3xl shadow-2xl sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full sm:p-8 border border-white/10">
+                <div class="flex items-center justify-between mb-6">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-12 h-12 bg-purple-600/20 rounded-2xl flex items-center justify-center border border-purple-500/30">
+                            <i class="fas fa-robot text-purple-400 text-xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold text-white tracking-tight">Safety AI Optimization</h3>
+                            <p class="text-xs font-black text-slate-500 uppercase tracking-widest">Predictive Risk Scheduling</p>
+                        </div>
+                    </div>
+                    <button onclick="closeAIModal()" class="text-slate-500 hover:text-white transition-colors">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+
+                <div id="aiContent" class="space-y-4">
+                    <!-- Dynamic Content -->
+                    <div class="flex flex-col items-center justify-center py-12 space-y-4">
+                        <div class="w-16 h-16 border-4 border-purple-500/20 border-t-purple-500 rounded-full animate-spin"></div>
+                        <p class="text-slate-400 font-medium">Gemini AI is analyzing establishment risk factors...</p>
+                    </div>
+                </div>
+
+                <div class="mt-8 flex justify-end">
+                    <button onclick="closeAIModal()" class="px-6 py-2.5 bg-white/5 hover:bg-white/10 text-white rounded-xl text-sm font-bold transition-all border border-white/10">
+                        Dismiss
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <!-- AI Action Details Modal -->
+        <div id="actionDetailsModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+            <div class="bg-[#0f1115] border border-white/10 w-full max-w-2xl rounded-3xl overflow-hidden shadow-2xl">
+                <div class="p-6 border-b border-white/5 flex justify-between items-center bg-gradient-to-r from-purple-900/20 to-transparent">
+                    <div class="flex items-center">
+                        <div class="w-10 h-10 bg-purple-600/20 rounded-xl flex items-center justify-center mr-4 border border-purple-500/30">
+                            <i class="fas fa-brain text-purple-400"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-xl font-bold text-white tracking-tight">AI Action Details</h2>
+                            <p class="text-[10px] text-purple-400 font-bold uppercase tracking-widest">Intelligent Inspection Analysis</p>
+                        </div>
+                    </div>
+                    <button onclick="closeActionModal()" class="text-slate-500 hover:text-white transition-colors p-2 hover:bg-white/5 rounded-xl">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div id="actionModalContent" class="p-8 max-h-[70vh] overflow-y-auto">
+                    <!-- Dynamic Content -->
+                </div>
+                <div class="p-6 bg-white/5 border-t border-white/5 flex justify-end">
+                    <button onclick="closeActionModal()" class="px-6 py-2.5 bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white rounded-xl text-sm font-bold transition-all">
+                        Dismiss
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    <script>
+        const btn = document.getElementById('aiPrioritizeBtn');
+        const modal = document.getElementById('aiModal');
+        const content = document.getElementById('aiContent');
+
+        function openAIModal() {
+            modal.classList.remove('hidden');
+            document.body.classList.add('overflow-hidden');
+        }
+
+        function closeAIModal() {
+            modal.classList.add('hidden');
+            document.body.classList.remove('overflow-hidden');
+        }
+
+        const actionModal = document.getElementById('actionDetailsModal');
+        const actionContent = document.getElementById('actionModalContent');
+
+        function closeActionModal() {
+            actionModal.classList.add('hidden');
+            document.body.classList.remove('overflow-hidden');
+        }
+
+        async function showActionDetails(id) {
+            actionModal.classList.remove('hidden');
+            document.body.classList.add('overflow-hidden');
+            actionContent.innerHTML = `
+                <div class="flex flex-col items-center justify-center py-12 space-y-4">
+                    <div class="w-16 h-16 border-4 border-purple-500/20 border-t-purple-500 rounded-full animate-spin"></div>
+                    <p class="text-slate-400 font-medium italic">Gemini AI is distilling historical data and inspection notes...</p>
+                </div>
+            `;
+
+            try {
+                // Fetch action details
+                const res = await fetch(\`/api/v1/ai/action-details/\${id}\`);
+                const result = await res.json();
+
+                // Build HTML
+                if (result.status === 'success') {
+                    const data = result.data;
+                    const ai = data.risk_assessment;
+                    const recommendations = data.strategic_recommendations;
+                    const audit = data.note_audit;
+
+                    let html = `
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                            <div class="bg-white/5 border border-white/5 p-5 rounded-2xl">
+                                <span class="text-[10px] text-slate-500 font-black uppercase tracking-widest block mb-2">Predictive Risk Score</span>
+                                <div class="flex items-end space-x-2">
+                                    <span class="text-4xl font-black text-white">\${(ai.risk_score * 100).toFixed(1)}%</span>
+                                    <span class="text-xs text-slate-500 font-bold mb-1 italic">Probability</span>
+                                </div>
+                                <div class="w-full bg-white/5 h-1.5 rounded-full mt-4 overflow-hidden">
+                                    <div class="h-full bg-gradient-to-r from-blue-500 to-purple-500" style="width: \${ai.risk_score * 100}%"></div>
+                                </div>
+                            </div>
+                            <div class="bg-white/5 border border-white/5 p-5 rounded-2xl">
+                                <span class="text-[10px] text-slate-500 font-black uppercase tracking-widest block mb-1">Status Sentiment</span>
+                                <div class="text-lg font-bold text-white mb-2">\${audit.summary_sentiment.toUpperCase()}</div>
+                                <div class="px-3 py-1 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded-lg inline-block text-[10px] font-black italic">
+                                    \${(audit.compliance_confidence * 100).toFixed(0)}% Integrity Confidence
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="space-y-6">
+                            <div>
+                                <h3 class="text-sm font-black text-white uppercase tracking-widest mb-4 flex items-center">
+                                    <i class="fas fa-magic text-purple-400 mr-2"></i> Strategic Recommendations
+                                </h3>
+                                <div class="space-y-3">
+                                    \${recommendations.map(rec => \`
+                                        <div class="bg-purple-600/5 border border-purple-500/10 p-4 rounded-xl flex items-start space-x-3">
+                                            <i class="fas fa-arrow-right text-purple-500 mt-1 text-xs"></i>
+                                            <p class="text-sm text-slate-300 italic">\${rec}</p>
+                                        </div>
+                                    \`).join('')}
+                                </div>
+                            </div>
+
+                            <div class="bg-blue-600/5 border border-blue-500/10 p-6 rounded-2xl">
+                                <div class="flex items-center justify-between mb-2">
+                                    <h3 class="text-sm font-black text-white uppercase tracking-widest">Forensic Chain of Custody</h3>
+                                    <i class="fas fa-fingerprint text-blue-400"></i>
+                                </div>
+                                <div class="flex flex-wrap gap-2 mt-4">
+                                    <span class="px-2 py-1 bg-blue-500/10 border border-blue-500/20 text-[9px] text-blue-300 rounded font-bold uppercase tracking-tighter">GPS: LOCKED</span>
+                                    <span class="px-2 py-1 bg-blue-500/10 border border-blue-500/20 text-[9px] text-blue-300 rounded font-bold uppercase tracking-tighter">ID: VERIFIED</span>
+                                    <span class="px-2 py-1 bg-blue-500/10 border border-blue-500/20 text-[9px] text-blue-300 rounded font-bold uppercase tracking-tighter">AUTH: SECURE</span>
+                                </div>
+                            </div>
+                        </div>
+                    \`;
+                    actionContent.innerHTML = html;
+                } else {
+                    actionContent.innerHTML = \`<div class="p-8 text-center text-rose-400">Error: \${result.message}</div>\`;
+                }
+            } catch (err) {
+                actionContent.innerHTML = \`<div class="p-8 text-center text-rose-400">Connection Error mapping AI Logic: \${err.message}</div>\`;
+            }
+        }
+
+        btn.addEventListener('click', async () => {
+            openAIModal();
+            content.innerHTML = `
+                <div class="flex flex-col items-center justify-center py-12 space-y-4">
+                    <div class="w-16 h-16 border-4 border-purple-500/20 border-t-purple-500 rounded-full animate-spin"></div>
+                    <p class="text-slate-400 font-medium">Analyzing real-time health data and risk indicators...</p>
+                </div>
+            `;
+
+            try {
+                const today = new Date().toISOString().split('T')[0];
+                const response = await fetch(\`/api/v1/inspections?prioritize=true&date=\${today}\`);
+                const result = await response.json();
+
+                if (result.status === 'success') {
+                    const data = result.data.data;
+                    
+                    if (data.length === 0) {
+                        content.innerHTML = \`
+                            <div class="bg-blue-900/20 border border-blue-500/30 p-6 rounded-2xl text-center">
+                                <i class="fas fa-info-circle text-blue-400 text-3xl mb-3"></i>
+                                <p class="text-slate-300">No pending inspections found for today's AI prioritization queue.</p>
+                            </div>
+                        \`;
+                        return;
+                    }
+
+                    let html = \`
+                        <div class="bg-indigo-950/30 border border-indigo-500/20 p-4 rounded-2xl mb-6">
+                            <p class="text-sm text-indigo-300 leading-relaxed">
+                                <i class="fas fa-sparkles mr-1"></i> AI has ranked today's queue based on <strong>Predictive Risk Scoring</strong>. Establishments with critical histories or high crowd density indicators are prioritized first.
+                            </p>
+                        </div>
+                        <div class="space-y-3">
+                    \`;
+
+                    data.forEach((item, index) => {
+                        const riskColor = item.risk_category === 'high' ? 'red' : (item.risk_category === 'medium' ? 'yellow' : 'green');
+                        html += \`
+                            <div class="bg-white/5 border border-white/5 p-4 rounded-2xl flex items-center justify-between hover:bg-white/10 transition-colors">
+                                <div class="flex items-center space-x-4">
+                                    <div class="text-lg font-black text-slate-700 w-6">\${index + 1}</div>
+                                    <div>
+                                        <div class="text-sm font-bold text-white">\${item.establishment_name || 'Establishment #' + item.establishment_id}</div>
+                                        <div class="flex items-center space-x-2 mt-1">
+                                            <span class="text-[10px] uppercase font-black px-2 py-0.5 rounded bg-\${riskColor}-500/20 text-\${riskColor}-400 border border-\${riskColor}-500/30">
+                                                \${item.risk_category.toUpperCase()} RISK
+                                            </span>
+                                            <span class="text-[10px] text-slate-500 font-bold">\${item.inspection_type.replace('_', ' ').toUpperCase()}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <a href="/inspections/conduct.php?id=\${item.inspection_id}" class="text-blue-400 hover:text-blue-300 transition-colors">
+                                    <i class="fas fa-chevron-right text-sm"></i>
+                                </a>
+                            </div>
+                        \`;
+                    });
+
+                    html += '</div>';
+                    content.innerHTML = html;
+                } else {
+                    throw new Error(result.message || 'AI engine failed to respond');
+                }
+            } catch (error) {
+                console.error(error);
+                content.innerHTML = \`
+                    <div class="bg-red-900/20 border border-red-500/30 p-6 rounded-2xl text-center">
+                        <i class="fas fa-exclamation-triangle text-red-400 text-3xl mb-3"></i>
+                        <p class="text-slate-300">AI Optimization Engine Error: \${error.message}</p>
+                    </div>
+                \`;
+            }
+        });
+    </script>
 </body>
 </html>

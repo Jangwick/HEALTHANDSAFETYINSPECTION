@@ -22,6 +22,7 @@ $webRoutes = [
     '/register' => ['type' => 'view', 'file' => 'auth/register.php'],
     '/forgot-password' => ['type' => 'view', 'file' => 'auth/forgot-password.php'],
     '/inspections' => ['type' => 'view', 'file' => 'inspections/list.php'],
+    '/scheduling' => ['type' => 'view', 'file' => 'inspections/scheduling.php'],
     '/inspections/scheduling' => ['type' => 'view', 'file' => 'inspections/scheduling.php'],
     '/inspections/create' => ['type' => 'view', 'file' => 'inspections/create.php'],
     '/inspections/view' => ['type' => 'view', 'file' => 'inspections/view.php'],
@@ -36,21 +37,41 @@ $webRoutes = [
     '/establishments/create' => ['type' => 'view', 'file' => 'establishments/create.php'],
     '/establishments/view' => ['type' => 'view', 'file' => 'establishments/view.php'],
     '/establishments/view.php' => ['type' => 'view', 'file' => 'establishments/view.php'],
+    '/establishments/view.php' => ['type' => 'view', 'file' => 'establishments/view.php'],
     '/establishments/edit.php' => ['type' => 'view', 'file' => 'establishments/edit.php'],
+    '/analytics' => ['type' => 'view', 'file' => 'establishments/statistics.php'],
+    '/establishments/statistics' => ['type' => 'view', 'file' => 'establishments/statistics.php'],
     '/establishments/statistics.php' => ['type' => 'view', 'file' => 'establishments/statistics.php'],
-    '/certificates' => ['type' => 'view', 'file' => 'certificates/list.php'],
+    '/certificates/list' => ['type' => 'view', 'file' => 'certificates/list.php'],
     '/certificates/list.php' => ['type' => 'view', 'file' => 'certificates/list.php'],
-    '/certificates/verify' => ['type' => 'view', 'file' => 'certificates/verify.php'],
-    '/certificates/verify.php' => ['type' => 'view', 'file' => 'certificates/verify.php'],
+    '/certificates/issue' => ['type' => 'view', 'file' => 'certificates/issue.php'],
     '/certificates/issue.php' => ['type' => 'view', 'file' => 'certificates/issue.php'],
+    '/certificates/view' => ['type' => 'view', 'file' => 'certificates/view.php'],
     '/certificates/view.php' => ['type' => 'view', 'file' => 'certificates/view.php'],
-    '/violations' => ['type' => 'view', 'file' => 'violations/list.php'],
-    '/violations/list.php' => ['type' => 'view', 'file' => 'violations/list.php'],
-    '/violations/add' => ['type' => 'view', 'file' => 'violations/add.php'],
+    '/violations/view' => ['type' => 'view', 'file' => 'violations/view.php'],
+    '/violations/view.php' => ['type' => 'view', 'file' => 'violations/view.php'],
+    '/inspectors' => ['type' => 'view', 'file' => 'inspectors/list.php'],
+    '/inspectors/list.php' => ['type' => 'view', 'file' => 'inspectors/list.php'],
+    '/integrations' => ['type' => 'view', 'file' => 'integrations/hub.php'],
+    '/integration/hub' => ['type' => 'view', 'file' => 'integrations/hub.php'],
+    '/integration/hub.php' => ['type' => 'view', 'file' => 'integrations/hub.php'],
+    '/registration' => ['type' => 'view', 'file' => 'auth/register.php'],
+    '/index.php' => ['type' => 'public', 'file' => 'dashboard.php'],
+    '/index' => ['type' => 'public', 'file' => 'dashboard.php'],
 ];
+
+// Clean up trailing slashes
+$requestUri = rtrim($requestUri, '/');
+if ($requestUri === '') {
+    $requestUri = '/';
+}
 
 // Match route - strip query parameters for route matching
 $baseUri = strtok($requestUri, '?');
+
+if (defined('APP_DEBUG') && APP_DEBUG) {
+    error_log("BASE_URI: " . $baseUri);
+}
 
 if (isset($webRoutes[$baseUri])) {
     $route = $webRoutes[$baseUri];

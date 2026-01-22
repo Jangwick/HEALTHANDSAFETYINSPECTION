@@ -52,6 +52,7 @@ $routes = [
     
     // Violations
     'GET /v1/violations' => ['ViolationController', 'index'],
+    'GET /v1/violations/{id}' => ['ViolationController', 'show'],
     'POST /v1/inspections/{id}/violations' => ['ViolationController', 'create'],
     'PUT /v1/violations/{id}' => ['ViolationController', 'update'],
     'POST /v1/violations/{id}/resolve' => ['ViolationController', 'resolve'],
@@ -70,6 +71,15 @@ $routes = [
     'GET /v1/analytics/compliance-report' => ['AnalyticsController', 'complianceReport'],
     'GET /v1/analytics/compliance-analytics' => ['AnalyticsController', 'complianceAnalytics'],
     'GET /v1/analytics/violation-trends' => ['AnalyticsController', 'violationTrends'],
+    
+    // AI Integration Routes (LGU Enhancement)
+    'GET /v1/ai/risk-assessment/{id}' => ['AIController', 'getRiskAssessment'],
+    'POST /v1/ai/analyze-evidence' => ['AIController', 'analyzeEvidence'],
+    'GET /v1/ai/audit-notes/{id}' => ['AIController', 'auditNotes'],
+    'GET /v1/ai/action-details/{id}' => ['AIController', 'getActionDetails'],
+
+    // Cross-Cluster Integration
+    'POST /v1/integrations/notify-police' => ['IntegrationController', 'notifyLawEnforcement'],
 ];
 
 // Match route
@@ -118,18 +128,77 @@ if ($matchedRoute !== null) {
         }
         
         if (class_exists($controllerClass)) {
-            $controller = new $controllerClass();
+            // Simple Dependency Injection for Controllers (LGU Enhancement)
+            $db = \Database::getConnection();
+            $logger = new \HealthSafety\Utils\Logger();
+            $validator = new \HealthSafety\Utils\Validator();
+            $roleMiddleware = new \HealthSafety\Middleware\RoleMiddleware($db);
+
+            $controller = null;
             
-            if (method_exists($controller, $methodName)) {
+            // Map Controllers to their Dependencies
+            switch ($controllerName) {
+                case 'AuthController':
+                    $authService = new \HealthSafety\Services\AuthService($db, $logger);
+                    $jwtHandler = new \HealthSafety\Utils\JWTHandler();
+                    $controller = new $controllerClass($authService, $jwtHandler, $validator);
+                    break;
+                    
+                case 'InspectionController':
+                    $inspectionService = new \HealthSafety\Services\InspectionService($db, $logger);
+                    $controller = new $controllerClass($inspectionService, $validator, $roleMiddleware);
+                    break;
+                    
+                case 'AIController':
+                    $aiService = new \HealthSafety\Services\AIService($db, $logger);
+                    $controller = new $controllerClass($aiService, $roleMiddleware);
+                    break;
+                
+                case 'ViolationController':
+                    $violationService = new \HealthSafety\Services\ViolationService($db, $logger);
+                    $controller = new $controllerClass($violationService, $validator, $roleMiddleware);
+                    break;
+                
+                case 'EstablishmentController':
+                    $establishmentService = new \HealthSafety\Services\EstablishmentService($db, $logger);
+                    $controller = new $controllerClass($establishmentService, $validator, $roleMiddleware);
+                    break;
+
+                case 'CertificateController':
+                    $certificateService = new \HealthSafety\Services\CertificateService($db, $logger);
+                    $controller = new $controllerClass($certificateService, $validator, $roleMiddleware);
+                    break;
+                
+                case 'IntegrationController':
+                    $integrationService = new \HealthSafety\Services\IntegrationService($db, $logger);
+                    $controller = new $controllerClass($integrationService, $validator, $roleMiddleware);
+                    break;
+
+                case 'AnalyticsController':
+                    $analyticsService = new \HealthSafety\Services\AnalyticsService($db, $logger);
+                    $controller = new $controllerClass($analyticsService, $roleMiddleware);
+                    break;
+                    
+                default:
+                    try {
+                        $controller = new $controllerClass();
+                    } catch (\ArgumentCountError $e) {
+                        Response::serverError("DI Failure: Controller $controllerName requires dependencies not mapped in api.php");
+                        return;
+                    }
+                    break;
+            }
+            
+            if ($controller && method_exists($controller, $methodName)) {
                 // Merge params with request body
                 $data = array_merge($params, $requestBody ?? [], $_GET);
                 
                 call_user_func([$controller, $methodName], $data);
             } else {
-                Response::notFound("Method not found");
+                Response::notFound("Method $methodName not found in $controllerName");
             }
         } else {
-            Response::notFound("Controller not found");
+            Response::notFound("Controller $controllerClass not found");
         }
     }
 } else {

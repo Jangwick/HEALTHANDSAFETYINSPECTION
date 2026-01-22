@@ -103,31 +103,45 @@ try {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Issue Certificate - Health & Safety Inspection System</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
+    <style type="text/tailwindcss">
+        @layer base {
+            html { font-size: 105%; }
+            body { @apply text-slate-900 font-medium; }
+        }
+    </style>
 </head>
-<body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="/dashboard.php">
-                <i class="bi bi-shield-check"></i> Health & Safety Inspection
-            </a>
-            <div class="ms-auto">
-                <a href="/views/certificates/list.php" class="btn btn-sm btn-outline-light">
-                    <i class="bi bi-arrow-left"></i> Back to Certificates
-                </a>
-            </div>
-        </div>
-    </nav>
+<body class="bg-slate-50 font-sans antialiased">
+    <div class="flex h-screen overflow-hidden">
+        <!-- Sidebar Navigation -->
+        <?php 
+            $activePage = 'certificates';
+            include __DIR__ . '/../partials/sidebar.php'; 
+        ?>
 
-    <div class="container mt-4">
-        <div class="row">
-            <div class="col-md-8 mx-auto">
-                <div class="card">
-                    <div class="card-header bg-primary text-white">
-                        <h4 class="mb-0"><i class="bi bi-award"></i> Issue New Certificate</h4>
-                    </div>
-                    <div class="card-body">
+        <!-- Main Content Area -->
+        <div class="flex-1 flex flex-col overflow-hidden">
+            <!-- Header -->
+            <header class="bg-white border-b border-slate-200 h-16 flex items-center justify-between px-8 shrink-0">
+                <h1 class="text-xl font-bold text-slate-800">Issue New Certificate</h1>
+                <div class="flex items-center space-x-4">
+                    <a href="/views/certificates/list.php" class="bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 px-4 py-2 rounded-lg text-sm font-bold flex items-center transition-all">
+                        <i class="fas fa-arrow-left mr-2"></i> Back to Certificates
+                    </a>
+                </div>
+            </header>
+
+            <!-- Scrollable Content -->
+            <main class="flex-1 overflow-y-auto p-8">
+                <div class="max-w-4xl mx-auto">
+                    <div class="card shadow-sm border-0 rounded-xl overflow-hidden">
+                        <div class="card-header bg-gradient-to-r from-blue-600 to-indigo-700 text-white p-4 border-b-0">
+                            <h4 class="mb-0 text-lg font-bold flex items-center"><i class="fas fa-certificate mr-3"></i> Certificate Issuance</h4>
+                        </div>
+                        <div class="card-body p-6">
                         <?php if (isset($error)): ?>
                         <div class="alert alert-danger">
                             <i class="bi bi-exclamation-circle"></i> <?php echo  htmlspecialchars($error) ?>
@@ -226,10 +240,11 @@ try {
                     </div>
                 </div>
             </div>
-        </div>
+        </main>
     </div>
+</div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         function updateInspectionInfo() {
             const select = document.getElementById('inspection_id');
