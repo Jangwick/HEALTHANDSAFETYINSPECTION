@@ -1,10 +1,9 @@
 <?php
+declare(strict_types=1);
 /**
  * Health & Safety Inspection System
  * Inspections List View
  */
-
-declare(strict_types=1);
 
 // PSR-4 Autoloading and Bootstrap already handled by public/index.php if routed correctly,
 // but for direct access we need to ensure environment is set up.

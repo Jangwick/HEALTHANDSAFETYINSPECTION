@@ -94,7 +94,7 @@ if (isset($webRoutes[$baseUri])) {
         if (!in_array($baseUri, $publicRoutes)) {
             // Check if user is logged in
             if (!isset($_SESSION['user_id'])) {
-                header('Location: login');
+                header('Location: /login');
                 exit;
             }
         }

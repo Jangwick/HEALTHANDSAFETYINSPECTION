@@ -1,10 +1,9 @@
 ﻿<?php
+declare(strict_types=1);
 /**
  * Health & Safety Inspection System
  * Inspection Scheduling Registry
  */
-
-declare(strict_types=1);
 
 if (!isset($_SESSION['user_id'])) {
     header('Location: /login');
@@ -19,11 +18,25 @@ $today = date('Y-m-d');
 $nextWeek = date('Y-m-d', strtotime('+7 days'));
 
 // Statistics
+$stmtStats = $db->prepare("SELECT COUNT(*) FROM inspections WHERE scheduled_date = ? AND status = 'pending'");
+$stmtStats->execute([$today]);
+$todayCount = $stmtStats->fetchColumn();
+
+$stmtWeek = $db->prepare("SELECT COUNT(*) FROM inspections WHERE scheduled_date BETWEEN ? AND ? AND status = 'pending'");
+$stmtWeek->execute([$today, $nextWeek]);
+$weekCount = $stmtWeek->fetchColumn();
+
+$stmtOverdue = $db->prepare("SELECT COUNT(*) FROM inspections WHERE scheduled_date < ? AND status = 'pending'");
+$stmtOverdue->execute([$today]);
+$overdueCount = $stmtOverdue->fetchColumn();
+
+$totalPending = $db->query("SELECT COUNT(*) FROM inspections WHERE status = 'pending'")->fetchColumn();
+
 $stats = [
-    'today' => $db->query("SELECT COUNT(*) FROM inspections WHERE scheduled_date = '$today' AND status = 'pending'")->fetchColumn(),
-    'this_week' => $db->query("SELECT COUNT(*) FROM inspections WHERE scheduled_date BETWEEN '$today' AND '$nextWeek' AND status = 'pending'")->fetchColumn(),
-    'overdue' => $db->query("SELECT COUNT(*) FROM inspections WHERE scheduled_date < '$today' AND status = 'pending'")->fetchColumn(),
-    'total_pending' => $db->query("SELECT COUNT(*) FROM inspections WHERE status = 'pending'")->fetchColumn()
+    'today' => $todayCount,
+    'this_week' => $weekCount,
+    'overdue' => $overdueCount,
+    'total_pending' => $totalPending
 ];
 
 // Get upcoming inspections
@@ -108,24 +121,24 @@ $overdueInspections = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
                         <div class="card relative p-6">
                             <div class="absolute top-0 left-0 w-1 h-full bg-blue-700"></div>
-                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Active Today</p>
+                            <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Active Today</p>
                             <p class="text-3xl font-black text-slate-800 italic"><?= $stats['today'] ?></p>
-                            <p class="text-[9px] text-slate-400 mt-2 uppercase font-medium">Pending Protocol Deployments</p>
+                            <p class="text-[10px] text-slate-400 mt-2 uppercase font-medium">Pending Protocol Deployments</p>
                         </div>
                         <div class="card p-6">
-                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Weekly Forecast</p>
+                            <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Weekly Forecast</p>
                             <p class="text-3xl font-black text-slate-800 italic"><?= $stats['this_week'] ?></p>
-                            <p class="text-[9px] text-slate-400 mt-2 uppercase font-medium">Scheduled next 7 days</p>
+                            <p class="text-[10px] text-slate-400 mt-2 uppercase font-medium">Scheduled next 7 days</p>
                         </div>
                         <div class="card p-6 border-rose-100">
-                            <p class="text-[10px] font-bold text-rose-400 uppercase tracking-widest mb-1">Protocol Delays</p>
+                            <p class="text-xs font-bold text-rose-400 uppercase tracking-widest mb-1">Protocol Delays</p>
                             <p class="text-3xl font-black text-rose-600 italic"><?= $stats['overdue'] ?></p>
-                            <p class="text-[9px] text-rose-400 mt-2 uppercase font-medium italic">Action Required Immediate</p>
+                            <p class="text-[10px] text-rose-400 mt-2 uppercase font-medium italic">Action Required Immediate</p>
                         </div>
                         <div class="card p-6">
-                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Master Ledger</p>
+                            <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Master Ledger</p>
                             <p class="text-3xl font-black text-slate-800 italic"><?= $stats['total_pending'] ?></p>
-                            <p class="text-[9px] text-slate-400 mt-2 uppercase font-medium">Total Pending Assignments</p>
+                            <p class="text-[10px] text-slate-400 mt-2 uppercase font-medium">Total Pending Assignments</p>
                         </div>
                     </div>
 
@@ -147,7 +160,7 @@ $overdueInspections = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                                 </td>
                                                 <td>
                                                     <div class="text-xs font-bold text-slate-800 uppercase"><?= htmlspecialchars($insp['establishment_name']) ?></div>
-                                                    <div class="text-[9px] text-slate-400 font-bold uppercase tracking-widest mt-0.5">Assigned: <?= htmlspecialchars($insp['inspector_full_name'] ?: 'Unassigned') ?></div>
+                                                    <div class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-0.5">Assigned: <?= htmlspecialchars($insp['inspector_full_name'] ?: 'Unassigned') ?></div>
                                                 </td>
                                                 <td class="text-right">
                                                     <a href="/inspections/conduct?id=<?= $insp['inspection_id'] ?>" class="bg-rose-600 hover:bg-rose-700 text-white text-[10px] font-bold px-4 py-2 rounded shadow-sm uppercase tracking-widest italic transition-all">
@@ -199,10 +212,10 @@ $overdueInspections = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                                 </td>
                                                 <td>
                                                     <div class="text-xs font-bold text-slate-800 group-hover:text-blue-700 transition-colors uppercase"><?= htmlspecialchars($insp['establishment_name']) ?></div>
-                                                    <div class="text-[9px] text-slate-300 font-medium italic">Ref: <?= $insp['reference_number'] ?></div>
+                                                    <div class="text-[10px] text-slate-400 font-medium italic">Ref: <?= $insp['reference_number'] ?></div>
                                                 </td>
                                                 <td>
-                                                    <span class="inline-block px-2 py-1 bg-slate-100 text-[9px] font-black text-slate-500 rounded uppercase tracking-tighter">
+                                                    <span class="inline-block px-2 py-1 bg-slate-100 text-[10px] font-black text-slate-500 rounded uppercase tracking-tighter">
                                                         <?= str_replace('_', ' ', $insp['inspection_type']) ?>
                                                     </span>
                                                 </td>

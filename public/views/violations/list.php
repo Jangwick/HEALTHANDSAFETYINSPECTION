@@ -1,10 +1,9 @@
 ﻿<?php
+declare(strict_types=1);
 /**
  * Health & Safety Inspection System
  * Violations List View - Institutional Registry
  */
-
-declare(strict_types=1);
 
 if (!isset($_SESSION['user_id'])) {
     header('Location: /login');
