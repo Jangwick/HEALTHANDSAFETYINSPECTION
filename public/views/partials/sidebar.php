@@ -60,11 +60,6 @@
                 Force Personnel
             </a>
 
-            <a href="/integrations" class="<?php echo ($activePage ?? '') == 'integrations' ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-900/20' : 'hover:bg-white/5 hover:text-white'; ?> group flex items-center px-4 py-3.5 text-xs font-black rounded-2xl transition-all duration-300 uppercase tracking-widest italic">
-                <i class="fas fa-hubspot mr-3 text-lg w-6 <?php echo ($activePage ?? '') == 'integrations' ? 'text-white' : 'text-violet-400'; ?>"></i>
-                Cluster Hub
-            </a>
-
             <!-- Section Title -->
             <div class="pt-8 pb-4">
                 <p class="px-4 text-[10px] font-black text-slate-600 uppercase tracking-[0.3em]">Intelligence</p>
