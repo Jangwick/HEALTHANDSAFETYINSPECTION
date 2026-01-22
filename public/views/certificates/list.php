@@ -96,14 +96,14 @@ try {
     <style type="text/tailwindcss">
         @layer base {
             html { font-size: 100%; }
-            body { @apply text-slate-700 bg-slate-50; }
-            .card { @apply bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden; }
-            .registry-table th { @apply px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 bg-slate-50/50; }
-            .registry-table td { @apply px-6 py-4 text-sm border-b border-slate-50; }
+            body { @apply text-slate-800 bg-slate-50; }
+            .card { @apply bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden transition-all duration-200; }
+            .registry-table th { @apply px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-widest border-b border-slate-100 bg-slate-50/50; }
+            .registry-table td { @apply px-6 py-4 text-sm text-slate-600 border-b border-slate-50; }
         }
     </style>
 </head>
-<body class="font-sans antialiased text-base overflow-hidden">
+<body class="font-sans antialiased text-base overflow-hidden selection:bg-blue-100 selection:text-blue-900">
     <div class="flex h-screen overflow-hidden">
         <!-- Sidebar Navigation -->
         <?php 
@@ -112,34 +112,45 @@ try {
         ?>
 
         <!-- Main Content -->
-        <div class="flex-1 flex flex-col min-w-0 overflow-hidden text-base">
+        <div class="flex-1 flex flex-col min-w-0 overflow-hidden bg-slate-50">
             <!-- Institutional Header -->
-            <header class="bg-white border-b border-slate-200 h-16 flex items-center justify-between px-8 shrink-0 z-10">
+            <header class="bg-white border-b border-slate-200 h-20 flex items-center justify-between px-10 shrink-0 z-20">
                 <div class="flex items-center space-x-4">
-                    <h1 class="text-sm font-bold text-slate-800 tracking-tight uppercase">Certification Registry</h1>
-                    <div class="h-4 w-px bg-slate-200"></div>
-                    <span class="text-[10px] font-bold text-blue-700 uppercase tracking-widest italic">Institutional Ledger</span>
+                    <div class="bg-blue-50 p-2.5 rounded-xl border border-blue-100">
+                        <i class="fas fa-stamp text-blue-600"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-sm font-bold text-slate-900 tracking-tight uppercase">Certification Registry</h1>
+                        <p class="text-[10px] font-medium text-slate-400 uppercase tracking-widest mt-0.5">Authorization Compliance Logs</p>
+                    </div>
                 </div>
-                <div class="flex items-center space-x-3 text-base">
-                    <a href="/certificates/issue" class="bg-blue-700 hover:bg-blue-800 text-white px-5 py-2 rounded-lg text-xs font-bold uppercase tracking-widest flex items-center shadow-md transition-all active:scale-95">
-                        <i class="fas fa-plus mr-2 text-[10px]"></i> Issue Certificate
+                <div class="flex items-center space-x-6 text-base">
+                    <div class="flex flex-col items-end mr-4">
+                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Active Records</span>
+                        <span class="text-sm font-bold text-slate-900 leading-none mt-1"><?= number_format($totalCertificates) ?></span>
+                    </div>
+                    <?php if (($_SESSION['role'] ?? '') !== 'establishment_owner'): ?>
+                    <a href="/certificates/issue" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl text-xs font-bold transition-all shadow-lg shadow-blue-500/20 flex items-center">
+                        <i class="fas fa-plus mr-2 text-[10px]"></i>
+                        Issue New
                     </a>
+                    <?php endif; ?>
                 </div>
             </header>
 
             <!-- Scrollable Content -->
-            <main class="flex-1 overflow-y-auto p-8">
+            <main class="flex-1 overflow-y-auto p-10">
                 <div class="max-w-7xl mx-auto space-y-8">
                     
                     <!-- Search & Filter Parameters -->
                     <div class="card p-6">
                         <form method="GET" class="grid grid-cols-1 md:grid-cols-4 gap-6">
                             <div class="md:col-span-1">
-                                <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1 italic">Registry Search</label>
+                                <label class="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-3 ml-1">Registry Search</label>
                                 <div class="relative">
-                                    <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-300 text-xs"></i>
+                                    <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-300 text-xs"></i>
                                     <input type="text" name="search" value="<?= htmlspecialchars($search) ?>" placeholder="Ref # or Subject..." 
-                                        class="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-700/10 focus:border-blue-700 outline-none transition-all placeholder:text-slate-300">
+                                        class="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all placeholder:text-slate-300 shadow-sm">
                                 </div>
                             </div>
                             <div>

@@ -85,13 +85,14 @@ $violations = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <style type="text/tailwindcss">
         @layer base {
             html { font-size: 100%; }
-            body { @apply text-slate-700 bg-slate-50; }
-            .italic-rows tbody tr td { @apply italic; }
-            .mono { font-family: 'JetBrains Mono', monospace; }
+            body { @apply text-slate-800 bg-slate-50; }
+            .card { @apply bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden transition-all duration-200; }
+            .registry-table th { @apply px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-widest border-b border-slate-100 bg-slate-50/50; }
+            .registry-table td { @apply px-6 py-4 text-sm text-slate-600 border-b border-slate-50; }
         }
     </style>
 </head>
-<body class="font-sans antialiased text-base overflow-hidden">
+<body class="font-sans antialiased text-base overflow-hidden selection:bg-rose-100 selection:text-rose-900">
     <div class="flex h-screen overflow-hidden">
         <!-- Sidebar Navigation -->
         <?php 
@@ -100,24 +101,28 @@ $violations = $stmt->fetchAll(PDO::FETCH_ASSOC);
         ?>
 
         <!-- Main Content Area -->
-        <div class="flex-1 flex flex-col min-w-0 overflow-hidden text-base">
+        <div class="flex-1 flex flex-col min-w-0 overflow-hidden bg-slate-50">
             <!-- Institutional Header -->
-            <header class="bg-white border-b border-slate-200 h-16 flex items-center justify-between px-8 shrink-0 z-10">
+            <header class="bg-white border-b border-slate-200 h-20 flex items-center justify-between px-10 shrink-0 z-20">
                 <div class="flex items-center space-x-4">
-                    <h1 class="text-sm font-bold text-slate-800 tracking-tight uppercase">Institutional Violation Registry</h1>
-                    <div class="h-4 w-px bg-slate-200"></div>
-                    <span class="text-[10px] font-bold text-blue-700 uppercase tracking-widest italic">Penalty Ledger 2.0</span>
+                    <div class="bg-rose-50 p-2.5 rounded-xl border border-rose-100">
+                        <i class="fas fa-skull-crossbones text-rose-600"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-sm font-bold text-slate-900 tracking-tight uppercase">Violations Registry</h1>
+                        <p class="text-[10px] font-medium text-slate-400 uppercase tracking-widest mt-0.5">Penalty and Citation Ledger</p>
+                    </div>
                 </div>
                 <div class="flex items-center space-x-6">
                     <div class="flex flex-col items-end">
-                        <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Active Citations</span>
-                        <span class="text-xs font-bold text-slate-800 italic uppercase"><?= $totalViolations ?> Records Found</span>
+                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Active Citations</span>
+                        <span class="text-lg font-bold text-slate-900 leading-none mt-1"><?= number_format($totalViolations) ?></span>
                     </div>
                 </div>
             </header>
 
             <!-- Scrollable Content -->
-            <main class="flex-1 overflow-y-auto p-8 bg-slate-50 text-base">
+            <main class="flex-1 overflow-y-auto p-10">
                 <div class="max-w-7xl mx-auto space-y-8">
                     
                     <!-- Search & Filtering Protocol -->
