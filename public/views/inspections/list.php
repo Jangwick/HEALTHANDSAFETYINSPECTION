@@ -123,18 +123,18 @@ $inspections = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 mb-8">
                     <form method="GET" class="grid grid-cols-1 md:grid-cols-4 gap-6 items-end">
                         <div>
-                            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Search Registry</label>
+                            <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Search Registry</label>
                             <div class="relative group">
                                 <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400">
                                     <i class="fas fa-search text-xs"></i>
                                 </span>
                                 <input type="text" name="search" value="<?php echo  htmlspecialchars($search) ?>" placeholder="Ref ID or Establishment..." 
-                                    class="w-full pl-9 pr-3 py-2 bg-white border border-slate-200 rounded-lg text-sm text-slate-700 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all">
+                                    class="w-full pl-9 pr-3 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-700 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all">
                             </div>
                         </div>
                         <div>
-                            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Operational Status</label>
-                            <select name="status" class="w-full bg-white border border-slate-200 rounded-lg py-2 px-3 text-sm text-slate-600 focus:ring-1 focus:ring-blue-500 outline-none transition-all appearance-none cursor-pointer">
+                            <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Operational Status</label>
+                            <select name="status" class="w-full bg-slate-50 border border-slate-200 rounded-lg py-2.5 px-3 text-sm text-slate-600 focus:ring-1 focus:ring-blue-500 outline-none transition-all appearance-none cursor-pointer">
                                 <option value="">All Logs</option>
                                 <option value="pending" <?php echo  $status === 'pending' ? 'selected' : '' ?>>Scheduled</option>
                                 <option value="in_progress" <?php echo  $status === 'in_progress' ? 'selected' : '' ?>>In Field</option>
@@ -142,8 +142,8 @@ $inspections = $stmt->fetchAll(PDO::FETCH_ASSOC);
                             </select>
                         </div>
                         <div>
-                            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Primary Category</label>
-                            <select name="type" class="w-full bg-white border border-slate-200 rounded-lg py-2 px-3 text-sm text-slate-600 focus:ring-1 focus:ring-blue-500 outline-none transition-all appearance-none cursor-pointer">
+                            <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Primary Category</label>
+                            <select name="type" class="w-full bg-slate-50 border border-slate-200 rounded-lg py-2.5 px-3 text-sm text-slate-600 focus:ring-1 focus:ring-blue-500 outline-none transition-all appearance-none cursor-pointer">
                                 <option value="">All Categories</option>
                                 <option value="food_safety" <?php echo  $type === 'food_safety' ? 'selected' : '' ?>>Food Services</option>
                                 <option value="building_safety" <?php echo  $type === 'building_safety' ? 'selected' : '' ?>>Structural Registry</option>
@@ -152,10 +152,10 @@ $inspections = $stmt->fetchAll(PDO::FETCH_ASSOC);
                             </select>
                         </div>
                         <div class="flex space-x-2">
-                            <button type="submit" class="flex-1 bg-slate-800 hover:bg-slate-900 text-white py-2 rounded-lg text-xs font-bold transition-all shadow-sm">
+                            <button type="submit" class="flex-1 bg-slate-800 hover:bg-slate-900 text-white py-2.5 rounded-lg text-xs font-bold transition-all shadow-sm">
                                 Apply Filter
                             </button>
-                            <a href="/inspections" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-lg text-xs font-bold transition-all border border-slate-200 shadow-sm flex items-center justify-center">
+                            <a href="/inspections" class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-lg text-xs font-bold transition-all border border-slate-200 shadow-sm flex items-center justify-center">
                                 <i class="fas fa-undo"></i>
                             </a>
                         </div>
@@ -167,7 +167,7 @@ $inspections = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     <?php if ($inspections): ?>
                         <div class="overflow-x-auto">
                             <table class="w-full text-left">
-                                <thead class="bg-slate-50 border-b border-slate-100 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                                <thead class="bg-slate-50 border-b border-slate-100 text-xs font-bold text-slate-500 uppercase tracking-widest">
                                     <tr>
                                         <th class="px-6 py-4">Ref. ID</th>
                                         <th class="px-6 py-4">Establishment</th>
@@ -181,12 +181,12 @@ $inspections = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                         <tr class="hover:bg-slate-50/50 transition-colors cursor-pointer" onclick="window.location='/inspections/view?id=<?php echo  $inspection['inspection_id'] ?>'">
                                             <td class="px-6 py-4 text-xs font-bold text-blue-700">HSI-<?php echo  str_pad((string)$inspection['inspection_id'], 5, '0', STR_PAD_LEFT) ?></td>
                                             <td class="px-6 py-4">
-                                                <p class="text-xs font-bold text-slate-900 leading-tight"><?php echo  htmlspecialchars($inspection['establishment_name']) ?></p>
-                                                <p class="text-[10px] text-slate-500 font-medium uppercase mt-0.5 tracking-tighter"><?php echo  ucwords(str_replace('_', ' ', (string)$inspection['inspection_type'])) ?></p>
+                                                <p class="text-sm font-bold text-slate-900 leading-tight"><?php echo  htmlspecialchars($inspection['establishment_name']) ?></p>
+                                                <p class="text-[11px] text-slate-500 font-medium uppercase mt-1 tracking-wider"><?php echo  ucwords(str_replace('_', ' ', (string)$inspection['inspection_type'])) ?></p>
                                             </td>
                                             <td class="px-6 py-4">
                                                 <div class="flex items-center">
-                                                    <span class="text-xs font-semibold text-slate-600"><?php echo  htmlspecialchars($inspection['inspector_name'] ?? 'Unassigned') ?></span>
+                                                    <span class="text-sm font-medium text-slate-600"><?php echo  htmlspecialchars($inspection['inspector_name'] ?? 'Unassigned') ?></span>
                                                 </div>
                                             </td>
                                             <td class="px-6 py-4">
@@ -208,7 +208,7 @@ $inspections = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                                     $style = $statusStyles[$inspection['status']] ?? 'bg-slate-50 text-slate-500 border-slate-200';
                                                     $statusLabel = $label[$inspection['status']] ?? ucfirst((string)$inspection['status']);
                                                 ?>
-                                                <span class="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border <?php echo  $style ?>">
+                                                <span class="px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider border <?php echo  $style ?>">
                                                     <?php echo  $statusLabel ?>
                                                 </span>
                                             </td>

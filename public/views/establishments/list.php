@@ -162,18 +162,18 @@ try {
                 <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 mb-8">
                     <form method="GET" class="grid grid-cols-1 md:grid-cols-6 gap-4 items-end">
                         <div class="md:col-span-2">
-                            <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">Search Registry</label>
+                            <label class="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Search Registry</label>
                             <div class="relative">
                                 <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400">
                                     <i class="fas fa-search text-xs"></i>
                                 </span>
                                 <input type="text" name="search" value="<?php echo htmlspecialchars($search) ?>" placeholder="Establishment name or owner..." 
-                                    class="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-700 focus:ring-1 focus:ring-blue-500 outline-none transition-all">
+                                    class="w-full pl-9 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-700 focus:ring-1 focus:ring-blue-500 outline-none transition-all">
                             </div>
                         </div>
                         <div>
-                            <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">Type</label>
-                            <select name="type" class="w-full bg-slate-50 border border-slate-200 rounded-lg py-2 px-3 text-sm text-slate-700 focus:ring-1 focus:ring-blue-500 outline-none transition-all cursor-pointer">
+                            <label class="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Type</label>
+                            <select name="type" class="w-full bg-slate-50 border border-slate-200 rounded-lg py-2.5 px-3 text-sm text-slate-700 focus:ring-1 focus:ring-blue-500 outline-none transition-all cursor-pointer">
                                 <option value="">All Types</option>
                                 <option value="restaurant" <?php echo $type === 'restaurant' ? 'selected' : '' ?>>Restaurant</option>
                                 <option value="school" <?php echo $type === 'school' ? 'selected' : '' ?>>School</option>
@@ -183,8 +183,8 @@ try {
                             </select>
                         </div>
                         <div>
-                            <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">Status</label>
-                            <select name="status" class="w-full bg-slate-50 border border-slate-200 rounded-lg py-2 px-3 text-sm text-slate-700 focus:ring-1 focus:ring-blue-500 outline-none transition-all cursor-pointer">
+                            <label class="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Status</label>
+                            <select name="status" class="w-full bg-slate-50 border border-slate-200 rounded-lg py-2.5 px-3 text-sm text-slate-700 focus:ring-1 focus:ring-blue-500 outline-none transition-all cursor-pointer">
                                 <option value="">All Statuses</option>
                                 <option value="compliant" <?php echo $status === 'compliant' ? 'selected' : '' ?>>Compliant</option>
                                 <option value="non_compliant" <?php echo $status === 'non_compliant' ? 'selected' : '' ?>>Non-Compliant</option>
@@ -192,12 +192,12 @@ try {
                             </select>
                         </div>
                         <div>
-                            <button type="submit" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-bold py-2 px-4 rounded-lg text-xs transition-all flex items-center justify-center shadow-sm">
+                            <button type="submit" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-bold py-2.5 px-4 rounded-lg text-xs transition-all flex items-center justify-center shadow-sm">
                                 <i class="fas fa-filter mr-2 opacity-70"></i> Filter
                             </button>
                         </div>
                         <div>
-                            <a href="/establishments" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold py-2 px-4 rounded-lg text-xs transition-all flex items-center justify-center border border-slate-200">
+                            <a href="/establishments" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold py-2.5 px-4 rounded-lg text-xs transition-all flex items-center justify-center border border-slate-200">
                                 Reset
                             </a>
                         </div>
@@ -210,7 +210,7 @@ try {
                         <div class="overflow-x-auto">
                             <table class="w-full text-left border-collapse">
                                 <thead>
-                                    <tr class="bg-slate-50 border-b border-slate-200 text-[10px] font-bold text-slate-500 uppercase tracking-widest">
+                                    <tr class="bg-slate-50 border-b border-slate-200 text-xs font-bold text-slate-500 uppercase tracking-widest">
                                         <th class="px-6 py-4">Establishment Name</th>
                                         <th class="px-6 py-4">Type</th>
                                         <th class="px-6 py-4">Owner / Representative</th>
@@ -219,19 +219,19 @@ try {
                                         <th class="px-6 py-4 text-right">Actions</th>
                                     </tr>
                                 </thead>
-                                <tbody class="divide-y divide-slate-100 italic-rows">
+                                <tbody class="divide-y divide-slate-100">
                                     <?php foreach ($establishments as $est): ?>
                                         <tr class="hover:bg-slate-50 transition-colors cursor-pointer" onclick="window.location='/establishments/view?id=<?php echo $est['establishment_id'] ?>'">
                                             <td class="px-6 py-4">
                                                 <div class="text-sm font-bold text-slate-800"><?php echo htmlspecialchars($est['name']) ?></div>
-                                                <div class="text-[10px] text-slate-500 font-medium mt-0.5">Permit: <?php echo htmlspecialchars($est['business_permit_number'] ?? 'N/A') ?></div>
+                                                <div class="text-[11px] text-slate-500 font-medium mt-1">Permit: <?php echo htmlspecialchars($est['business_permit_number'] ?? 'N/A') ?></div>
                                             </td>
                                             <td class="px-6 py-4">
                                                 <span class="text-[10px] font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded uppercase"><?php echo htmlspecialchars($est['type']) ?></span>
                                             </td>
                                             <td class="px-6 py-4">
-                                                <div class="text-xs font-medium text-slate-700"><?php echo htmlspecialchars($est['owner_name']) ?></div>
-                                                <div class="text-[10px] text-slate-500 mt-0.5"><?php echo htmlspecialchars($est['owner_phone'] ?? 'No contact') ?></div>
+                                                <div class="text-sm font-medium text-slate-700"><?php echo htmlspecialchars($est['owner_name']) ?></div>
+                                                <div class="text-[10px] text-slate-500 mt-1"><?php echo htmlspecialchars($est['owner_phone'] ?? 'No contact') ?></div>
                                             </td>
                                             <td class="px-6 py-4">
                                                 <?php
@@ -242,16 +242,16 @@ try {
                                                     ];
                                                     $style = $statusStyles[$est['compliance_status']] ?? 'bg-slate-50 text-slate-600 border-slate-200';
                                                 ?>
-                                                <span class="inline-flex items-center px-2 py-1 rounded text-[10px] font-bold border <?php echo $style ?>">
+                                                <span class="inline-flex items-center px-2 py-1 rounded text-[11px] font-bold border <?php echo $style ?>">
                                                     <span class="w-1.5 h-1.5 rounded-full bg-current mr-1.5 opacity-60"></span>
                                                     <?php echo strtoupper(str_replace('_', ' ', $est['compliance_status'])) ?>
                                                 </span>
                                             </td>
                                             <td class="px-6 py-4">
-                                                <div class="text-xs text-slate-700 font-medium">
+                                                <div class="text-sm text-slate-700 font-medium">
                                                     <?php echo $est['last_inspection_date'] ? date('M d, Y', strtotime($est['last_inspection_date'])) : 'No inspections' ?>
                                                 </div>
-                                                <div class="text-[10px] text-slate-500 mt-0.5"><?php echo $est['inspection_count'] ?> recorded deployments</div>
+                                                <div class="text-[11px] text-slate-500 mt-1"><?php echo $est['inspection_count'] ?> recorded deployments</div>
                                             </td>
                                             <td class="px-6 py-4 text-right" onclick="event.stopPropagation()">
                                                 <div class="flex justify-end space-x-1">

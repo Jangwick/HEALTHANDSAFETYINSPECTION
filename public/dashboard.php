@@ -91,48 +91,48 @@
 
                     <!-- Stats Grid -->
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                        <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm transition-hover">
+                        <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm transition-all hover:shadow-md">
                             <div class="flex items-center justify-between mb-4">
-                                <div class="p-2 bg-blue-50 rounded-lg text-blue-700">
+                                <div class="p-2 bg-blue-50 rounded-lg text-blue-700 border border-blue-100/50">
                                     <i class="fas fa-clipboard-list text-xl"></i>
                                 </div>
-                                <span class="text-[10px] font-bold text-green-600 bg-green-50 px-2 py-1 rounded border border-green-100">+12%</span>
+                                <span class="text-[11px] font-bold text-green-600 bg-green-50 px-2 py-1 rounded border border-green-100">+12%</span>
                             </div>
-                            <h3 class="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1">Total Logs</h3>
-                            <p class="text-2xl font-bold text-slate-900">247</p>
+                            <h3 class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-1.5">Total Logs</h3>
+                            <p class="text-3xl font-bold text-slate-900">247</p>
                         </div>
 
-                        <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm transition-hover">
+                        <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm transition-all hover:shadow-md">
                             <div class="flex items-center justify-between mb-4">
-                                <div class="p-2 bg-amber-50 rounded-lg text-amber-700">
+                                <div class="p-2 bg-amber-50 rounded-lg text-amber-700 border border-amber-100/50">
                                     <i class="fas fa-hourglass-half text-xl"></i>
                                 </div>
-                                <span class="text-[10px] font-bold text-amber-600 bg-amber-50 px-2 py-1 rounded border border-amber-100">Review</span>
+                                <span class="text-[11px] font-bold text-amber-600 bg-amber-50 px-2 py-1 rounded border border-amber-100">Review</span>
                             </div>
-                            <h3 class="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1">Pending Assignments</h3>
-                            <p class="text-2xl font-bold text-slate-900">18</p>
+                            <h3 class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-1.5">Pending Assignments</h3>
+                            <p class="text-3xl font-bold text-slate-900">18</p>
                         </div>
 
-                        <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm transition-hover">
+                        <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm transition-all hover:shadow-md">
                             <div class="flex items-center justify-between mb-4">
-                                <div class="p-2 bg-rose-50 rounded-lg text-rose-700">
+                                <div class="p-2 bg-rose-50 rounded-lg text-rose-700 border border-rose-100/50">
                                     <i class="fas fa-shield-virus text-xl"></i>
                                 </div>
-                                <span class="text-[10px] font-bold text-rose-600 bg-rose-50 px-2 py-1 rounded border border-rose-100">Action Required</span>
+                                <span class="text-[11px] font-bold text-rose-600 bg-rose-50 px-2 py-1 rounded border border-rose-100">Action Required</span>
                             </div>
-                            <h3 class="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1">Safety Violations</h3>
-                            <p class="text-2xl font-bold text-slate-900">2</p>
+                            <h3 class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-1.5">Safety Violations</h3>
+                            <p class="text-3xl font-bold text-slate-900">2</p>
                         </div>
 
-                        <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm transition-hover">
+                        <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm transition-all hover:shadow-md">
                             <div class="flex items-center justify-between mb-4">
-                                <div class="p-2 bg-indigo-50 rounded-lg text-indigo-700">
+                                <div class="p-2 bg-indigo-50 rounded-lg text-indigo-700 border border-indigo-100/50">
                                     <i class="fas fa-certificate text-xl"></i>
                                 </div>
-                                <span class="text-[10px] font-bold text-slate-500 bg-slate-50 px-2 py-1 rounded border border-slate-100 text-slate-500">Valid</span>
+                                <span class="text-[11px] font-bold text-slate-500 bg-slate-50 px-2 py-1 rounded border border-slate-100 text-slate-500">Valid</span>
                             </div>
-                            <h3 class="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1">Issued Certificates</h3>
-                            <p class="text-2xl font-bold text-slate-900">89</p>
+                            <h3 class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-1.5">Issued Certificates</h3>
+                            <p class="text-3xl font-bold text-slate-900">89</p>
                         </div>
                     </div>
 
