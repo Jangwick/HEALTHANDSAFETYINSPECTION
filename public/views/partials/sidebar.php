@@ -17,7 +17,7 @@
             <!-- Section Title -->
             <p class="px-4 text-[10px] font-black text-slate-600 uppercase tracking-[0.3em] mb-4">Core Analytics</p>
             
-            <a href="/dashboard.php" class="<?php echo ($activePage ?? '') == 'dashboard' ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-900/20' : 'hover:bg-white/5 hover:text-white'; ?> group flex items-center px-4 py-3.5 text-xs font-black rounded-2xl transition-all duration-300 uppercase tracking-widest italic">
+            <a href="/dashboard" class="<?php echo ($activePage ?? '') == 'dashboard' ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-900/20' : 'hover:bg-white/5 hover:text-white'; ?> group flex items-center px-4 py-3.5 text-xs font-black rounded-2xl transition-all duration-300 uppercase tracking-widest italic">
                 <i class="fas fa-grid-2 mr-3 text-lg w-6 <?php echo ($activePage ?? '') == 'dashboard' ? 'text-white' : 'text-blue-500'; ?>"></i>
                 Operational Hub
             </a>
@@ -28,39 +28,39 @@
             </div>
 
             <?php if (($_SESSION['role'] ?? '') !== 'establishment_owner'): ?>
-            <a href="/views/inspections/list.php" class="<?php echo ($activePage ?? '') == 'inspections' ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-900/20' : 'hover:bg-white/5 hover:text-white'; ?> group flex items-center px-4 py-3.5 text-xs font-black rounded-2xl transition-all duration-300 uppercase tracking-widest italic">
+            <a href="/inspections" class="<?php echo ($activePage ?? '') == 'inspections' ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-900/20' : 'hover:bg-white/5 hover:text-white'; ?> group flex items-center px-4 py-3.5 text-xs font-black rounded-2xl transition-all duration-300 uppercase tracking-widest italic">
                 <i class="fas fa-clipboard-check mr-3 text-lg w-6 <?php echo ($activePage ?? '') == 'inspections' ? 'text-white' : 'text-emerald-500'; ?>"></i>
                 Inspection Logs
             </a>
 
-            <a href="/views/inspections/scheduling.php" class="<?php echo ($activePage ?? '') == 'scheduling' ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-900/20' : 'hover:bg-white/5 hover:text-white'; ?> group flex items-center px-4 py-3.5 text-xs font-black rounded-2xl transition-all duration-300 uppercase tracking-widest italic">
+            <a href="/scheduling" class="<?php echo ($activePage ?? '') == 'scheduling' ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-900/20' : 'hover:bg-white/5 hover:text-white'; ?> group flex items-center px-4 py-3.5 text-xs font-black rounded-2xl transition-all duration-300 uppercase tracking-widest italic">
                 <i class="fas fa-calendar-day mr-3 text-lg w-6 <?php echo ($activePage ?? '') == 'scheduling' ? 'text-white' : 'text-amber-500'; ?>"></i>
                 Scheduler
             </a>
             <?php endif; ?>
             
-            <a href="/views/establishments/list.php" class="<?php echo ($activePage ?? '') == 'establishments' ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-900/20' : 'hover:bg-white/5 hover:text-white'; ?> group flex items-center px-4 py-3.5 text-xs font-black rounded-2xl transition-all duration-300 uppercase tracking-widest italic">
+            <a href="/establishments" class="<?php echo ($activePage ?? '') == 'establishments' ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-900/20' : 'hover:bg-white/5 hover:text-white'; ?> group flex items-center px-4 py-3.5 text-xs font-black rounded-2xl transition-all duration-300 uppercase tracking-widest italic">
                 <i class="fas fa-building-circle-check mr-3 text-lg w-6 <?php echo ($activePage ?? '') == 'establishments' ? 'text-white' : 'text-blue-400'; ?>"></i>
                 Establishments
             </a>
             
-            <a href="/views/certificates/list.php" class="<?php echo ($activePage ?? '') == 'certificates' ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-900/20' : 'hover:bg-white/5 hover:text-white'; ?> group flex items-center px-4 py-3.5 text-xs font-black rounded-2xl transition-all duration-300 uppercase tracking-widest italic">
+            <a href="/certificates" class="<?php echo ($activePage ?? '') == 'certificates' ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-900/20' : 'hover:bg-white/5 hover:text-white'; ?> group flex items-center px-4 py-3.5 text-xs font-black rounded-2xl transition-all duration-300 uppercase tracking-widest italic">
                 <i class="fas fa-certificate mr-3 text-lg w-6 <?php echo ($activePage ?? '') == 'certificates' ? 'text-white' : 'text-indigo-400'; ?>"></i>
                 Certificates
             </a>
 
             <?php if (($_SESSION['role'] ?? '') !== 'establishment_owner'): ?>
-            <a href="/views/violations/list.php" class="<?php echo ($activePage ?? '') == 'violations' ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-900/20' : 'hover:bg-white/5 hover:text-white'; ?> group flex items-center px-4 py-3.5 text-xs font-black rounded-2xl transition-all duration-300 uppercase tracking-widest italic">
+            <a href="/violations" class="<?php echo ($activePage ?? '') == 'violations' ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-900/20' : 'hover:bg-white/5 hover:text-white'; ?> group flex items-center px-4 py-3.5 text-xs font-black rounded-2xl transition-all duration-300 uppercase tracking-widest italic">
                 <i class="fas fa-triangle-exclamation mr-3 text-lg w-6 <?php echo ($activePage ?? '') == 'violations' ? 'text-white' : 'text-rose-500'; ?>"></i>
                 Violations Log
             </a>
 
-            <a href="/views/inspectors/list.php" class="<?php echo ($activePage ?? '') == 'inspectors' ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-900/20' : 'hover:bg-white/5 hover:text-white'; ?> group flex items-center px-4 py-3.5 text-xs font-black rounded-2xl transition-all duration-300 uppercase tracking-widest italic">
+            <a href="/inspectors" class="<?php echo ($activePage ?? '') == 'inspectors' ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-900/20' : 'hover:bg-white/5 hover:text-white'; ?> group flex items-center px-4 py-3.5 text-xs font-black rounded-2xl transition-all duration-300 uppercase tracking-widest italic">
                 <i class="fas fa-user-shield mr-3 text-lg w-6 <?php echo ($activePage ?? '') == 'inspectors' ? 'text-white' : 'text-slate-400'; ?>"></i>
                 Force Personnel
             </a>
 
-            <a href="/views/integrations/hub.php" class="<?php echo ($activePage ?? '') == 'integrations' ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-900/20' : 'hover:bg-white/5 hover:text-white'; ?> group flex items-center px-4 py-3.5 text-xs font-black rounded-2xl transition-all duration-300 uppercase tracking-widest italic">
+            <a href="/integrations" class="<?php echo ($activePage ?? '') == 'integrations' ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-900/20' : 'hover:bg-white/5 hover:text-white'; ?> group flex items-center px-4 py-3.5 text-xs font-black rounded-2xl transition-all duration-300 uppercase tracking-widest italic">
                 <i class="fas fa-hubspot mr-3 text-lg w-6 <?php echo ($activePage ?? '') == 'integrations' ? 'text-white' : 'text-violet-400'; ?>"></i>
                 Cluster Hub
             </a>
@@ -70,7 +70,7 @@
                 <p class="px-4 text-[10px] font-black text-slate-600 uppercase tracking-[0.3em]">Intelligence</p>
             </div>
 
-            <a href="/views/establishments/statistics.php" class="<?php echo ($activePage ?? '') == 'statistics' ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-900/20' : 'hover:bg-white/5 hover:text-white'; ?> group flex items-center px-4 py-3.5 text-xs font-black rounded-2xl transition-all duration-300 uppercase tracking-widest italic">
+            <a href="/analytics" class="<?php echo ($activePage ?? '') == 'statistics' ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-900/40' : 'hover:bg-white/5 hover:text-white'; ?> group flex items-center px-4 py-3.5 text-xs font-black rounded-2xl transition-all duration-300 uppercase tracking-widest italic">
                 <i class="fas fa-chart-mixed mr-3 text-lg w-6 <?php echo ($activePage ?? '') == 'statistics' ? 'text-white' : 'text-cyan-400'; ?>"></i>
                 Compliance AI
             </a>
@@ -130,7 +130,7 @@
         
         localStorage.removeItem('access_token');
         localStorage.removeItem('user');
-        window.location.href = '/login.php';
+        window.location.href = '/login';
     }
 
     function updateSharedUserInfo() {
