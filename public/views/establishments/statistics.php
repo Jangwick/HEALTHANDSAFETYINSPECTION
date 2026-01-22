@@ -118,21 +118,21 @@ try {
     <title>Establishment Statistics - Health & Safety Inspection System</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
-    <style>
-        body { background-color: #f8f9fa; }
-        .card { box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-bottom: 1.5rem; }
-        .stat-card { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 1.5rem; border-radius: 10px; }
-        .stat-number { font-size: 2.5rem; font-weight: bold; margin: 0; }
-        .stat-label { font-size: 0.9rem; opacity: 0.9; }
+    <style type="text/tailwindcss">
+        @layer base {
+            html { font-size: 105%; }
+            body { @apply text-slate-200; }
+            h1, h2, h3, h4, h5, h6 { @apply font-bold tracking-tight text-white; }
+        }
+        .card { @apply bg-[#15181e] border border-white/5 rounded-2xl shadow-xl mb-6 overflow-hidden; }
+        .stat-card { @apply bg-gradient-to-br from-blue-600 to-indigo-700 p-6 rounded-2xl text-white shadow-lg; }
+        .stat-number { @apply text-3xl font-black mb-1; }
+        .stat-label { @apply text-[10px] font-black uppercase tracking-widest text-white/70; }
         .chart-container { position: relative; height: 300px; }
-        .progress-bar-custom { height: 25px; font-weight: 600; }
-        .alert-warning-custom { background-color: #fef3c7; border-left: 4px solid #f59e0b; }
     </style>
 </head>
-<body class="bg-gray-100 font-sans antialiased text-slate-900">
+<body class="bg-[#0b0c10] font-sans antialiased text-base overflow-hidden">
     <div class="flex h-screen overflow-hidden">
         <!-- Sidebar -->
         <?php 

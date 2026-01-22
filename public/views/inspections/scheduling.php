@@ -66,8 +66,15 @@ $overdueInspections = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <title>Scheduling - Health & Safety System</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style type="text/tailwindcss">
+        @layer base {
+            html { font-size: 105%; }
+            body { @apply text-slate-200; }
+            h1, h2, h3, h4, h5, h6 { @apply font-bold tracking-tight text-white; }
+        }
+    </style>
 </head>
-<body class="bg-[#0b0c10] font-sans antialiased text-slate-200 overflow-hidden">
+<body class="bg-[#0b0c10] font-sans antialiased text-base overflow-hidden">
     <div class="flex h-screen">
         <!-- Sidebar Navigation -->
         <?php 
@@ -76,7 +83,7 @@ $overdueInspections = $stmt->fetchAll(PDO::FETCH_ASSOC);
         ?>
 
         <!-- Main Content -->
-        <div class="flex-1 flex flex-col min-w-0">
+        <div class="flex-1 flex flex-col min-w-0 overflow-hidden">
             <!-- Top Navbar -->
             <header class="bg-[#0f1115] border-b border-white/5 h-20 flex items-center justify-between px-8 shrink-0">
                 <div class="flex flex-col">
@@ -136,9 +143,9 @@ $overdueInspections = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <div class="grid grid-cols-1 gap-8">
                     <!-- Upcoming List -->
-                    <div class="lg:col-span-2 space-y-8">
+                    <div class="space-y-8">
                         <section>
                             <div class="flex items-center justify-between mb-4">
                                 <h2 class="text-sm font-bold text-slate-400 uppercase tracking-widest flex items-center">
@@ -207,45 +214,6 @@ $overdueInspections = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                 <?php endif; ?>
                             </div>
                         </section>
-                    </div>
-
-                    <!-- Side Panel: Overdue -->
-                    <div class="space-y-8">
-                        <section>
-                            <h2 class="text-sm font-bold text-slate-400 uppercase tracking-widest flex items-center mb-4">
-                                <i class="fas fa-exclamation-circle mr-2 text-rose-500"></i>
-                                Overdue
-                            </h2>
-                            <div class="space-y-3">
-                                <?php if (empty($overdueInspections)): ?>
-                                    <div class="bg-[#15181e] p-6 rounded-2xl border border-white/5 text-center text-slate-500 italic text-sm">Great! No overdue tasks.</div>
-                                <?php else: ?>
-                                    <?php foreach (array_slice($overdueInspections, 0, 5) as $insp): ?>
-                                        <div class="bg-[#15181e] p-4 rounded-2xl border-l-4 border-l-rose-500 border-white/5 shadow-lg group hover:bg-[#1a1d24] transition-all relative overflow-hidden">
-                                            <div class="flex justify-between items-start mb-2">
-                                                <span class="text-[10px] font-black text-rose-500 uppercase"><?= date('M d', strtotime($insp['scheduled_date'])) ?></span>
-                                                <span class="text-[10px] px-1.5 py-0.5 rounded bg-rose-500/10 text-rose-500 font-bold uppercase">LATE</span>
-                                            </div>
-                                            <h3 class="font-bold text-white group-hover:text-rose-400 transition-colors truncate"><?= htmlspecialchars($insp['establishment_name']) ?></h3>
-                                            <p class="text-xs text-slate-500 mb-3"><?= ucwords(str_replace('_', ' ', $insp['inspection_type'])) ?></p>
-                                            <div class="flex items-center justify-between">
-                                                <div class="text-[10px] text-slate-400">Assignee: <?= htmlspecialchars($insp['inspector_name'] ?: 'None') ?></div>
-                                                <a href="/inspections/view?id=<?= $insp['inspection_id'] ?>" class="text-[10px] font-bold text-blue-400 hover:underline">Re-schedule</a>
-                                            </div>
-                                        </div>
-                                    <?php endforeach; ?>
-                                <?php endif; ?>
-                            </div>
-                        </section>
-
-                        <div class="bg-gradient-to-br from-[#1a1c22] to-[#0f1115] border border-white/5 rounded-2xl p-6 shadow-xl relative overflow-hidden group">
-                            <div class="absolute -right-12 -bottom-12 w-40 h-40 bg-blue-500/5 rounded-full blur-3xl group-hover:scale-110 transition-transform"></div>
-                            <h3 class="text-lg font-black text-white mb-2">Smart Assist</h3>
-                            <p class="text-slate-500 text-xs mb-4 leading-relaxed tracking-safe">Need to optimize routes or automate scheduling based on risk? Launch our intelligence module.</p>
-                            <button class="w-full py-3 bg-[#1e2229] hover:bg-[#252a33] text-blue-400 border border-white/5 rounded-xl text-xs font-black uppercase tracking-widest shadow-lg transition-all active:scale-95 flex items-center justify-center">
-                                <i class="fas fa-bolt mr-2 text-amber-400"></i> Optimize Schedule
-                            </button>
-                        </div>
                     </div>
                 </div>
             </main>

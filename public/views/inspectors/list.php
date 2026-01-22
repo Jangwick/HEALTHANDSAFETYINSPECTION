@@ -31,8 +31,15 @@ $inspectors = $inspectorService->listInspectors(1, 50)['data'];
     <title>Inspector Profiles - LGU 4 Public Safety</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style type="text/tailwindcss">
+        @layer base {
+            html { font-size: 105%; }
+            body { @apply text-slate-200; }
+            h1, h2, h3, h4, h5, h6 { @apply font-bold tracking-tight text-white; }
+        }
+    </style>
 </head>
-<body class="bg-slate-50 font-sans antialiased text-slate-900 overflow-hidden">
+<body class="bg-[#0b0c10] font-sans antialiased text-base overflow-hidden">
     <div class="flex h-screen">
         <!-- Sidebar Navigation -->
         <?php 

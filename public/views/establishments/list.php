@@ -111,11 +111,12 @@ try {
     <style type="text/tailwindcss">
         @layer base {
             html { font-size: 105%; }
-            body { @apply text-white font-medium; }
+            body { @apply text-slate-200; }
+            h1, h2, h3, h4, h5, h6 { @apply font-bold tracking-tight text-white; }
         }
     </style>
 </head>
-<body class="bg-[#0b0c10] font-sans antialiased overflow-hidden text-lg">
+<body class="bg-[#0b0c10] font-sans antialiased text-base overflow-hidden">
     <div class="flex h-screen">
         <!-- Sidebar Navigation -->
         <?php 
